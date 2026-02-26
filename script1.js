@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentLoanData = []; // Store processed loan data globally
 
     // --- Bank Logo Mapping (Placeholder Images) ---
-    const bankLogos = { "IDFC BANK": "images/idfc.png", "SBI BANK": "images/sbi.png", "ICICI BANK": "images/icicibank.png", "KOTAK BANK": "images/kotakbank.png", "DMI FINANCE": "images/dmifinance.png", "AXIS BANK": "images/axisbank.png", "RBL BANK": "images/rblbank.png", "CREDIT SAISON": "images/creditsaison.png", "INDUSIND BANK": "images/IndusindBank.png" };
+    const bankLogos = { "IDFC BANK": "images/idfc.png", "SBI BANK": "images/sbi.png", "ICICI BANK": "images/icicibank.png", "KOTAK BANK": "images/kotakbank.png", "DMI FINANCE": "images/dmifinance.png", "AXIS BANK": "images/axisbank.png", "RBL BANK": "images/rblbank.png", "CREDIT SAISON": "images/creditsaison.png", "INDUSIND BANK": "images/indusindbank.png" };
 
 
     const BANK_FORECLOSURE_RULES = {
