@@ -1,0 +1,2585 @@
+:root {
+    --bank-bg: #f5f7fb;
+    --bank-card: #ffffff;
+    --bank-border: #e1e5eb;
+    --bank-primary: #1f3a5f;
+    --bank-secondary: #3b82f6;
+    --bank-success: #16a34a;
+    --bank-danger: #dc2626;
+    --bank-text: #1e293b;
+    --bank-muted: #64748b;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
+
+/* --- Base Styles --- */
+body {
+    margin: 0;
+    background: var(--bank-bg);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--bank-text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    line-height: 1.6;
+}
+
+/* --- Header --- */
+header {
+    background: linear-gradient(90deg, #1f3a5f, #3b82f6);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .15);
+    color: white;
+    padding: 1.2em 0;
+    text-align: center;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #1e7e34;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.2em;
+    letter-spacing: 0.5px;
+}
+
+/* --- Page and Dashboard Containers --- */
+.page-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.loan-details-card {
+    background: var(--bank-card);
+    border: 1px solid var(--bank-border);
+    border-radius: 16px;
+    padding: 16px 18px 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .06);
+}
+
+
+.loan-details-card h2 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: var(--bank-primary);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+
+.loan-details-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+/* Right content column */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.sidebar,
+.main-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.summary-section,
+.loan-details-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+
+.dashboard-container {
+    grid-template-columns: 360px 1fr;
+    gap: 24px;
+    align-items: stretch;
+    background: transparent;
+    padding: 20px;
+    box-shadow: none;
+    border-radius: 8px;
+    display: grid;
+    width: auto;
+    display: grid;
+    align-items: start;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+    background: var(--bank-card);
+    border-right: 1px solid var(--bank-border);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--bank-border);
+    grid-column: 1 / 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    min-width: 300px;
+}
+
+
+.sidebar h2 {
+    margin-top: 0;
+    color: #1b5e20;
+    margin-bottom: 20px;
+    text-align: left;
+    font-size: 1.6em;
+    border-bottom: 2px dotted #8bc34a;
+    background-color: #f0fff0;
+    padding: 12px 15px 12px 0;
+    border-radius: 0 8px 0 0;
+}
+
+/* --- Summary Section --- */
+.summary-section {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #c8e6c9;
+}
+
+.summary-section h3 {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    color: #1e5631;
+    font-size: 1.1em;
+    font-weight: 600;
+    text-shadow: 0.5px 0.5px 0 rgba(0, 0, 0, 0.1);
+}
+
+.summary-section h3 i {
+    margin-right: 8px;
+    font-size: 0.9em;
+    color: #28a745;
+}
+
+.summary-section h3 span {
+    font-weight: 700;
+    color: #28a745;
+    margin-left: auto;
+    font-size: 1.1em;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+/* --- Overall Progress Section --- */
+
+
+.overall-progress-section h3 i {
+    margin-right: 5px;
+    font-size: 0.9em;
+    color: #28a745;
+}
+
+.overall-progress-bar-container {
+    background-color: #d0e8d0;
+    border-radius: 6px;
+    height: 20px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 8px;
+    margin-bottom: 6px;
+}
+
+.overall-progress-bar {
+    background: linear-gradient(90deg, #1f3a5f, #3b82f6);
+    height: 100%;
+    border-radius: 6px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    color: white;
+    font-size: 0.85em;
+    font-weight: bold;
+
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    width: 0%;
+    transition: width 0.8s ease-out;
+}
+
+.overall-progress-percentage {
+    margin-left: auto;
+    margin-right: 8px;
+}
+
+.overall-progress-amounts {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 0.75em;
+    color: #388e3c;
+    margin-top: 4px;
+}
+
+.overall-progress-raised,
+.overall-progress-total {
+    text-align: left;
+}
+
+
+
+/* --- Main Content --- */
+.main-content {
+    grid-column: 2 / 3;
+    padding-left: 20px;
+    padding-top: 10px;
+}
+
+.main-content h2 i {
+    margin-right: 8px;
+    font-size: 0.9em;
+    color: #28a745;
+    transition: transform 0.3s ease-in-out;
+}
+
+.main-content h2:hover i {
+    transform: rotate(10deg);
+}
+
+.main-content h2 {
+    margin-top: 0;
+    color: #1b5e20;
+    margin-bottom: 20px;
+    text-align: left;
+    font-size: 1.6em;
+    border-bottom: 2px dotted #8bc34a;
+    background-color: #f0fff0;
+    padding: 12px 15px 12px 0;
+    border-radius: 0 8px 0 0;
+    padding-bottom: 12px;
+}
+
+/* --- Debt Container (Table) --- */
+.debt-container {
+    background: var(--bank-card);
+    border: 1px solid var(--bank-border);
+    overflow-x: auto;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.1);
+    min-width: 960px;
+    /* Keep min-width for table readability on smaller screens */
+}
+
+.debt-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.debt-container th,
+.debt-container td {
+    border: 1px solid #c8e6c9;
+    padding: 10px;
+    text-align: left;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+.debt-container th {
+    background: #f8fafc;
+    color: #334155;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.debt-container tbody tr:hover {
+    background-color: #e0f7e0;
+    cursor: pointer;
+}
+
+th.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+th.sortable:hover {
+    background-color: #f0f0f0;
+}
+
+.debt-container th:nth-child(3) {
+    white-space: nowrap;
+}
+
+/* --- Loan Status Colors in Table --- */
+.debt-container tbody tr.today-emi {
+    background-color: #e0f2f7;
+    /* Light blue for today's EMI */
+    border-left: 5px solid #2196f3;
+    /* Blue border */
+}
+
+.debt-container tbody tr.future-emi {
+    background-color: #fde0e0;
+    /* Light red for future EMI */
+    border-left: 5px solid #f44336;
+    /* Red border */
+}
+
+.debt-container tbody tr.past-emi {
+    background-color: #e6ffe6;
+    /* Light green for past EMI */
+    border-left: 5px solid #4caf50;
+    /* Green border */
+}
+
+
+/* --- Loan Boxes Container (Individual Loan Details) --- */
+.loan-boxes-container {
+    font-family: 'Space Grotesk', sans-serif;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(calc(33% - 20px), 1fr));
+    gap: 20px;
+    margin-top: 20px;
+    grid-column: 1 / 3;
+}
+
+.loan-box {
+    background: var(--bank-card);
+    border: 1px solid var(--bank-border);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .04);
+    padding: 15px;
+    border-radius: 12px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    position: relative;
+    /* Added for bank logo positioning */
+}
+
+.loan-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(40, 167, 69, 0.15);
+    border-color: #008080;
+    background-color: #e6ffe6;
+}
+
+.loan-box .bank-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #2c4b2c;
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.loan-box p {
+    color: #3e6040;
+    margin-bottom: 6px;
+    font-size: 0.85em;
+}
+
+/* New style for EMI amount to make it bigger and bolder */
+.loan-box p:nth-of-type(2) {
+    /* This targets the second <p> tag which contains EMI */
+    font-size: 1.2em;
+    /* Make it bigger */
+    font-weight: 700;
+    /* Make it bolder */
+    color: #1a5a2a;
+    /* A darker green for better readability */
+    margin-bottom: 10px;
+    /* Add some space below */
+}
+
+.loan-progress-bar-container {
+    background-color: #e0f2e0;
+    border-radius: 8px;
+    height: 16px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.loan-progress-bar {
+    background: linear-gradient(90deg, #1f3a5f, #3b82f6);
+    height: 100%;
+    width: 0%;
+    border-radius: 8px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 0.8em;
+    transition: width 0.6s ease-out;
+}
+
+.loan-progress-text {
+    position: absolute;
+    top: 50%;
+    left: 8px;
+    transform: translateY(-50%);
+    color: white;
+    font-size: 0.8em;
+}
+
+.loan-box .remaining-tenure-display {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.8em;
+    color: #6c8c6f;
+}
+
+/* Updated: Bank Logo in Loan Box to be a consistent size */
+.loan-box .bank-logo {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 60px;
+    /* Fixed width */
+    height: 60px;
+    /* Fixed height */
+    object-fit: contain;
+    /* Ensures the image fits within the box without distortion */
+    background-color: #ffffff;
+    /* Add a background to ensure consistent box size */
+    padding: 5px;
+    /* Add some padding around the logo */
+    border-radius: 8px;
+    /* Slightly more rounded corners for the logo box */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Principal and Interest Breakdown Progress Bar */
+.loan-breakdown-progress-container {
+    display: flex;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    height: 28px;
+}
+
+.principal-progress {
+    background-color: #5cb85c;
+    color: white;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100%;
+    font-size: 0.90em;
+    position: relative;
+    padding-left: 10px;
+    border-radius: 5px 0 0 5px;
+}
+
+.interest-progress {
+    background-color: #a72845;
+    color: white;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 100%;
+    font-size: 0.90em;
+    position: relative;
+    padding-right: 10px;
+    border-radius: 0 5px 5px 0;
+}
+
+.progress-label {
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.progress-value {
+    font-weight: bold;
+    font-size: 0.90em;
+}
+
+.interest-progress .progress-value {
+    margin-left: 5px;
+}
+
+.principal-progress .progress-value {
+    margin-left: 5px;
+}
+
+/* Principal and Interest Amounts Below the Bar */
+.principal-interest-amounts {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85em;
+    color: #78909c;
+}
+
+.principal-amount-display {
+    font-weight: 400;
+    text-align: left;
+}
+
+.interest-amount-display {
+    font-weight: 400;
+    text-align: right;
+}
+
+/* --- Loan Progress Chart Container --- */
+.loan-progress-chart-container {
+    background: var(--bank-card);
+    border: 1px solid var(--bank-border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    margin-top: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .06);
+    transition: all 0.25s ease;
+
+}
+
+.loan-progress-chart-container h2 {
+    background: transparent;
+    padding: 0;
+    border: none;
+    color: var(--bank-primary);
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    line-height: 1.8;
+    text-align: center;
+
+}
+
+.loan-progress-chart-container:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.10);
+
+    border-color: #28a745;
+    background: linear-gradient(135deg, #e6ffe6, #d4f8d4);
+}
+
+#loanChart {
+    background: transparent;
+    width: 100% !important;
+    height: auto !important;
+}
+
+.loan-progress-chart-container h2 i {
+    margin-right: 8px;
+    color: #28a745;
+    font-size: 1.1em;
+    transition: transform 0.3s ease-in-out;
+}
+
+
+/* --- Loan Breakdown Chart Container (Donut Chart) --- */
+.loan-breakdown-chart-container {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    text-align: center;
+}
+
+.loan-breakdown-chart-container h2 {
+    font-size: 1.2em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+#loanBreakdownChart {
+    width: 100% !important;
+    max-width: 300px;
+    height: 190px !important;
+    margin: 10px auto;
+}
+
+/* --- Top Loans Section --- */
+.top-loans-section {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #effaf1;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #d3edd4;
+}
+
+.top-loans-section h3 {
+    /* Changed from h2 to h3 to match HTML */
+    margin-bottom: 15px;
+    font-size: 1.2em;
+    line-height: 1.8;
+    color: #2f4f2f;
+    text-align: center;
+}
+
+.top-loans-section h3 i {
+    /* Changed from h2 to h3 to match HTML */
+    margin-right: 8px;
+    color: #28a745;
+    font-size: 1.1em;
+    transition: transform 0.3s ease-in-out;
+}
+
+.top-loans-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(40, 167, 69, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    background-color: #e6ffe6;
+}
+
+#top-loans-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #444;
+    line-height: 1.6;
+}
+
+/* Enhanced styles for top 3 loans finishing soon */
+#top-loans-list li {
+    background: linear-gradient(135deg, #f0f9f0, #e6ffe6);
+    padding: 12px 18px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    transition: all 0.3s ease-in-out;
+    border: 1px solid #c8e6c9;
+    position: relative;
+    overflow: hidden;
+    font-size: 1em;
+    /* Increased font size */
+    font-weight: 600;
+    /* Made text bolder */
+    color: #333;
+    /* Darker text color */
+}
+
+#top-loans-list li:last-child {
+    margin-bottom: 0;
+}
+
+#top-loans-list li::before {
+    content: '\f005';
+    /* Font Awesome star icon */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.5em;
+    color: #ffc107;
+    /* Gold color for star */
+    opacity: 0.7;
+    transition: transform 0.3s ease-in-out;
+}
+
+#top-loans-list li:hover::before {
+    transform: scale(1.2) rotate(10deg);
+    opacity: 1;
+}
+
+#top-loans-list li:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border-color: #28a745;
+    background: linear-gradient(135deg, #e6ffe6, #d4f8d4);
+}
+
+/* Specific styling for the actual text inside the list item */
+#top-loans-list li span {
+    font-weight: 700;
+    /* Ensure values are bold */
+    color: #1e843b;
+    /* Stronger green for important numbers */
+}
+
+
+/* --- Credit Card Simple Table --- */
+#credit-card-simple-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+}
+
+#credit-card-simple-table th,
+#credit-card-simple-table td {
+    padding: 8px 0;
+    text-align: left;
+    font-size: 13px;
+    color: #555;
+}
+
+#credit-card-simple-table th {
+    font-weight: bold;
+    padding-bottom: 6px;
+    color: #444;
+}
+
+#credit-card-simple-table thead th {
+    border-bottom: 1px solid #d0e5d0;
+    padding-bottom: 8px;
+}
+
+#credit-card-simple-table tbody tr {
+    border-bottom: 1px dotted #e0e8e3;
+}
+
+#credit-card-simple-table tbody tr:nth-child(even) {
+    background-color: #f9fbfb;
+}
+
+#credit-card-simple-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+#credit-card-simple-table td:nth-child(3),
+#credit-card-simple-table th:nth-child(3) {
+    text-align: center;
+}
+
+/* New: Days to Due styling for Credit Card Table */
+#credit-card-simple-table .days-to-due {
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+#credit-card-simple-table .days-to-due.due-today {
+    background-color: #2196f3;
+    /* Blue */
+    color: white;
+}
+
+#credit-card-simple-table .days-to-due.due-future {
+    background-color: #ffc107;
+    /* Orange */
+    color: #333;
+}
+
+#credit-card-simple-table .days-to-due.overdue {
+    background-color: #dc3545;
+    /* Red */
+    color: white;
+}
+
+
+/* --- Auto Debit Loans Section --- */
+#auto-debit-loans-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 8px;
+}
+
+#auto-debit-loans-list li {
+    background-color: #fff;
+    padding: 8px;
+    margin-bottom: 6px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+#auto-debit-loans-list li .loan-details {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 2px;
+}
+
+#auto-debit-loans-list li .loan-details .bank-emi-group {
+    flex-grow: 1;
+}
+
+#auto-debit-loans-list li .loan-details .bank-emi {
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #37474f;
+    display: inline-block;
+    margin-right: 3px;
+}
+
+#auto-debit-loans-list li .loan-details .due-date {
+    font-size: 0.8em;
+    color: #78909c;
+    flex-shrink: 0;
+    text-align: right;
+    margin-left: auto;
+}
+
+#auto-debit-loans-list li .total-amount {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #2e7d32;
+    text-align: right;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* --- EMI Forecast Section --- */
+.emi-forecast-section {
+    margin-top: 25px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    text-align: left;
+}
+
+.emi-forecast-section h3 {
+    color: #333;
+    font-size: 1.4em;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.yearly-forecast-item {
+    margin-bottom: 15px;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+}
+
+.yearly-forecast-item h3 {
+    margin: 0;
+    font-size: 1.1em;
+    color: #555;
+}
+
+.yearly-forecast-item p {
+    margin: 0;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.yearly-forecast-item .additional-info {
+    font-size: 0.8em;
+    /* Smaller font for additional info */
+    color: #666;
+    margin-left: 10px;
+    font-weight: normal;
+    /* Override bold from parent p */
+}
+
+/* Styling for the current year item */
+.current-year {
+    font-family: 'Space Grotesk', sans-serif;
+    background-color: #e6f7e6;
+    border-color: #c3e6cb;
+}
+
+.current-year h3 {
+    color: #27ae60;
+}
+
+.current-year p {
+    color: #27ae60;
+}
+
+/* Styling for past year items */
+.past-year {
+    background-color: #f0f0f0;
+    /* Light gray for past years */
+    border-color: #d0d0d0;
+}
+
+.past-year h3 {
+    color: #777;
+    /* Darker gray for past year label */
+}
+
+.past-year p {
+    color: #555;
+    /* Medium gray for past year amount */
+}
+
+
+/* Styling for future year items */
+.future-year p {
+    color: #37474f;
+}
+
+/* Subtle hover effect on forecast items */
+.yearly-forecast-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03);
+    transform: translateY(-1px);
+    transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+/* --- Credit Cards Section --- */
+#credit-cards-section {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bank-card);
+    border: 1px solid var(--bank-border);
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
+    grid-column: 1 / -1;
+    width: 100%;
+    display: block;
+    justify-content: center;
+
+    max-width: 1400px;
+    margin: 30px auto;
+    max-width: 1400px;
+    margin-left: auto;
+
+
+
+    box-sizing: border-box;
+}
+
+#credit-cards-section h2 {
+    background: transparent;
+    padding: 0;
+    border: none;
+    color: var(--bank-primary);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+
+
+#credit-cards-section>div {
+    width: 100%;
+    max-width: 1200px;
+}
+
+/* --- Credit Cards Overview Section --- */
+.credit-cards-overview {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding: 25px;
+    /* Increased padding */
+    background: linear-gradient(135deg, #e0f2f7 0%, #c8e6f0 100%);
+    /* Lighter blue gradient */
+    border: 1px solid #a7d9eb;
+    /* More distinct border */
+    border-radius: 12px;
+    /* More rounded corners */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    /* Stronger shadow */
+    transition: all 0.3s ease-in-out;
+}
+
+.credit-cards-overview:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.overview-item {
+    text-align: center;
+    flex: 1;
+    min-width: 150px;
+    padding: 15px;
+    /* Increased padding */
+    background-color: rgba(255, 255, 255, 0.7);
+    /* Slightly transparent white background */
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.overview-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.overview-item h3 {
+    font-size: 1.1em;
+    /* Slightly larger font */
+    color: #334e68;
+    /* Darker, more professional color */
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.overview-value {
+    font-size: 2.2em;
+    /* Larger font for values */
+    font-weight: 800;
+    /* Bolder values */
+    color: #2c3e50;
+    margin: 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.overview-value.outstanding-total {
+    color: #e74c3c;
+    /* Brighter red for outstanding */
+}
+
+
+/* --- Credit Card Box Styles --- */
+.credit-card-box {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    border: 1px solid #dbe4f0;
+    border-radius: 20px;
+    padding: 26px 24px;
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    position: relative;
+    transition: all 0.25s ease;
+    width: 100%;
+    min-width: 0;
+}
+
+.credit-card-box:hover {
+    transform: translateY(-6px);
+    box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    border-color: #3b82f6;
+}
+
+
+.credit-card-box::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6);
+    pointer-events: none;
+}
+
+.credit-card-box h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f3a5f;
+    letter-spacing: .3px;
+}
+
+.credit-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.credit-bank-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    background: white;
+    padding: 6px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+}
+
+
+
+.credit-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.credit-row span:first-child {
+    color: #64748b;
+    font-weight: 500;
+}
+
+.credit-row span:last-child {
+    font-weight: 700;
+    color: #1e293b;
+}
+
+
+.credit-card-box,
+.credit-card-box * {
+    opacity: 1 !important;
+    color: var(--bank-text);
+}
+
+.credit-card-box .label {
+    color: var(--bank-muted);
+    font-weight: 500;
+}
+
+.credit-card-box .value {
+    font-weight: 700;
+    color: var(--bank-primary);
+}
+
+.credit-card-box .cycle,
+.credit-card-box .due {
+    color: #64748b;
+    opacity: 1;
+}
+
+.credit-card-box p,
+.credit-card-box span,
+.credit-card-box div,
+.credit-card-box small {
+    opacity: 1 !important;
+}
+
+.credit-card-box p {
+    color: #475569 !important;
+    /* slate gray */
+    font-weight: 500;
+}
+
+.credit-progress {
+    height: 10px;
+    background: #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 14px 0 8px;
+}
+
+.credit-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    border-radius: 10px;
+}
+
+.credit-used {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.credit-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 600;
+}
+
+
+
+@keyframes pulseLight {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(1.15);
+        /* More pronounced scaling */
+        opacity: 0.7;
+    }
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    /* Increased margin */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    /* Stronger separator */
+    padding-bottom: 20px;
+    /* Increased padding */
+    position: relative;
+    z-index: 1;
+}
+
+.card-name {
+    color: var(--bank-primary);
+    font-weight: 700;
+}
+
+
+.rewards-program {
+    background-color: rgba(255, 255, 255, 0.3);
+    /* More transparent */
+    color: #e6ffb3;
+    padding: 8px 15px;
+    /* Increased padding */
+    border-radius: 30px;
+    /* More rounded */
+    font-size: 0.8em;
+    /* Slightly larger */
+    font-weight: bold;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    /* Stronger border */
+}
+
+.card-limits p {
+    font-size: 1.1em;
+    /* Slightly larger */
+    margin: 12px 0;
+    /* Increased margin */
+    color: #e8e8e8;
+    /* Lighter grey */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.limit-value {
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 0.5px 0.5px 2px rgba(0, 0, 0, 0.4);
+    /* Stronger text shadow */
+}
+
+/* Credit card amount colors */
+.credit-card-box .credit-available {
+    color: #16a34a !important;
+    /* Green */
+    font-weight: 700;
+}
+
+.credit-card-box .credit-outstanding {
+    color: #dc2626 !important;
+    /* Red */
+    font-weight: 700;
+}
+
+/* In case values are inside spans without class */
+.credit-card-box .available {
+    color: #16a34a !important;
+    font-weight: 700;
+}
+
+.credit-card-box .outstanding,
+.credit-card-box .outstanding-amount {
+    color: #dc2626 !important;
+    font-weight: 700;
+}
+
+
+.total-outstanding {
+    font-size: 1.6em;
+    /* Larger font */
+    font-weight: 800;
+    color: #ff6b6b;
+    /* Brighter red */
+    margin: 25px 0 20px;
+    /* Increased margin */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    /* Increased padding */
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    /* Stronger separator */
+    position: relative;
+    z-index: 1;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+    /* Stronger text shadow */
+}
+
+.usage-progress {
+    margin-top: 35px;
+    /* Increased margin */
+    margin-bottom: 30px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 12px;
+    /* Thicker progress bar */
+    margin-bottom: 10px;
+    /* Increased margin */
+    background: #e5e7eb;
+    border-radius: 10px;
+    height: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #1f3a5f);
+    border-radius: 10px;
+    background-size: 250% 100%;
+    /* Wider gradient for more animation effect */
+    animation: gradientShift 6s ease-in-out infinite alternate;
+    /* Slower animation */
+    transition: width 0.6s ease-in-out;
+    /* Slower transition */
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 100% 50%;
+    }
+}
+
+.usage-percentage {
+    font-size: 1em;
+    /* Slightly larger */
+    font-weight: 600;
+    color: #e0e0e0;
+    text-shadow: 0.5px 0.5px 2px rgba(0, 0, 0, 0.3);
+    /* Stronger text shadow */
+}
+
+.card-cycle-info {
+    margin-top: 30px;
+    /* Increased margin */
+    padding-top: 20px;
+    /* Increased padding */
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    /* Stronger separator */
+    font-size: 1em;
+    /* Slightly larger */
+    color: #d0d0d0;
+    /* Lighter grey */
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+    font-weight: 500;
+}
+
+.card-cycle-info span {
+    white-space: nowrap;
+}
+
+.no-credit-cards-message {
+    font-style: italic;
+    color: #666;
+    text-align: center;
+    padding: 20px;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: 5px;
+    margin: 20px auto;
+    width: fit-content;
+}
+
+.credit-card-chip {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    width: 40px;
+    height: 30px;
+    background: linear-gradient(135deg, #bbb 0%, #888 100%);
+    border-radius: 5px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card-logo {
+    position: absolute;
+    bottom: 25px;
+    right: 30px;
+    font-family: 'Arial Black', sans-serif;
+    font-size: 1.8em;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.7);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    letter-spacing: -1px;
+    z-index: 2;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 1000px) {
+    .dashboard-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .sidebar {
+        border-right: none;
+        padding-right: 0;
+        margin-bottom: 20px;
+    }
+
+    .main-content {
+        padding-left: 0;
+    }
+
+    .loan-boxes-container {
+        grid-template-columns: repeat(auto-fit, minmax(calc(50% - 15px), 1fr));
+        gap: 15px;
+    }
+}
+
+@media (max-width: 700px) {
+    .loan-boxes-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .credit-cards-overview {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .credit-cards-grid {
+        padding: 10px;
+        /* Adjust padding for smaller screens */
+    }
+
+    .credit-card-box {
+        padding: 20px 25px;
+        /* Adjust padding for smaller screens */
+    }
+}
+
+/* --- Other Elements (Logos, etc.) --- */
+.credit-card-box .card-network-logo {
+    max-height: 30px;
+    opacity: 0.8;
+}
+
+.credit-card-box .card-header .card-logo {
+    max-height: 25px;
+    max-width: 80px;
+    opacity: 0.9;
+}
+
+/* Next EMI Due Date styling (already existing) */
+.loan-box .next-emi-date {
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #4CAF50;
+    /* Green color for emphasis */
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.loan-box .next-emi-date span {
+    font-weight: 700;
+    color: #2e7d32;
+    /* Darker green */
+}
+
+/* New: Due Countdown styling */
+.loan-box .due-countdown {
+    font-size: 1em;
+    font-weight: 700;
+    margin-top: 10px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-align: center;
+    color: white;
+    /* Default text color for countdown */
+}
+
+.loan-box .due-countdown.due-today {
+    background-color: #2196f3;
+    /* Blue for due today */
+    box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3);
+}
+
+.loan-box .due-countdown.due-future {
+    background-color: #ff9800;
+    /* Orange for future due date */
+    box-shadow: 0 2px 5px rgba(255, 152, 0, 0.3);
+}
+
+.loan-box .due-countdown.paid {
+    /* Changed from .overdue to .paid */
+    background-color: #4CAF50;
+    /* Green for paid */
+    box-shadow: 0 2px 5px rgba(76, 175, 80, 0.3);
+}
+
+.loan-box .due-countdown.completed {
+    background-color: #4CAF50;
+    /* Green for completed */
+    box-shadow: 0 2px 5px rgba(76, 175, 80, 0.3);
+}
+
+/* New styles for Debt by Bank Section */
+.debt-by-bank-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e0e0e0;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.debt-by-bank-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(180, 137, 137, 0.1);
+}
+
+
+
+.debt-by-bank-item .bank-name-display {
+    font-weight: 600;
+    color: #333;
+    flex-grow: 1;
+    text-align: left;
+}
+
+.debt-by-bank-item .bank-debt-amount {
+    font-weight: 700;
+    color: #dc3545;
+    /* Red color for debt amount */
+    font-size: 1.1em;
+}
+
+
+.credit-cards-outer {
+    background: white;
+    border-radius: 16px;
+    padding: 22px 24px 28px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e6edf5;
+    width: 100%;
+}
+
+#credit-cards-overview {
+    background: linear-gradient(180deg, #e6f7ff, #d6f0fa);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 28px;
+}
+
+
+.credit-summary-box {
+
+    background: linear-gradient(180deg, #ffffff, #f8fbff);
+    border: 1px solid var(--bank-border);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .06);
+    transition: all 0.25s ease;
+}
+
+.credit-summary-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, .12);
+}
+
+
+.credit-summary-box h3 {
+    color: var(--bank-muted);
+    font-size: 13px;
+}
+
+.credit-summary-box h2 {
+    color: var(--bank-primary);
+    font-size: 26px;
+}
+
+#totalOutstanding {
+    color: var(--bank-danger);
+}
+
+#credit-cards-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px !important;
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: stretch;
+}
+
+.credit-card-box {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+
+.credit-card-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 35px rgba(0, 0, 0, .12);
+    border-color: var(--bank-secondary);
+}
+
+
+.credit-card-box .card-name {
+    font-size: 1.1em;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.credit-card-box>* {
+    margin-bottom: 10px;
+}
+
+.credit-card-box h3 {
+    min-height: 44px;
+    /* forces titles to align */
+}
+
+.credit-card-box .card-limits p {
+    margin: 4px 0;
+    font-size: 0.9em;
+}
+
+.usage-progress {
+    margin-top: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.6s ease-in-out;
+}
+
+.usage-percentage {
+    font-size: 0.8em;
+    color: #666;
+}
+
+/* --- New Foreclosure Button in Loan Boxes --- */
+.foreclose-button {
+    background-color: #007bff;
+    /* Nice Primary Blue */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    width: 100%;
+    margin-top: 15px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    font-weight: 700;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.foreclose-button:hover {
+    background-color: #0056b3;
+    /* Darker Blue on hover */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+
+/* --- Modal Styles (Foreclosure Calculator) --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-content h2 {
+    color: #28a745;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* Foreclosure Details Section */
+#foreclosureLoanDetails {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #f0f0f0;
+    border-radius: 6px;
+    background-color: #fff;
+}
+
+#foreclosureLoanDetails p,
+#foreclosureLoanDetails h3 {
+    margin: 5px 0;
+}
+
+#foreclosureLoanDetails h3 {
+    color: #333;
+    font-size: 1.2em;
+}
+
+#foreclosureLoanDetails span {
+    font-weight: 600;
+    color: #000;
+}
+
+/* Foreclosure Input Section */
+#foreclosureInputs {
+    padding: 15px;
+    background-color: #fcfcfc;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+#foreclosureInputs label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #555;
+    font-size: 0.9em;
+}
+
+#foreclosureInputs input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+#foreclosureInputs button {
+    background-color: #28a745;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-top: 20px;
+    width: 100%;
+    transition: background-color 0.2s;
+}
+
+#foreclosureInputs button:hover {
+    background-color: #1e7e34;
+}
+
+#foreclosureInputs .warning-message {
+    color: #dc3545;
+    font-weight: 600;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #dc3545;
+    background-color: #fef5f5;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+/* Additional style for the remaining principal and pending amount displays */
+#foreclosureInputs p {
+    font-weight: 500;
+    margin: 5px 0;
+    font-size: 1em;
+}
+
+#foreclosureInputs p span {
+    font-weight: 700;
+    color: #333;
+}
+
+
+/* Style for the new CLOSE button */
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.close-button:hover {
+    background: #c0392b;
+}
+
+/* --- UPDATED FORECLOSURE RESULTS SECTION (New UI Design) --- */
+
+/* Ensures the Calculation Summary section looks clean */
+#foreclosureResults {
+    /* Resets the inline style used in the HTML */
+    display: block !important;
+    margin-top: 25px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f7f7f7;
+}
+
+/* 1. PRIMARY RESULTS (The "Big Numbers") */
+
+.summary-heading {
+    font-size: 1.5em;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    font-weight: 700;
+}
+
+.summary-primary {
+    display: flex;
+    /* Puts cost and savings side-by-side */
+    justify-content: space-around;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.summary-box {
+    flex: 1;
+    /* Each box takes equal space */
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    /* Subtle lift effect */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.summary-box label {
+    font-size: 0.95em;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.summary-box h3 {
+    font-size: 2.2em;
+    /* Makes the numbers very large */
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Styling for the COST (Red/Danger) */
+.summary-cost {
+    background-color: #fff4f4;
+    border: 1px solid #ffc9c9;
+}
+
+.summary-cost label {
+    color: #c0392b;
+    /* Dark red label */
+}
+
+#totalForeclosureAmountDisplay {
+    color: #e74c3c;
+    /* Bright red number */
+}
+
+/* Styling for the BENEFIT (Green/Success) */
+.summary-savings {
+    background-color: #f3fef3;
+    border: 1px solid #bceabf;
+}
+
+.summary-savings label {
+    color: #27ae60;
+    /* Dark green label */
+}
+
+#totalSavingsDisplay {
+    color: #2ecc71;
+    /* Bright green number */
+}
+
+
+/* 2. SECONDARY DETAILS (The "Breakdown") */
+
+.summary-divider {
+    border: 0;
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 25px 0;
+}
+
+.summary-details {
+    padding: 0 10px;
+    /* Internal padding for the list of details */
+}
+
+.summary-details p {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+    color: #555;
+    margin: 0;
+    /* Reset margins */
+    padding: 10px 0;
+    border-bottom: 1px dotted #e0e0e0;
+    /* Subtle line between items */
+}
+
+.summary-details p:last-child {
+    border-bottom: none;
+    /* No line after the last item */
+}
+
+.summary-details p span {
+    /* The label (e.g., "GST Amount") */
+    color: #333;
+}
+
+.summary-details p strong {
+    /* The value (e.g., "₹ 208") */
+    font-weight: 600;
+    color: #000;
+}
+
+/* Highlighted line for Total Charges */
+.total-charges-line {
+    font-weight: bold;
+    color: #d35400 !important;
+    /* Orange/Brown for emphasis */
+    margin-top: 10px !important;
+    border-top: 1px solid #ccc !important;
+    padding-top: 10px !important;
+}
+
+.total-charges-line strong {
+    color: #d35400 !important;
+    font-size: 1.1em;
+}
+
+/* Highlighted line for Interest Saved */
+.interest-line {
+    font-weight: bold;
+    color: #16a085 !important;
+    /* Teal for emphasis */
+    margin-top: 10px !important;
+    border-top: 1px solid #ccc !important;
+    padding-top: 10px !important;
+}
+
+.interest-line strong {
+    color: #16a085 !important;
+    font-size: 1.1em;
+}
+
+
+/* Style for the new CLOSE button */
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #dc3545;
+    /* Red color */
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    /* Ensure it is on top of other elements */
+    transition: background-color 0.3s;
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+
+}
+
+.close-button:hover {
+    background-color: #c82333;
+}
+
+.bank-debt-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.bank-debt-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 120px;
+    align-items: center;
+    background: var(--bank-card);
+    border: 1px solid var(--bank-border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .04);
+}
+
+.bank-debt-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.bank-debt-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.bank-debt-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bank-text);
+}
+
+.bank-debt-bar {
+    height: 6px;
+    border-radius: 4px;
+    background: #e5e7eb;
+    overflow: hidden;
+}
+
+.bank-debt-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #1f3a5f);
+}
+
+.bank-debt-amount {
+    text-align: right;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--bank-danger);
+}
+
+/* Credit Card Billing Cycle Container */
+#credit-card-table-container {
+    background: var(--bank-card);
+    border: 1px solid var(--bank-border);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
+}
+
+#credit-card-table-container h3 {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+
+#credit-card-simple-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+#credit-card-simple-table thead {
+    background: #f8fafc;
+}
+
+#credit-card-simple-table th {
+    text-align: left;
+    letter-spacing: .04em;
+    color: #64748b;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--bank-border);
+    padding: 8px 10px;
+    font-size: 11px;
+}
+
+#credit-card-simple-table td {
+    padding: 10px 10px;
+    font-size: 13px;
+    color: #1e293b;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+#credit-card-simple-table tbody tr:hover {
+    background: #f1f5f9;
+    cursor: pointer;
+}
+
+.interest-low {
+    color: #16a34a;
+    font-weight: 700;
+}
+
+.interest-medium {
+    color: #f59e0b;
+    font-weight: 700;
+}
+
+.interest-high {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+#credit-card-simple-table td:nth-child(2) {
+    white-space: nowrap;
+}
+
+#credit-card-simple-table td:nth-child(3) {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* ================= SUMMARY – VISUAL UPGRADE ================= */
+
+.summary-section {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Card container */
+.summary-card {
+    background: #fdfefe;
+    border: 1px solid #dbeedd;
+    border-radius: 14px;
+    padding: 18px 20px;
+    box-shadow: 0 6px 18px rgba(22, 163, 74, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(22, 163, 74, 0.1);
+}
+
+/* Section titles */
+.summary-card h4 {
+    margin: 0 0 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #14532d;
+    letter-spacing: 0.3px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #c7e9cd;
+}
+
+/* Rows */
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 0.95rem;
+    color: #334155;
+}
+
+/* Values */
+.summary-row strong {
+    font-weight: 600;
+    color: #15803d;
+}
+
+/* Highlighted values */
+.summary-row.highlight strong {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #166534;
+}
+
+/* EMI Freedom special card */
+.freedom-card {
+    background: linear-gradient(135deg,
+            #eaffea 0%,
+            #d8f8dc 100%);
+    border: 1px solid #bfe7c5;
+    text-align: center;
+    padding: 22px;
+}
+
+.freedom-card h4 {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 10px;
+}
+
+/* Freedom date */
+.freedom-date {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #14532d;
+    letter-spacing: 0.5px;
+}
+
+/* Chart spacing */
+.summary-card canvas {
+    margin-top: 6px;
+}
+
+/* Mobile polish */
+@media (max-width: 768px) {
+    .summary-card {
+        padding: 16px;
+    }
+
+    .summary-row {
+        font-size: 0.9rem;
+    }
+
+    .freedom-date {
+        font-size: 1.4rem;
+    }
+}
+
+/* Reduce gap for dynamically added summary rows */
+.summary-section h3 {
+    margin: 6px 0;
+    /* default is ~16px */
+    line-height: 1.25;
+}
+
+/* Make Active EMI bigger */
+.active-emi-row strong {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0f5132;
+}
+
+/* Make Total EMI slightly smaller */
+.summary-card .summary-row.highlight strong {
+    font-size: 1rem;
+}
+
+/* Make Active Loans look like Active EMI */
+.active-loans-row strong {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0f5132;
+}
+
+.active-emi-row strong {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0f5132;
+}
+
+.loan-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.info-button {
+    background: #f3f4f6;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.loan-extra-info {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.9rem;
+    color: #4b5563;
+}
+
+.disabled-button {
+    background-color: #d1d5db !important;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+
+
+/* Admin Panel Styles */
+.admin-toggle-btn {
+    background: linear-gradient(135deg, #1f3a5f, #3b82f6);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.admin-toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #3b82f6, #1f3a5f);
+}
+
+.admin-modal-content {
+    max-width: 900px !important;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.close-admin {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #666;
+}
+
+.close-admin:hover {
+    color: #dc3545;
+}
+
+.admin-form-container {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 150px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+    font-size: 13px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-save,
+.btn-cancel,
+.btn-edit,
+.btn-delete,
+.btn-export,
+.btn-import {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.btn-save {
+    background: #28a745;
+    color: white;
+}
+
+.btn-save:hover {
+    background: #218838;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background: #5a6268;
+}
+
+.btn-edit {
+    background: #ffc107;
+    color: #333;
+    margin-right: 5px;
+}
+
+.btn-edit:hover {
+    background: #e0a800;
+}
+
+.btn-delete {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #c82333;
+}
+
+.btn-export,
+.btn-import {
+    background: #17a2b8;
+    color: white;
+    margin-right: 10px;
+}
+
+.btn-export:hover,
+.btn-import:hover {
+    background: #138496;
+}
+
+.admin-loans-list {
+    margin-top: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#adminLoansTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+#adminLoansTable th {
+    background: #343a40;
+    color: white;
+    padding: 10px;
+    font-size: 13px;
+    position: sticky;
+    top: 0;
+}
+
+#adminLoansTable td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #dee2e6;
+    font-size: 13px;
+}
+
+#adminLoansTable tr:hover {
+    background: #f8f9fa;
+}
+
+.admin-import-export {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.import-export-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* --- Redesigned Overall Progress Section --- */
+
+.overall-progress-section {
+    background: #ffffff;
+    border: 1px solid #e1e5eb;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-top: 15px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.overall-progress-section:hover {
+    transform: translateY(-4px);
+    /* lift effect */
+    box-shadow: 0 14px 30px rgba(31, 58, 95, 0.12);
+
+}
+
+
+.overall-progress-section h3 {
+    margin: 0 0 8px 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f3a5f;
+    text-align: center;
+}
+
+/* Progress bar container */
+.overall-progress-bar-container {
+    background: #e6edf7;
+    border-radius: 20px;
+    height: 18px;
+    overflow: hidden;
+    margin: 6px 0 6px 0;
+    /* reduced gap */
+}
+
+/* Progress fill */
+.overall-progress-bar {
+    background: linear-gradient(90deg, #3b82f6, #2563eb);
+    height: 100%;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    width: 0%;
+    transition: width 0.8s ease;
+}
+
+/* Paid & Total row */
+.overall-progress-amounts {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-top: 2px;
+    /* reduced spacing */
+}
+
+.overall-progress-raised {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.overall-progress-total {
+    color: #15803d;
+    font-weight: 600;
+}
+
+/* Freedom line */
+.overall-progress-freedom {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #3b82f6;
+    font-weight: 600;
+    text-align: center;
+}
