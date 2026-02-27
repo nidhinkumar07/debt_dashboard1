@@ -119,7 +119,7 @@ header h1 {
     display: flex;
     flex-direction: column;
     justify-content: start;
-    min-width: 300px;
+    min-width: unset;
 }
 
 
@@ -265,7 +265,8 @@ header h1 {
     margin-bottom: 30px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(40, 167, 69, 0.1);
-    min-width: 960px;
+    overflow-x: auto;
+    min-width: unset;
     /* Keep min-width for table readability on smaller screens */
 }
 
@@ -336,7 +337,7 @@ th.sortable:hover {
 .loan-boxes-container {
     font-family: 'Space Grotesk', sans-serif;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(calc(33% - 20px), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
     margin-top: 20px;
     grid-column: 1 / 3;
@@ -1430,11 +1431,12 @@ th.sortable:hover {
 @media (max-width: 600px) {
     .credit-cards-overview {
         flex-direction: column;
-        align-items: center;
+        align-items: stretch;
     }
 
     .credit-cards-grid {
         padding: 10px;
+        grid-template-columns: 1fr;
         /* Adjust padding for smaller screens */
     }
 
@@ -2582,4 +2584,49 @@ th.sortable:hover {
     color: #3b82f6;
     font-weight: 600;
     text-align: center;
+}
+
+/* ===========================
+   RESPONSIVE DESIGN
+   =========================== */
+
+@media (max-width: 1024px) {
+    .dashboard-container {
+        grid-template-columns: 1fr;
+        padding: 10px;
+    }
+
+    .sidebar {
+        grid-column: 1 / -1;
+        min-width: 100%;
+        border-right: none;
+        margin-bottom: 20px;
+    }
+
+    .main-content {
+        grid-column: 1 / -1;
+        padding-left: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .debt-container table {
+        font-size: 12px;
+    }
+
+    .debt-container th,
+    .debt-container td {
+        padding: 6px;
+    }
+}
+
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.5em;
+    }
+
+    .sidebar h2,
+    .main-content h2 {
+        font-size: 1.2em;
+    }
 }
