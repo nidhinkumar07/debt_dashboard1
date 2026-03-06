@@ -83,31 +83,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Credit Card Data (Detailed) ---
     const creditCardData1 = [
-        {
+         {
             name: "IndusInd Legend",
             totalLimit: 50000,
-            currentOutstanding: 36437,
+            currentOutstanding: 31711,
             billingCycleEndDay: 15,
             paymentDueDay: 4
         },
         {
             name: "ICICI AmazonPay",
             totalLimit: 140000,
-            currentOutstanding: 26048,
+            currentOutstanding: 5139,
             billingCycleEndDay: 28,
-            paymentDueDay: 10
+            paymentDueDay: 15
         },
         {
             name: "SBI SimplyCLICK",
             totalLimit: 131000,
-            currentOutstanding: 49316,
+            currentOutstanding: 48823,
             billingCycleEndDay: 11,
             paymentDueDay: 30
         },
         {
             name: "IDFC First Classic",
             totalLimit: 52000,
-            currentOutstanding: 36148,
+            currentOutstanding: 18966,
             billingCycleEndDay: 19,
             paymentDueDay: 3
         },
@@ -121,14 +121,14 @@ document.addEventListener('DOMContentLoaded', function () {
         {
             name: "Flipkart Axis",
             totalLimit: 180000,
-            currentOutstanding: 25357,
+            currentOutstanding: 7812,
             billingCycleEndDay: 13,
             paymentDueDay: 1
         },
         {
             name: "Kotak League Card",
             totalLimit: 200000,
-            currentOutstanding: 64840,
+            currentOutstanding: 40457,
             billingCycleEndDay: 25,
             paymentDueDay: 13
         }
