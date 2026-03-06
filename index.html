@@ -20,7 +20,8 @@
         <h1>My Debts Dashboard</h1>
     </header>
 
-    <div style="text-align: right; max-width: 1400px; margin: 0 auto 10px; padding: 0 20px;">
+    <!-- Desktop only: full Admin Panel button row -->
+    <div class="admin-btn-desktop">
         <button id="adminToggleBtn" class="admin-toggle-btn">
             <i class="fas fa-cog"></i> Admin Panel
         </button>
@@ -121,7 +122,7 @@
         </div>
     </div>
 
-    <!-- ===== MOBILE TAB BAR — 3 tabs, hidden on desktop ===== -->
+    <!-- ===== MOBILE TAB BAR — 4 tabs, hidden on desktop ===== -->
     <div class="mobile-tab-nav" id="mobileTabNav">
         <button class="mob-tab active" id="tabSummary" onclick="switchTab('summary')">
             <i class="fas fa-chart-pie"></i>
@@ -133,7 +134,11 @@
         </button>
         <button class="mob-tab" id="tabCards" onclick="switchTab('cards')">
             <i class="fas fa-credit-card"></i>
-            <span>Credit Cards</span>
+            <span>Cards</span>
+        </button>
+        <button class="mob-tab mob-tab-admin" id="tabAdmin" onclick="openAdminPanel()">
+            <i class="fas fa-cog"></i>
+            <span>Admin</span>
         </button>
     </div>
 
