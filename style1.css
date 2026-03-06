@@ -3411,3 +3411,100 @@ div[style*="text-align: right"] {
         display: none !important;
     }
 }
+
+
+
+/* ================================================================
+   FINAL CLEAN 3-TAB MOBILE SYSTEM
+   (overrides all previous tab-related rules)
+================================================================ */
+
+/* --- Hide billing cycle table on mobile (it's in desktop sidebar only) --- */
+@media (max-width: 768px) {
+    #credit-card-table-container {
+        display: none !important;
+    }
+}
+
+/* --- mob-hidden: strong override so no other rule can show a hidden panel --- */
+@media (max-width: 768px) {
+    .mob-hidden {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+}
+
+/* --- panelCards sits naturally below dashboard on desktop --- */
+@media (min-width: 769px) {
+    #panelCards {
+        display: block !important;
+    }
+
+    #panelSummary,
+    #panelLoans {
+        display: flex !important;
+        /* sidebar/main-content are flex by default */
+    }
+
+    /* tab bar stays hidden */
+    .mobile-tab-nav {
+        display: none !important;
+    }
+}
+
+/* --- Mobile tab bar: 3-tab layout --- */
+@media (max-width: 768px) {
+    .mobile-tab-nav {
+        display: flex;
+        position: sticky;
+        top: 0;
+        z-index: 300;
+        width: 100%;
+        background: #ffffff;
+        border-bottom: 2px solid #e1e5eb;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+    }
+
+    .mob-tab {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        padding: 9px 4px;
+        border: none;
+        background: transparent;
+        color: #64748b;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        text-transform: uppercase;
+        transition: all 0.2s ease;
+    }
+
+    .mob-tab i {
+        font-size: 17px;
+    }
+
+    .mob-tab.active {
+        color: #1f3a5f;
+        border-bottom: 3px solid #3b82f6;
+        background: #f0f6ff;
+    }
+
+    /* panelCards full width on mobile */
+    #panelCards {
+        width: 100%;
+        box-sizing: border-box;
+        padding-top: 0 !important;
+    }
+
+    /* remove extra spacing between panels on mobile */
+    .page-container {
+        padding-top: 8px;
+    }
+}
