@@ -335,117 +335,118 @@
             <!-- ================= CREDIT CARDS ================= -->
             <section class="dashboard-section credit-cards-outer" id="credit-cards-section">
                 <div class="section-header">
-                    <h2><i class="fas fa-credit-card"></i> Your Credit Cards (updated as of 21/09/25)</h2>
+                    <h2><i class="fas fa-credit-card"></i> Your Credit Cards</h2>
+                </div>
 
-                    <div id="credit-cards-overview" class="credit-cards-overview">
-                        <div class="overview-item">
-                            <h3>Total Credit Limit</h3>
-                            <p id="totalCreditLimit" class="overview-value">₹ 0</p>
-                        </div>
-                        <div class="overview-item">
-                            <h3>Total Available Limit</h3>
-                            <p id="totalAvailableLimit" class="overview-value">₹ 0</p>
-                        </div>
-                        <div class="overview-item">
-                            <h3>Total Outstanding</h3>
-                            <p id="totalOutstanding" class="overview-value outstanding-total">₹ 0</p>
-                        </div>
+                <div id="credit-cards-overview" class="credit-cards-overview">
+                    <div class="overview-item">
+                        <h3>Total Credit Limit</h3>
+                        <p id="totalCreditLimit" class="overview-value">₹ 0</p>
+                    </div>
+                    <div class="overview-item">
+                        <h3>Total Available Limit</h3>
+                        <p id="totalAvailableLimit" class="overview-value">₹ 0</p>
+                    </div>
+                    <div class="overview-item">
+                        <h3>Total Outstanding</h3>
+                        <p id="totalOutstanding" class="overview-value outstanding-total">₹ 0</p>
                     </div>
                 </div>
-
-                <div class="credit-cards-grid" id="credit-cards-grid">
-                    <p class="no-credit-cards-message" style="display: none;">No credit card data available.</p>
-                </div>
-            </section>
-
         </div>
 
-        <!-- ================= FORECLOSURE MODAL ================= -->
-        <div id="foreclosureModal" class="modal">
-            <div class="modal-content">
-                <button type="button" class="close-button"
-                    onclick="document.getElementById('foreclosureModal').style.cssText = 'display: none !important;'">
-                    CLOSE
-                </button>
+        <div class="credit-cards-grid" id="credit-cards-grid">
+            <p class="no-credit-cards-message" style="display: none;">No credit card data available.</p>
+        </div>
+        </section>
 
-                <h2>Loan Foreclosure Calculator</h2>
+    </div>
 
-                <div id="foreclosureChargesRuleDisplay" style="margin-bottom: 15px;"></div>
+    <!-- ================= FORECLOSURE MODAL ================= -->
+    <div id="foreclosureModal" class="modal">
+        <div class="modal-content">
+            <button type="button" class="close-button"
+                onclick="document.getElementById('foreclosureModal').style.cssText = 'display: none !important;'">
+                CLOSE
+            </button>
 
-                <div id="foreclosureLoanDetails">
-                    <p>EMI Eligibility: <span id="emiEligibility"></span></p>
-                    <h3 id="foreclosureLoanBank"></h3>
-                    <p id="foreclosureLoanDescription"></p>
-                    <p>Initial Principal: <span id="initialPrincipal"></span></p>
-                    <p>EMI: <span id="emiAmountDisplay"></span></p>
-                    <p>Months Paid: <span id="monthsPaidDisplay"></span></p>
-                    <p>Months Pending: <span id="monthsPendingDisplay"></span></p>
-                </div>
+            <h2>Loan Foreclosure Calculator</h2>
 
-                <div id="foreclosureInputs">
-                    <p class="warning-message" id="foreclosureWarning" style="display:none;"></p>
+            <div id="foreclosureChargesRuleDisplay" style="margin-bottom: 15px;"></div>
 
-                    <p>Remaining Principal : <span id="remainingPrincipalDisplay"></span></p>
-                    <p>Estimated Total Pending Amount (Principal + Interest): <span
-                            id="estimatedTotalPendingDisplay"></span></p>
+            <div id="foreclosureLoanDetails">
+                <p>EMI Eligibility: <span id="emiEligibility"></span></p>
+                <h3 id="foreclosureLoanBank"></h3>
+                <p id="foreclosureLoanDescription"></p>
+                <p>Initial Principal: <span id="initialPrincipal"></span></p>
+                <p>EMI: <span id="emiAmountDisplay"></span></p>
+                <p>Months Paid: <span id="monthsPaidDisplay"></span></p>
+                <p>Months Pending: <span id="monthsPendingDisplay"></span></p>
+            </div>
 
-                    <label for="foreclosureCharges">Foreclosure Charge Percentage (% of Remaining Principal):</label>
-                    <input type="number" id="foreclosureCharges" placeholder="e.g., 4" min="0" max="100">
+            <div id="foreclosureInputs">
+                <p class="warning-message" id="foreclosureWarning" style="display:none;"></p>
 
-                    <label for="foreclosureGST">GST Rate on Foreclosure Charges (%):</label>
-                    <input type="number" id="foreclosureGST" value="18" min="0" max="100">
+                <p>Remaining Principal : <span id="remainingPrincipalDisplay"></span></p>
+                <p>Estimated Total Pending Amount (Principal + Interest): <span
+                        id="estimatedTotalPendingDisplay"></span></p>
 
-                    <button id="calculateForeclosure">Calculate Foreclosure</button>
-                </div>
+                <label for="foreclosureCharges">Foreclosure Charge Percentage (% of Remaining Principal):</label>
+                <input type="number" id="foreclosureCharges" placeholder="e.g., 4" min="0" max="100">
 
-                <div id="foreclosureResults" style="display:none; margin-top: 20px;">
-                    <h2 class="summary-heading">Calculation Summary</h2>
+                <label for="foreclosureGST">GST Rate on Foreclosure Charges (%):</label>
+                <input type="number" id="foreclosureGST" value="18" min="0" max="100">
 
-                    <div class="summary-primary">
-                        <div class="summary-box summary-cost">
-                            <label>Total Foreclosure Amount</label>
-                            <h3 id="totalForeclosureAmountDisplay">₹ 0</h3>
-                        </div>
+                <button id="calculateForeclosure">Calculate Foreclosure</button>
+            </div>
 
-                        <div class="summary-box summary-savings">
-                            <label>Total Immediate Savings</label>
-                            <h3 id="totalSavingsDisplay">₹ 0</h3>
-                        </div>
+            <div id="foreclosureResults" style="display:none; margin-top: 20px;">
+                <h2 class="summary-heading">Calculation Summary</h2>
+
+                <div class="summary-primary">
+                    <div class="summary-box summary-cost">
+                        <label>Total Foreclosure Amount</label>
+                        <h3 id="totalForeclosureAmountDisplay">₹ 0</h3>
                     </div>
 
-                    <hr class="summary-divider">
-
-                    <div class="summary-details">
-                        <p>
-                            <span>Foreclosure Charges Amount (at <span id="chargesPercentDisplay">0</span>%):</span>
-                            <strong id="chargesAmountDisplay">₹ 0</strong>
-                        </p>
-                        <p>
-                            <span>GST Amount (at <span id="gstPercentDisplay">18</span>%):</span>
-                            <strong id="gstAmountDisplay">₹ 0</strong>
-                        </p>
-                        <p class="total-charges-line">
-                            <span>Total Foreclosure Charges:</span>
-                            <strong id="totalChargesDisplay">₹ 0</strong>
-                        </p>
-
-                        <p class="interest-line">
-                            <span>Estimated Interest Saved:</span>
-                            <strong id="interestSavedDisplay">₹ 0</strong>
-                        </p>
-                        <p>
-                            <span>Interest Paid to Date:</span>
-                            <strong id="interestPaidDisplay">₹ 0</strong>
-                        </p>
-                        <p>
-                            <span>Original Total Loan Interest:</span>
-                            <strong id="totalInterestDisplay">₹ 0</strong>
-                        </p>
+                    <div class="summary-box summary-savings">
+                        <label>Total Immediate Savings</label>
+                        <h3 id="totalSavingsDisplay">₹ 0</h3>
                     </div>
-
                 </div>
+
+                <hr class="summary-divider">
+
+                <div class="summary-details">
+                    <p>
+                        <span>Foreclosure Charges Amount (at <span id="chargesPercentDisplay">0</span>%):</span>
+                        <strong id="chargesAmountDisplay">₹ 0</strong>
+                    </p>
+                    <p>
+                        <span>GST Amount (at <span id="gstPercentDisplay">18</span>%):</span>
+                        <strong id="gstAmountDisplay">₹ 0</strong>
+                    </p>
+                    <p class="total-charges-line">
+                        <span>Total Foreclosure Charges:</span>
+                        <strong id="totalChargesDisplay">₹ 0</strong>
+                    </p>
+
+                    <p class="interest-line">
+                        <span>Estimated Interest Saved:</span>
+                        <strong id="interestSavedDisplay">₹ 0</strong>
+                    </p>
+                    <p>
+                        <span>Interest Paid to Date:</span>
+                        <strong id="interestPaidDisplay">₹ 0</strong>
+                    </p>
+                    <p>
+                        <span>Original Total Loan Interest:</span>
+                        <strong id="totalInterestDisplay">₹ 0</strong>
+                    </p>
+                </div>
+
             </div>
         </div>
+    </div>
 
 
 
