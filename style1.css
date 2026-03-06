@@ -2630,3 +2630,487 @@ th.sortable:hover {
         font-size: 1.2em;
     }
 }
+
+/* ================================================
+   COMPREHENSIVE RESPONSIVE FIXES
+   ================================================ */
+
+/* --- Base Mobile Resets --- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+img,
+canvas,
+svg {
+    max-width: 100%;
+}
+
+/* --- Header --- */
+@media (max-width: 480px) {
+    header {
+        padding: 0.9em 12px;
+    }
+
+    header h1 {
+        font-size: 1.2em;
+        letter-spacing: 0;
+    }
+}
+
+/* --- Admin Toggle Button Row --- */
+div[style*="text-align: right"] {
+    padding: 0 12px !important;
+}
+
+@media (max-width: 480px) {
+    #adminToggleBtn {
+        width: 100%;
+        font-size: 13px;
+        padding: 9px 14px;
+    }
+}
+
+/* --- Page Container --- */
+@media (max-width: 768px) {
+    .page-container {
+        padding: 10px;
+    }
+}
+
+/* --- Dashboard Container --- */
+@media (max-width: 1024px) {
+    .dashboard-container {
+        grid-template-columns: 1fr !important;
+        padding: 8px;
+        gap: 16px;
+    }
+
+    .sidebar {
+        grid-column: 1 / -1 !important;
+        border-right: none;
+        margin-bottom: 0;
+    }
+
+    .main-content {
+        grid-column: 1 / -1 !important;
+        padding-left: 0;
+    }
+}
+
+/* --- Sidebar --- */
+@media (max-width: 768px) {
+    .sidebar {
+        padding: 14px 12px;
+        border-radius: 10px;
+    }
+
+    .sidebar h2 {
+        font-size: 1.2em;
+        padding: 10px 10px 10px 0;
+        margin-bottom: 14px;
+    }
+}
+
+/* --- Summary Cards Grid on mobile --- */
+@media (max-width: 600px) {
+    .summary-section.redesigned-summary {
+        gap: 12px;
+    }
+
+    .summary-card {
+        padding: 14px;
+    }
+
+    .freedom-date {
+        font-size: 1.3rem;
+    }
+
+    .active-emi-row strong,
+    .active-loans-row strong {
+        font-size: 1.2rem;
+    }
+}
+
+/* --- Debt Table --- */
+@media (max-width: 768px) {
+    .loan-details-card {
+        padding: 12px 10px;
+        border-radius: 10px;
+    }
+
+    .loan-details-card h2 {
+        font-size: 1.1em;
+    }
+
+    .debt-container {
+        border-radius: 6px;
+        margin-bottom: 16px;
+    }
+
+    .debt-container table {
+        font-size: 11px;
+        min-width: 500px;
+        /* ensures table stays readable via horizontal scroll */
+    }
+
+    .debt-container th,
+    .debt-container td {
+        padding: 7px 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .debt-container table {
+        min-width: 420px;
+    }
+
+    .debt-container th,
+    .debt-container td {
+        padding: 5px 4px;
+        font-size: 10px;
+    }
+}
+
+/* --- Loan Boxes --- */
+@media (max-width: 1000px) {
+    .loan-boxes-container {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 14px;
+    }
+}
+
+@media (max-width: 600px) {
+    .loan-boxes-container {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .loan-box {
+        padding: 14px;
+    }
+
+    .loan-box .bank-logo {
+        width: 44px;
+        height: 44px;
+        top: 10px;
+        right: 10px;
+    }
+
+    .loan-breakdown-progress-container {
+        height: 24px;
+    }
+
+    .principal-progress,
+    .interest-progress {
+        font-size: 0.78em;
+    }
+}
+
+/* --- Overall Progress Section --- */
+@media (max-width: 480px) {
+    .overall-progress-section {
+        padding: 10px 12px;
+    }
+
+    .overall-progress-amounts {
+        font-size: 11px;
+    }
+}
+
+/* --- Top Loans, Auto Debit, Debt by Bank --- */
+@media (max-width: 480px) {
+
+    .top-loans-section,
+    .payment-autodebit-section,
+    .emi-forecast-section {
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    #top-loans-list li {
+        padding: 10px 14px;
+        font-size: 0.9em;
+    }
+}
+
+/* --- Bank Debt Row --- */
+@media (max-width: 480px) {
+    .bank-debt-row {
+        grid-template-columns: 32px 1fr 90px;
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .bank-debt-amount {
+        font-size: 12px;
+    }
+
+    .bank-debt-name {
+        font-size: 12px;
+    }
+}
+
+/* --- Credit Cards Section --- */
+@media (max-width: 768px) {
+    .credit-cards-outer {
+        padding: 14px 12px 18px;
+        border-radius: 12px;
+    }
+
+    #credit-cards-section h2 {
+        font-size: 15px;
+    }
+
+    .section-header {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    #credit-cards-overview {
+        flex-direction: column;
+        padding: 14px;
+        gap: 10px;
+    }
+
+    .overview-item {
+        min-width: 0;
+        padding: 12px;
+    }
+
+    .overview-value {
+        font-size: 1.6em;
+    }
+
+    .overview-item h3 {
+        font-size: 0.9em;
+        margin-bottom: 4px;
+    }
+}
+
+@media (max-width: 600px) {
+    #credit-cards-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    .credit-card-box {
+        padding: 18px 16px;
+    }
+
+    .credit-card-box h3 {
+        font-size: 15px;
+        min-height: unset;
+    }
+}
+
+@media (max-width: 480px) {
+    .credit-cards-overview {
+        flex-direction: column;
+        padding: 12px;
+        gap: 8px;
+    }
+
+    .overview-value {
+        font-size: 1.3em;
+    }
+
+    .credit-footer {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+/* --- EMI Forecast Section --- */
+@media (max-width: 600px) {
+    .yearly-forecast-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 10px;
+    }
+
+    .yearly-forecast-item h3 {
+        font-size: 0.95em;
+    }
+
+    .yearly-forecast-item p {
+        font-size: 1em;
+    }
+}
+
+/* --- Admin Modal --- */
+@media (max-width: 768px) {
+    .admin-modal-content {
+        max-width: 98vw !important;
+        margin: 5% auto !important;
+        padding: 16px !important;
+        max-height: 90vh !important;
+    }
+
+    .admin-modal-content h2 {
+        font-size: 1.1em;
+        padding-right: 30px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-group {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-save,
+    .btn-cancel {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .import-export-buttons {
+        flex-direction: column;
+    }
+
+    .btn-export,
+    .btn-import {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
+
+    #adminLoansTable {
+        font-size: 12px;
+    }
+
+    #adminLoansTable th,
+    #adminLoansTable td {
+        padding: 6px 8px;
+    }
+
+    .admin-loans-list {
+        max-height: 220px;
+    }
+}
+
+/* --- Foreclosure Modal --- */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        padding: 20px 16px;
+        margin: 6% auto;
+    }
+
+    .modal-content h2 {
+        font-size: 1.1em;
+        padding-right: 40px;
+    }
+
+    .summary-primary {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .summary-box h3 {
+        font-size: 1.6em;
+    }
+
+    .close-button {
+        top: 8px;
+        right: 10px;
+        font-size: 12px;
+        padding: 5px 8px;
+    }
+
+    #foreclosureInputs {
+        padding: 12px;
+    }
+
+    #foreclosureResults {
+        padding: 14px;
+    }
+
+    .summary-details p {
+        font-size: 0.82em;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+}
+
+/* --- Credit Card Simple Table --- */
+@media (max-width: 480px) {
+    #credit-card-table-container {
+        padding: 10px;
+    }
+
+    #credit-card-simple-table th,
+    #credit-card-simple-table td {
+        padding: 7px 6px;
+        font-size: 11px;
+    }
+}
+
+/* --- Loan Actions --- */
+@media (max-width: 480px) {
+    .loan-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .foreclose-button {
+        padding: 9px 12px;
+        font-size: 0.9em;
+    }
+
+    .info-button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* --- Section Header (Credit cards outer) --- */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .section-header h2 {
+        font-size: 1em;
+    }
+}
+
+/* --- Prevent text overflow everywhere --- */
+@media (max-width: 480px) {
+    body {
+        font-size: 14px;
+    }
+
+    .summary-row {
+        font-size: 0.85rem;
+        gap: 4px;
+    }
+
+    .summary-row strong {
+        text-align: right;
+        max-width: 55%;
+        word-break: break-word;
+    }
+}
