@@ -3367,3 +3367,47 @@ div[style*="text-align: right"] {
         display: block;
     }
 }
+
+
+
+/* ================================================
+   HIDE CREDIT CARD BILLING CYCLE FROM SUMMARY TAB
+   ON MOBILE (it already appears in Loans & Cards tab)
+   ================================================ */
+
+@media (max-width: 768px) {
+
+    /* Hide the Credit Card Billing Cycle table inside sidebar on mobile */
+    #credit-card-table-container {
+        display: none !important;
+    }
+}
+
+
+
+/* ================================================
+   FIX: Hide credit card billing cycle on mobile
+   (cards are shown in Loans & Cards tab already)
+   ================================================ */
+
+@media (max-width: 768px) {
+
+    /* Billing cycle table inside sidebar — hide on mobile */
+    #credit-card-table-container {
+        display: none !important;
+    }
+
+    /* panelCreditCards as standalone block */
+    #panelCreditCards {
+        width: 100%;
+        box-sizing: border-box;
+        padding-top: 0 !important;
+    }
+
+    /* When mob-hidden is applied, use display:none with high specificity */
+    #panelSummary.mob-hidden,
+    #panelDetails.mob-hidden,
+    #panelCreditCards.mob-hidden {
+        display: none !important;
+    }
+}
