@@ -3508,3 +3508,139 @@ div[style*="text-align: right"] {
         padding-top: 8px;
     }
 }
+
+
+
+/* ================================================================
+   ADMIN PANEL BUTTON — MOBILE/DESKTOP PLACEMENT
+================================================================ */
+
+/* Header needs relative positioning to place the cog */
+header {
+    position: relative;
+}
+
+/* Mobile cog: sits top-right inside the header */
+.admin-header-cog {
+    display: none;
+    /* hidden on desktop */
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.admin-header-cog i {
+    transition: transform 0.4s ease;
+}
+
+.admin-header-cog:hover i {
+    transform: rotate(60deg);
+}
+
+.admin-header-cog:hover {
+    background: rgba(255, 255, 255, 0.28);
+}
+
+/* Desktop: show full-width admin button row, hide mobile cog */
+@media (min-width: 769px) {
+    .admin-header-cog {
+        display: none !important;
+    }
+
+    .admin-btn-desktop {
+        display: block;
+        text-align: right;
+        max-width: 1400px;
+        margin: 0 auto 10px;
+        padding: 0 20px;
+    }
+}
+
+/* Mobile: hide desktop button row, show cog in header */
+@media (max-width: 768px) {
+    .admin-btn-desktop {
+        display: none !important;
+    }
+
+    .admin-header-cog {
+        display: flex !important;
+    }
+
+    /* Shift title slightly left so cog doesn't overlap */
+    header h1 {
+        padding-right: 52px;
+    }
+}
+
+
+
+/* ================================================================
+   ADMIN AS 4TH TAB + DESKTOP BUTTON VISIBILITY
+================================================================ */
+
+/* Desktop: show full admin button row */
+@media (min-width: 769px) {
+    .admin-btn-desktop {
+        display: block;
+        text-align: right;
+        max-width: 1400px;
+        margin: 0 auto 10px;
+        padding: 0 20px;
+    }
+
+    /* Remove any leftover mobile cog styles */
+    .admin-header-cog {
+        display: none !important;
+    }
+
+    header h1 {
+        padding-right: 0;
+    }
+}
+
+/* Mobile: hide the desktop button row entirely */
+@media (max-width: 768px) {
+    .admin-btn-desktop {
+        display: none !important;
+    }
+
+    .admin-header-cog {
+        display: none !important;
+    }
+}
+
+/* Admin tab — distinct accent so it stands out from nav tabs */
+.mob-tab-admin {
+    color: #3b82f6 !important;
+}
+
+.mob-tab-admin i {
+    transition: transform 0.5s ease;
+}
+
+.mob-tab-admin:hover i,
+.mob-tab-admin:active i {
+    transform: rotate(90deg);
+}
+
+/* Admin tab never gets the blue-underline "active" treatment
+   (it opens a modal, not a panel) */
+.mob-tab-admin.active {
+    border-bottom: 3px solid transparent !important;
+    background: transparent !important;
+    color: #3b82f6 !important;
+}
