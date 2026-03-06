@@ -271,8 +271,8 @@
                     <ul id="top-loans-list"></ul>
                 </div>
 
-                <!-- Billing Cycle -->
-                <div id="credit-card-table-container" class="top-loans-section">
+                <!-- Billing Cycle — hidden on mobile (credit cards are in Loans & Cards tab) -->
+                <div id="credit-card-table-container" class="top-loans-section mob-summary-only">
                     <h3>Credit Card Billing Cycle</h3>
                     <table id="credit-card-simple-table">
                         <thead>
@@ -341,37 +341,37 @@
             </div>
             <!-- ============ END DASHBOARD GRID ============ -->
 
-            <!-- ================= CREDIT CARDS (inside details panel on mobile) ===== -->
-            <div id="panelCreditCards">
-                <section class="dashboard-section credit-cards-outer" id="credit-cards-section">
-                    <div class="section-header">
-                        <h2><i class="fas fa-credit-card"></i> Your Credit Cards</h2>
+        </div><!-- end page-container -->
+
+        <!-- ================= CREDIT CARDS (Loans & Cards tab on mobile) ===== -->
+        <div id="panelCreditCards" class="page-container" style="padding-top:0;">
+            <section class="dashboard-section credit-cards-outer" id="credit-cards-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-credit-card"></i> Your Credit Cards</h2>
+                </div>
+
+                <div id="credit-cards-overview" class="credit-cards-overview">
+                    <div class="overview-item">
+                        <h3>Total Credit Limit</h3>
+                        <p id="totalCreditLimit" class="overview-value">₹ 0</p>
                     </div>
-
-                    <div id="credit-cards-overview" class="credit-cards-overview">
-                        <div class="overview-item">
-                            <h3>Total Credit Limit</h3>
-                            <p id="totalCreditLimit" class="overview-value">₹ 0</p>
-                        </div>
-                        <div class="overview-item">
-                            <h3>Total Available Limit</h3>
-                            <p id="totalAvailableLimit" class="overview-value">₹ 0</p>
-                        </div>
-                        <div class="overview-item">
-                            <h3>Total Outstanding</h3>
-                            <p id="totalOutstanding" class="overview-value outstanding-total">₹ 0</p>
-                        </div>
+                    <div class="overview-item">
+                        <h3>Total Available Limit</h3>
+                        <p id="totalAvailableLimit" class="overview-value">₹ 0</p>
                     </div>
-            </div>
+                    <div class="overview-item">
+                        <h3>Total Outstanding</h3>
+                        <p id="totalOutstanding" class="overview-value outstanding-total">₹ 0</p>
+                    </div>
+                </div>
+        </div>
 
-            <div class="credit-cards-grid" id="credit-cards-grid">
-                <p class="no-credit-cards-message" style="display: none;">No credit card data available.</p>
-            </div>
-            </section>
+        <div class="credit-cards-grid" id="credit-cards-grid">
+            <p class="no-credit-cards-message" style="display: none;">No credit card data available.</p>
+        </div>
+        </section>
 
-        </div><!-- end panelCreditCards -->
-
-    </div>
+    </div><!-- end panelCreditCards -->
 
     <!-- ================= FORECLOSURE MODAL ================= -->
     <div id="foreclosureModal" class="modal">
