@@ -3582,3 +3582,33 @@ header {
         padding: 0 !important;
     }
 }
+
+
+
+/* ================================================================
+   MOBILE HEADER — centered title, no gap before tab bar
+================================================================ */
+@media (max-width: 768px) {
+    header {
+        text-align: center;
+        margin-bottom: 0 !important;
+        padding: 0.9em 16px;
+    }
+    header h1 {
+        font-size: 1.3em;
+        text-align: center;
+        padding-right: 0;
+        margin: 0 auto;
+    }
+    /* Remove the space the hidden admin button was leaving */
+    #adminBtnDesktop,
+    .admin-btn-desktop {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: 0 !important;
+    }
+    /* Tab bar sits flush under the header */
+    .mobile-tab-nav {
+        margin-top: 0 !important;
+    }
+}
