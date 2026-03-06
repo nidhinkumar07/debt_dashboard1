@@ -2636,11 +2636,15 @@ th.sortable:hover {
    ================================================ */
 
 /* --- Base Mobile Resets --- */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
-img, canvas, svg {
+img,
+canvas,
+svg {
     max-width: 100%;
 }
 
@@ -2649,6 +2653,7 @@ img, canvas, svg {
     header {
         padding: 0.9em 12px;
     }
+
     header h1 {
         font-size: 1.2em;
         letter-spacing: 0;
@@ -2682,11 +2687,13 @@ div[style*="text-align: right"] {
         padding: 8px;
         gap: 16px;
     }
+
     .sidebar {
         grid-column: 1 / -1 !important;
         border-right: none;
         margin-bottom: 0;
     }
+
     .main-content {
         grid-column: 1 / -1 !important;
         padding-left: 0;
@@ -2699,6 +2706,7 @@ div[style*="text-align: right"] {
         padding: 14px 12px;
         border-radius: 10px;
     }
+
     .sidebar h2 {
         font-size: 1.2em;
         padding: 10px 10px 10px 0;
@@ -2711,12 +2719,15 @@ div[style*="text-align: right"] {
     .summary-section.redesigned-summary {
         gap: 12px;
     }
+
     .summary-card {
         padding: 14px;
     }
+
     .freedom-date {
         font-size: 1.3rem;
     }
+
     .active-emi-row strong,
     .active-loans-row strong {
         font-size: 1.2rem;
@@ -2729,17 +2740,22 @@ div[style*="text-align: right"] {
         padding: 12px 10px;
         border-radius: 10px;
     }
+
     .loan-details-card h2 {
         font-size: 1.1em;
     }
+
     .debt-container {
         border-radius: 6px;
         margin-bottom: 16px;
     }
+
     .debt-container table {
         font-size: 11px;
-        min-width: 500px; /* ensures table stays readable via horizontal scroll */
+        min-width: 500px;
+        /* ensures table stays readable via horizontal scroll */
     }
+
     .debt-container th,
     .debt-container td {
         padding: 7px 6px;
@@ -2750,6 +2766,7 @@ div[style*="text-align: right"] {
     .debt-container table {
         min-width: 420px;
     }
+
     .debt-container th,
     .debt-container td {
         padding: 5px 4px;
@@ -2770,18 +2787,22 @@ div[style*="text-align: right"] {
         grid-template-columns: 1fr;
         gap: 14px;
     }
+
     .loan-box {
         padding: 14px;
     }
+
     .loan-box .bank-logo {
         width: 44px;
         height: 44px;
         top: 10px;
         right: 10px;
     }
+
     .loan-breakdown-progress-container {
         height: 24px;
     }
+
     .principal-progress,
     .interest-progress {
         font-size: 0.78em;
@@ -2793,6 +2814,7 @@ div[style*="text-align: right"] {
     .overall-progress-section {
         padding: 10px 12px;
     }
+
     .overall-progress-amounts {
         font-size: 11px;
     }
@@ -2800,12 +2822,14 @@ div[style*="text-align: right"] {
 
 /* --- Top Loans, Auto Debit, Debt by Bank --- */
 @media (max-width: 480px) {
+
     .top-loans-section,
     .payment-autodebit-section,
     .emi-forecast-section {
         padding: 12px;
         border-radius: 8px;
     }
+
     #top-loans-list li {
         padding: 10px 14px;
         font-size: 0.9em;
@@ -2819,9 +2843,11 @@ div[style*="text-align: right"] {
         padding: 8px 10px;
         gap: 8px;
     }
+
     .bank-debt-amount {
         font-size: 12px;
     }
+
     .bank-debt-name {
         font-size: 12px;
     }
@@ -2833,25 +2859,31 @@ div[style*="text-align: right"] {
         padding: 14px 12px 18px;
         border-radius: 12px;
     }
+
     #credit-cards-section h2 {
         font-size: 15px;
     }
+
     .section-header {
         flex-direction: column;
         gap: 12px;
     }
+
     #credit-cards-overview {
         flex-direction: column;
         padding: 14px;
         gap: 10px;
     }
+
     .overview-item {
         min-width: 0;
         padding: 12px;
     }
+
     .overview-value {
         font-size: 1.6em;
     }
+
     .overview-item h3 {
         font-size: 0.9em;
         margin-bottom: 4px;
@@ -2863,9 +2895,11 @@ div[style*="text-align: right"] {
         grid-template-columns: 1fr !important;
         gap: 14px !important;
     }
+
     .credit-card-box {
         padding: 18px 16px;
     }
+
     .credit-card-box h3 {
         font-size: 15px;
         min-height: unset;
@@ -2878,9 +2912,11 @@ div[style*="text-align: right"] {
         padding: 12px;
         gap: 8px;
     }
+
     .overview-value {
         font-size: 1.3em;
     }
+
     .credit-footer {
         flex-direction: column;
         gap: 4px;
@@ -2895,9 +2931,11 @@ div[style*="text-align: right"] {
         gap: 4px;
         padding: 10px;
     }
+
     .yearly-forecast-item h3 {
         font-size: 0.95em;
     }
+
     .yearly-forecast-item p {
         font-size: 1em;
     }
@@ -2911,41 +2949,53 @@ div[style*="text-align: right"] {
         padding: 16px !important;
         max-height: 90vh !important;
     }
+
     .admin-modal-content h2 {
         font-size: 1.1em;
         padding-right: 30px;
     }
+
     .form-row {
         flex-direction: column;
         gap: 10px;
     }
+
     .form-group {
         min-width: 0;
         width: 100%;
     }
+
     .form-actions {
         flex-direction: column;
         gap: 8px;
     }
-    .btn-save, .btn-cancel {
+
+    .btn-save,
+    .btn-cancel {
         width: 100%;
         padding: 10px;
     }
+
     .import-export-buttons {
         flex-direction: column;
     }
-    .btn-export, .btn-import {
+
+    .btn-export,
+    .btn-import {
         width: 100%;
         margin-right: 0;
         margin-bottom: 8px;
     }
+
     #adminLoansTable {
         font-size: 12px;
     }
+
     #adminLoansTable th,
     #adminLoansTable td {
         padding: 6px 8px;
     }
+
     .admin-loans-list {
         max-height: 220px;
     }
@@ -2958,29 +3008,36 @@ div[style*="text-align: right"] {
         padding: 20px 16px;
         margin: 6% auto;
     }
+
     .modal-content h2 {
         font-size: 1.1em;
         padding-right: 40px;
     }
+
     .summary-primary {
         flex-direction: column;
         gap: 12px;
     }
+
     .summary-box h3 {
         font-size: 1.6em;
     }
+
     .close-button {
         top: 8px;
         right: 10px;
         font-size: 12px;
         padding: 5px 8px;
     }
+
     #foreclosureInputs {
         padding: 12px;
     }
+
     #foreclosureResults {
         padding: 14px;
     }
+
     .summary-details p {
         font-size: 0.82em;
         flex-wrap: wrap;
@@ -2993,6 +3050,7 @@ div[style*="text-align: right"] {
     #credit-card-table-container {
         padding: 10px;
     }
+
     #credit-card-simple-table th,
     #credit-card-simple-table td {
         padding: 7px 6px;
@@ -3006,10 +3064,12 @@ div[style*="text-align: right"] {
         flex-direction: column;
         gap: 8px;
     }
+
     .foreclose-button {
         padding: 9px 12px;
         font-size: 0.9em;
     }
+
     .info-button {
         width: 100%;
         text-align: center;
@@ -3031,6 +3091,7 @@ div[style*="text-align: right"] {
         flex-direction: column;
         align-items: stretch;
     }
+
     .section-header h2 {
         font-size: 1em;
     }
@@ -3041,10 +3102,12 @@ div[style*="text-align: right"] {
     body {
         font-size: 14px;
     }
+
     .summary-row {
         font-size: 0.85rem;
         gap: 4px;
     }
+
     .summary-row strong {
         text-align: right;
         max-width: 55%;
@@ -3102,7 +3165,8 @@ div[style*="text-align: right"] {
 }
 
 .summary-row strong {
-    flex: 0 0 auto;          /* don't shrink the value */
+    flex: 0 0 auto;
+    /* don't shrink the value */
     white-space: nowrap;
     text-align: right;
     color: #15803d;
@@ -3121,6 +3185,7 @@ div[style*="text-align: right"] {
     #adminToggleBtn {
         width: auto !important;
     }
+
     div[style*="text-align: right"] {
         text-align: right !important;
     }
@@ -3194,6 +3259,7 @@ div[style*="text-align: right"] {
         width: 100%;
         box-sizing: border-box;
     }
+
     .credit-cards-overview {
         width: 100%;
         box-sizing: border-box;
@@ -3206,4 +3272,98 @@ div[style*="text-align: right"] {
     width: 100%;
     box-sizing: border-box;
     overflow: hidden;
+}
+
+
+
+/* ================================================
+   MOBILE TAB NAVIGATION
+   ================================================ */
+
+/* Hidden by default on desktop — JS shows it on mobile */
+.mobile-tab-nav {
+    display: none;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    width: 100%;
+    background: #ffffff;
+    border-bottom: 2px solid #e1e5eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-sizing: border-box;
+}
+
+.mob-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px 8px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 3px solid transparent;
+    text-transform: uppercase;
+}
+
+.mob-tab i {
+    font-size: 18px;
+    margin-bottom: 2px;
+}
+
+.mob-tab.active {
+    color: #1f3a5f;
+    border-bottom: 3px solid #3b82f6;
+    background: #f0f6ff;
+}
+
+.mob-tab:hover:not(.active) {
+    background: #f8fafc;
+    color: #334155;
+}
+
+/* Panel hidden state — only applies on mobile */
+@media (max-width: 768px) {
+    .mob-hidden {
+        display: none !important;
+    }
+
+    /* Ensure credit cards panel sits naturally in flow */
+    #panelCreditCards {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Remove top margin gap between panels on mobile */
+    #panelDetails,
+    #panelCreditCards {
+        margin-top: 0;
+    }
+
+    /* Remove dashboard-container padding that causes gap under tab bar */
+    .dashboard-container {
+        padding-top: 4px !important;
+    }
+}
+
+/* Desktop: tab nav stays hidden, everything shows normally */
+@media (min-width: 769px) {
+    .mobile-tab-nav {
+        display: none !important;
+    }
+
+    .mob-hidden {
+        display: unset !important;
+    }
+
+    #panelCreditCards {
+        display: block;
+    }
 }
