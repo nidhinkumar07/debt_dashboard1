@@ -20,7 +20,6 @@
         <h1>My Debts Dashboard</h1>
     </header>
 
-    <!-- Add this after the header -->
     <div style="text-align: right; max-width: 1400px; margin: 0 auto 10px; padding: 0 20px;">
         <button id="adminToggleBtn" class="admin-toggle-btn">
             <i class="fas fa-cog"></i> Admin Panel
@@ -32,8 +31,6 @@
         <div class="modal-content admin-modal-content">
             <span class="close-admin">&times;</span>
             <h2><i class="fas fa-database"></i> Loan Management System</h2>
-
-            <!-- Loan Form -->
             <div class="admin-form-container">
                 <h3><i class="fas fa-plus-circle"></i> Add / Edit Loan</h3>
                 <form id="loanForm">
@@ -47,7 +44,6 @@
                             <input type="text" id="description" required>
                         </div>
                     </div>
-
                     <div class="form-row">
                         <div class="form-group">
                             <label for="initialAmount">Initial Amount (₹):</label>
@@ -58,7 +54,6 @@
                             <input type="number" id="emi" required>
                         </div>
                     </div>
-
                     <div class="form-row">
                         <div class="form-group">
                             <label for="interestRate">Interest Rate (%):</label>
@@ -69,7 +64,6 @@
                             <input type="number" id="tenure" required>
                         </div>
                     </div>
-
                     <div class="form-row">
                         <div class="form-group">
                             <label for="startDay">Start Day:</label>
@@ -84,29 +78,21 @@
                             <input type="number" id="startYear" required>
                         </div>
                     </div>
-
                     <div class="form-row">
                         <div class="form-group">
                             <label for="emiDay">EMI Day:</label>
                             <input type="number" id="emiDay" min="1" max="31" required>
                         </div>
                     </div>
-
                     <input type="hidden" id="loanId" value="">
                     <input type="hidden" id="editMode" value="false">
-
                     <div class="form-actions">
-                        <button type="submit" class="btn-save">
-                            <i class="fas fa-save"></i> Save Loan
-                        </button>
-                        <button type="button" class="btn-cancel" onclick="resetForm()">
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
+                        <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Loan</button>
+                        <button type="button" class="btn-cancel" onclick="resetForm()"><i class="fas fa-times"></i>
+                            Cancel</button>
                     </div>
                 </form>
             </div>
-
-            <!-- Loans List -->
             <div class="admin-loans-list">
                 <h3><i class="fas fa-list"></i> Existing Loans</h3>
                 <table id="adminLoansTable">
@@ -119,52 +105,49 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="adminLoansTableBody">
-                    </tbody>
+                    <tbody id="adminLoansTableBody"></tbody>
                 </table>
             </div>
-
-            <!-- Import/Export Section -->
             <div class="admin-import-export">
                 <h3><i class="fas fa-exchange-alt"></i> Backup & Restore</h3>
                 <div class="import-export-buttons">
-                    <button onclick="exportLoans()" class="btn-export">
-                        <i class="fas fa-download"></i> Export Loans
-                    </button>
-                    <button onclick="importLoans()" class="btn-import">
-                        <i class="fas fa-upload"></i> Import Loans
-                    </button>
+                    <button onclick="exportLoans()" class="btn-export"><i class="fas fa-download"></i> Export
+                        Loans</button>
+                    <button onclick="importLoans()" class="btn-import"><i class="fas fa-upload"></i> Import
+                        Loans</button>
                     <input type="file" id="importFile" accept=".json" style="display: none;">
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== MOBILE TAB NAVIGATION (only visible on mobile) ===== -->
+    <!-- ===== MOBILE TAB BAR — 3 tabs, hidden on desktop ===== -->
     <div class="mobile-tab-nav" id="mobileTabNav">
         <button class="mob-tab active" id="tabSummary" onclick="switchTab('summary')">
             <i class="fas fa-chart-pie"></i>
             <span>Summary</span>
         </button>
-        <button class="mob-tab" id="tabDetails" onclick="switchTab('details')">
+        <button class="mob-tab" id="tabLoans" onclick="switchTab('loans')">
             <i class="fas fa-list-alt"></i>
-            <span>Loans & Cards</span>
+            <span>Loans</span>
+        </button>
+        <button class="mob-tab" id="tabCards" onclick="switchTab('cards')">
+            <i class="fas fa-credit-card"></i>
+            <span>Credit Cards</span>
         </button>
     </div>
 
-    <div class="page-container">
-
-        <!-- ================= DASHBOARD GRID ================= -->
+    <!-- ================================================================
+         PANEL 1 — SUMMARY (left sidebar on desktop, Tab 1 on mobile)
+    ================================================================ -->
+    <div class="page-container" style="padding-bottom: 0;">
         <div class="dashboard-container">
 
-            <!-- ============== LEFT SIDEBAR ============== -->
             <aside class="sidebar" id="panelSummary">
 
-                <!-- Summary -->
                 <h2>Summary</h2>
                 <div class="summary-section redesigned-summary">
 
-                    <!-- STATUS -->
                     <div class="summary-card">
                         <h4>Status</h4>
                         <div class="summary-row active-loans-row">
@@ -177,7 +160,6 @@
                         </div>
                     </div>
 
-                    <!-- MONTHLY BURDEN -->
                     <div class="summary-card">
                         <h4>EMI</h4>
                         <div class="summary-row active-emi-row">
@@ -190,7 +172,6 @@
                         </div>
                     </div>
 
-                    <!-- LIFETIME COST -->
                     <div class="summary-card">
                         <h4>Loan Cost</h4>
                         <div class="summary-row">
@@ -207,72 +188,49 @@
                         </div>
                     </div>
 
-                    <!-- FREEDOM -->
                     <div class="summary-card freedom-card">
                         <h4>EMI Freedom</h4>
                         <div class="freedom-date" id="emi-freedom-date">—</div>
                     </div>
 
-                    <!-- CHART -->
                     <div class="summary-card">
                         <h4>Loan Breakdown</h4>
                         <canvas id="loanBreakdownChart" height="150"></canvas>
                     </div>
 
-                    <!-- REMAINING -->
                     <div class="summary-row active-emi-row">
                         <span>Total Pending</span>
                         <strong id="total-remaining">₹ 0</strong>
                     </div>
 
-
                 </div>
 
-
-                <!-- Overall Progress -->
                 <div class="overall-progress-section">
-
-                    <h3 class="overall-title">
-                        <i class="fas fa-chart-line"></i> Overall Progress
-                    </h3>
-
+                    <h3 class="overall-title"><i class="fas fa-chart-line"></i> Overall Progress</h3>
                     <div class="overall-progress-bar-container">
                         <div class="overall-progress-bar">
                             <span class="overall-progress-percentage">0%</span>
                         </div>
                     </div>
-
                     <div class="overall-progress-amounts">
-                        <div>
-                            <strong class="overall-progress-raised">₹ 0 paid</strong>
-                        </div>
-                        <div>
-                            <strong class="overall-progress-total">₹ 0 total</strong>
-                        </div>
+                        <div><strong class="overall-progress-raised">₹ 0 paid</strong></div>
+                        <div><strong class="overall-progress-total">₹ 0 total</strong></div>
                     </div>
-                    <div class="overall-progress-freedom" id="overallFreedomText">
-                        Freedom In: —
-                    </div>
+                    <div class="overall-progress-freedom" id="overallFreedomText">Freedom In: —</div>
                 </div>
 
-
-
-                <!-- Loan Progress Chart -->
                 <div class="loan-progress-chart-container">
                     <h2><i class="fas fa-chart-bar"></i>Loan Progress Over Time</h2>
                     <canvas id="loanChart" height="120"></canvas>
                 </div>
 
-
-
-                <!-- Top Loans -->
                 <div class="top-loans-section">
                     <h3><i class="fas fa-trophy"></i> Top 3 Loans That Finishes Soon</h3>
                     <ul id="top-loans-list"></ul>
                 </div>
 
-                <!-- Billing Cycle — hidden on mobile (credit cards are in Loans & Cards tab) -->
-                <div id="credit-card-table-container" class="top-loans-section mob-summary-only">
+                <!-- Billing Cycle: visible on desktop sidebar, hidden on mobile -->
+                <div id="credit-card-table-container" class="top-loans-section">
                     <h3>Credit Card Billing Cycle</h3>
                     <table id="credit-card-simple-table">
                         <thead>
@@ -282,36 +240,33 @@
                                 <th>Interest Rate</th>
                             </tr>
                         </thead>
-                        <tbody id="credit-card-simple-tbody">
-                        </tbody>
+                        <tbody id="credit-card-simple-tbody"></tbody>
                     </table>
                 </div>
 
-                <!-- Auto Debits -->
                 <div class="payment-autodebit-section">
                     <h3><i class="fas fa-sync-alt" style="margin-right: 8px; color: #388e3c;"></i> Payment For Auto
                         Debits</h3>
-                    <ul id="auto-debit-loans-list">
-                    </ul>
+                    <ul id="auto-debit-loans-list"></ul>
                 </div>
 
-
-                <!-- Debt by Bank -->
                 <div class="top-loans-section">
                     <h3><i class="fas fa-university" style="margin-right: 8px; color: #388e3c;"></i> Debt by Bank</h3>
                     <div id="debt-by-bank-list" class="bank-debt-list"></div>
                 </div>
 
-                <!-- EMI Forecast -->
                 <div class="emi-forecast-section">
                     <h2>Yearly EMI Forecast</h2>
                 </div>
 
             </aside>
+            <!-- END panelSummary -->
 
 
-            <!-- ============== RIGHT MAIN CONTENT ============== -->
-            <div class="main-content" id="panelDetails">
+            <!-- ================================================================
+                 PANEL 2 — LOANS (right main on desktop, Tab 2 on mobile)
+            ================================================================ -->
+            <div class="main-content" id="panelLoans">
 
                 <div class="loan-details-card">
                     <h2>Loan Details</h2>
@@ -327,51 +282,56 @@
                                     <th data-column="tenure" class="sortable">Remaining Tenure</th>
                                 </tr>
                             </thead>
-                            <tbody id="bank-a-debts">
-                                <!-- Loans will be populated by script1.js -->
-                            </tbody>
+                            <tbody id="bank-a-debts"></tbody>
                         </table>
                     </div>
-
-                    <div class="loan-boxes-container">
-                    </div>
-
+                    <div class="loan-boxes-container"></div>
                 </div>
 
             </div>
-            <!-- ============ END DASHBOARD GRID ============ -->
+            <!-- END panelLoans -->
 
-        </div><!-- end page-container -->
-
-        <!-- ================= CREDIT CARDS (Loans & Cards tab on mobile) ===== -->
-        <div id="panelCreditCards" class="page-container" style="padding-top:0;">
-            <section class="dashboard-section credit-cards-outer" id="credit-cards-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-credit-card"></i> Your Credit Cards</h2>
-                </div>
-
-                <div id="credit-cards-overview" class="credit-cards-overview">
-                    <div class="overview-item">
-                        <h3>Total Credit Limit</h3>
-                        <p id="totalCreditLimit" class="overview-value">₹ 0</p>
-                    </div>
-                    <div class="overview-item">
-                        <h3>Total Available Limit</h3>
-                        <p id="totalAvailableLimit" class="overview-value">₹ 0</p>
-                    </div>
-                    <div class="overview-item">
-                        <h3>Total Outstanding</h3>
-                        <p id="totalOutstanding" class="overview-value outstanding-total">₹ 0</p>
-                    </div>
-                </div>
         </div>
+        <!-- END dashboard-container -->
+    </div>
+    <!-- END page-container -->
 
-        <div class="credit-cards-grid" id="credit-cards-grid">
-            <p class="no-credit-cards-message" style="display: none;">No credit card data available.</p>
-        </div>
+
+    <!-- ================================================================
+         PANEL 3 — CREDIT CARDS
+         Desktop: shown below dashboard as a full-width section.
+         Mobile: shown ONLY when Credit Cards tab is active.
+    ================================================================ -->
+    <div id="panelCards" class="page-container" style="padding-top: 0;">
+        <section class="dashboard-section credit-cards-outer" id="credit-cards-section">
+
+            <div class="section-header">
+                <h2><i class="fas fa-credit-card"></i> Your Credit Cards (updated as of 21/09/25)</h2>
+            </div>
+
+            <div id="credit-cards-overview" class="credit-cards-overview">
+                <div class="overview-item">
+                    <h3>Total Credit Limit</h3>
+                    <p id="totalCreditLimit" class="overview-value">₹ 0</p>
+                </div>
+                <div class="overview-item">
+                    <h3>Total Available Limit</h3>
+                    <p id="totalAvailableLimit" class="overview-value">₹ 0</p>
+                </div>
+                <div class="overview-item">
+                    <h3>Total Outstanding</h3>
+                    <p id="totalOutstanding" class="overview-value outstanding-total">₹ 0</p>
+                </div>
+            </div>
+
+            <div class="credit-cards-grid" id="credit-cards-grid">
+                <p class="no-credit-cards-message" style="display: none;">No credit card data available.</p>
+            </div>
+
         </section>
+    </div>
+    <!-- END panelCards -->
 
-    </div><!-- end panelCreditCards -->
 
     <!-- ================= FORECLOSURE MODAL ================= -->
     <div id="foreclosureModal" class="modal">
@@ -380,11 +340,8 @@
                 onclick="document.getElementById('foreclosureModal').style.cssText = 'display: none !important;'">
                 CLOSE
             </button>
-
             <h2>Loan Foreclosure Calculator</h2>
-
             <div id="foreclosureChargesRuleDisplay" style="margin-bottom: 15px;"></div>
-
             <div id="foreclosureLoanDetails">
                 <p>EMI Eligibility: <span id="emiEligibility"></span></p>
                 <h3 id="foreclosureLoanBank"></h3>
@@ -394,40 +351,30 @@
                 <p>Months Paid: <span id="monthsPaidDisplay"></span></p>
                 <p>Months Pending: <span id="monthsPendingDisplay"></span></p>
             </div>
-
             <div id="foreclosureInputs">
                 <p class="warning-message" id="foreclosureWarning" style="display:none;"></p>
-
                 <p>Remaining Principal : <span id="remainingPrincipalDisplay"></span></p>
                 <p>Estimated Total Pending Amount (Principal + Interest): <span
                         id="estimatedTotalPendingDisplay"></span></p>
-
                 <label for="foreclosureCharges">Foreclosure Charge Percentage (% of Remaining Principal):</label>
                 <input type="number" id="foreclosureCharges" placeholder="e.g., 4" min="0" max="100">
-
                 <label for="foreclosureGST">GST Rate on Foreclosure Charges (%):</label>
                 <input type="number" id="foreclosureGST" value="18" min="0" max="100">
-
                 <button id="calculateForeclosure">Calculate Foreclosure</button>
             </div>
-
             <div id="foreclosureResults" style="display:none; margin-top: 20px;">
                 <h2 class="summary-heading">Calculation Summary</h2>
-
                 <div class="summary-primary">
                     <div class="summary-box summary-cost">
                         <label>Total Foreclosure Amount</label>
                         <h3 id="totalForeclosureAmountDisplay">₹ 0</h3>
                     </div>
-
                     <div class="summary-box summary-savings">
                         <label>Total Immediate Savings</label>
                         <h3 id="totalSavingsDisplay">₹ 0</h3>
                     </div>
                 </div>
-
                 <hr class="summary-divider">
-
                 <div class="summary-details">
                     <p>
                         <span>Foreclosure Charges Amount (at <span id="chargesPercentDisplay">0</span>%):</span>
@@ -441,7 +388,6 @@
                         <span>Total Foreclosure Charges:</span>
                         <strong id="totalChargesDisplay">₹ 0</strong>
                     </p>
-
                     <p class="interest-line">
                         <span>Estimated Interest Saved:</span>
                         <strong id="interestSavedDisplay">₹ 0</strong>
@@ -455,7 +401,6 @@
                         <strong id="totalInterestDisplay">₹ 0</strong>
                     </p>
                 </div>
-
             </div>
         </div>
     </div>
@@ -463,61 +408,50 @@
 
     <!-- ===== MOBILE TAB SWITCHING SCRIPT ===== -->
     <script>
-        function switchTab(tab) {
-            const isMobile = window.innerWidth <= 768;
-            if (!isMobile) return;
+        const TABS = {
+            summary: { panel: 'panelSummary', btn: 'tabSummary' },
+            loans: { panel: 'panelLoans', btn: 'tabLoans' },
+            cards: { panel: 'panelCards', btn: 'tabCards' }
+        };
 
-            const summary = document.getElementById('panelSummary');
-            const details = document.getElementById('panelDetails');
-            const cards = document.getElementById('panelCreditCards');
-            const tabSum = document.getElementById('tabSummary');
-            const tabDet = document.getElementById('tabDetails');
-
-            if (tab === 'summary') {
-                summary.classList.remove('mob-hidden');
-                details.classList.add('mob-hidden');
-                cards.classList.add('mob-hidden');
-                tabSum.classList.add('active');
-                tabDet.classList.remove('active');
-            } else {
-                summary.classList.add('mob-hidden');
-                details.classList.remove('mob-hidden');
-                cards.classList.remove('mob-hidden');
-                tabDet.classList.add('active');
-                tabSum.classList.remove('active');
-            }
+        function switchTab(active) {
+            if (window.innerWidth > 768) return;
+            Object.keys(TABS).forEach(function (key) {
+                var panel = document.getElementById(TABS[key].panel);
+                var btn = document.getElementById(TABS[key].btn);
+                if (key === active) {
+                    panel.classList.remove('mob-hidden');
+                    btn.classList.add('active');
+                } else {
+                    panel.classList.add('mob-hidden');
+                    btn.classList.remove('active');
+                }
+            });
         }
 
         function applyMobileLayout() {
-            const isMobile = window.innerWidth <= 768;
-            const summary = document.getElementById('panelSummary');
-            const details = document.getElementById('panelDetails');
-            const cards = document.getElementById('panelCreditCards');
-            const nav = document.getElementById('mobileTabNav');
-            const tabSum = document.getElementById('tabSummary');
-            const tabDet = document.getElementById('tabDetails');
+            var isMobile = window.innerWidth <= 768;
+            var nav = document.getElementById('mobileTabNav');
 
             if (isMobile) {
                 nav.style.display = 'flex';
-                // Show whichever tab is currently active
-                if (tabSum.classList.contains('active')) {
-                    summary.classList.remove('mob-hidden');
-                    details.classList.add('mob-hidden');
-                    cards.classList.add('mob-hidden');
-                } else {
-                    summary.classList.add('mob-hidden');
-                    details.classList.remove('mob-hidden');
-                    cards.classList.remove('mob-hidden');
-                }
+                // Find active tab key
+                var activeBtnId = '';
+                document.querySelectorAll('.mob-tab.active').forEach(function (b) { activeBtnId = b.id; });
+                var activeKey = 'summary';
+                Object.keys(TABS).forEach(function (key) {
+                    if (TABS[key].btn === activeBtnId) activeKey = key;
+                });
+                switchTab(activeKey);
             } else {
                 nav.style.display = 'none';
-                summary.classList.remove('mob-hidden');
-                details.classList.remove('mob-hidden');
-                cards.classList.remove('mob-hidden');
+                // Desktop: show all panels, clear mob-hidden
+                Object.keys(TABS).forEach(function (key) {
+                    document.getElementById(TABS[key].panel).classList.remove('mob-hidden');
+                });
             }
         }
 
-        // Run on load and resize
         window.addEventListener('DOMContentLoaded', applyMobileLayout);
         window.addEventListener('resize', applyMobileLayout);
     </script>
