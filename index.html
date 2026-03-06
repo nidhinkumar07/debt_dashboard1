@@ -140,13 +140,25 @@
         </div>
     </div>
 
+    <!-- ===== MOBILE TAB NAVIGATION (only visible on mobile) ===== -->
+    <div class="mobile-tab-nav" id="mobileTabNav">
+        <button class="mob-tab active" id="tabSummary" onclick="switchTab('summary')">
+            <i class="fas fa-chart-pie"></i>
+            <span>Summary</span>
+        </button>
+        <button class="mob-tab" id="tabDetails" onclick="switchTab('details')">
+            <i class="fas fa-list-alt"></i>
+            <span>Loans & Cards</span>
+        </button>
+    </div>
+
     <div class="page-container">
 
         <!-- ================= DASHBOARD GRID ================= -->
         <div class="dashboard-container">
 
             <!-- ============== LEFT SIDEBAR ============== -->
-            <aside class="sidebar">
+            <aside class="sidebar" id="panelSummary">
 
                 <!-- Summary -->
                 <h2>Summary</h2>
@@ -299,8 +311,7 @@
 
 
             <!-- ============== RIGHT MAIN CONTENT ============== -->
-
-            <div class="main-content">
+            <div class="main-content" id="panelDetails">
 
                 <div class="loan-details-card">
                     <h2>Loan Details</h2>
@@ -330,34 +341,35 @@
             </div>
             <!-- ============ END DASHBOARD GRID ============ -->
 
-
-
-            <!-- ================= CREDIT CARDS ================= -->
-            <section class="dashboard-section credit-cards-outer" id="credit-cards-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-credit-card"></i> Your Credit Cards</h2>
-                </div>
-
-                <div id="credit-cards-overview" class="credit-cards-overview">
-                    <div class="overview-item">
-                        <h3>Total Credit Limit</h3>
-                        <p id="totalCreditLimit" class="overview-value">₹ 0</p>
+            <!-- ================= CREDIT CARDS (inside details panel on mobile) ===== -->
+            <div id="panelCreditCards">
+                <section class="dashboard-section credit-cards-outer" id="credit-cards-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-credit-card"></i> Your Credit Cards</h2>
                     </div>
-                    <div class="overview-item">
-                        <h3>Total Available Limit</h3>
-                        <p id="totalAvailableLimit" class="overview-value">₹ 0</p>
-                    </div>
-                    <div class="overview-item">
-                        <h3>Total Outstanding</h3>
-                        <p id="totalOutstanding" class="overview-value outstanding-total">₹ 0</p>
-                    </div>
-                </div>
-        </div>
 
-        <div class="credit-cards-grid" id="credit-cards-grid">
-            <p class="no-credit-cards-message" style="display: none;">No credit card data available.</p>
-        </div>
-        </section>
+                    <div id="credit-cards-overview" class="credit-cards-overview">
+                        <div class="overview-item">
+                            <h3>Total Credit Limit</h3>
+                            <p id="totalCreditLimit" class="overview-value">₹ 0</p>
+                        </div>
+                        <div class="overview-item">
+                            <h3>Total Available Limit</h3>
+                            <p id="totalAvailableLimit" class="overview-value">₹ 0</p>
+                        </div>
+                        <div class="overview-item">
+                            <h3>Total Outstanding</h3>
+                            <p id="totalOutstanding" class="overview-value outstanding-total">₹ 0</p>
+                        </div>
+                    </div>
+            </div>
+
+            <div class="credit-cards-grid" id="credit-cards-grid">
+                <p class="no-credit-cards-message" style="display: none;">No credit card data available.</p>
+            </div>
+            </section>
+
+        </div><!-- end panelCreditCards -->
 
     </div>
 
@@ -449,7 +461,66 @@
     </div>
 
 
+    <!-- ===== MOBILE TAB SWITCHING SCRIPT ===== -->
+    <script>
+        function switchTab(tab) {
+            const isMobile = window.innerWidth <= 768;
+            if (!isMobile) return;
 
+            const summary = document.getElementById('panelSummary');
+            const details = document.getElementById('panelDetails');
+            const cards = document.getElementById('panelCreditCards');
+            const tabSum = document.getElementById('tabSummary');
+            const tabDet = document.getElementById('tabDetails');
+
+            if (tab === 'summary') {
+                summary.classList.remove('mob-hidden');
+                details.classList.add('mob-hidden');
+                cards.classList.add('mob-hidden');
+                tabSum.classList.add('active');
+                tabDet.classList.remove('active');
+            } else {
+                summary.classList.add('mob-hidden');
+                details.classList.remove('mob-hidden');
+                cards.classList.remove('mob-hidden');
+                tabDet.classList.add('active');
+                tabSum.classList.remove('active');
+            }
+        }
+
+        function applyMobileLayout() {
+            const isMobile = window.innerWidth <= 768;
+            const summary = document.getElementById('panelSummary');
+            const details = document.getElementById('panelDetails');
+            const cards = document.getElementById('panelCreditCards');
+            const nav = document.getElementById('mobileTabNav');
+            const tabSum = document.getElementById('tabSummary');
+            const tabDet = document.getElementById('tabDetails');
+
+            if (isMobile) {
+                nav.style.display = 'flex';
+                // Show whichever tab is currently active
+                if (tabSum.classList.contains('active')) {
+                    summary.classList.remove('mob-hidden');
+                    details.classList.add('mob-hidden');
+                    cards.classList.add('mob-hidden');
+                } else {
+                    summary.classList.add('mob-hidden');
+                    details.classList.remove('mob-hidden');
+                    cards.classList.remove('mob-hidden');
+                }
+            } else {
+                nav.style.display = 'none';
+                summary.classList.remove('mob-hidden');
+                details.classList.remove('mob-hidden');
+                cards.classList.remove('mob-hidden');
+            }
+        }
+
+        // Run on load and resize
+        window.addEventListener('DOMContentLoaded', applyMobileLayout);
+        window.addEventListener('resize', applyMobileLayout);
+    </script>
 
 </body>
 
