@@ -18,7 +18,31 @@
 
     <header>
         <h1>My Debts Dashboard</h1>
+        <button id="reminderBellBtn" class="reminder-bell-btn" title="EMI Reminders">
+            <i class="fas fa-bell"></i>
+            <span id="reminderBadge" class="reminder-badge" style="display:none;"></span>
+        </button>
     </header>
+
+    <!-- EMI Reminder Settings Modal -->
+    <div id="reminderModal" class="modal">
+        <div class="modal-content" style="max-width:420px;">
+            <span class="close-admin" id="closeReminderModal">&times;</span>
+            <h2><i class="fas fa-bell"></i> EMI Reminder Settings</h2>
+            <div style="margin-bottom:16px;">
+                <label style="font-weight:600;display:block;margin-bottom:6px;">Notify me <strong><span
+                            id="reminderDaysLabel">3</span> days</strong> before each EMI is due</label>
+                <input type="range" id="reminderDaysSlider" min="1" max="10" value="3" style="width:100%;">
+                <div style="display:flex;justify-content:space-between;font-size:0.78em;color:#64748b;"><span>1
+                        day</span><span>10 days</span></div>
+            </div>
+            <button id="requestNotifPermBtn" class="btn-save" style="width:100%;margin-bottom:10px;">
+                <i class="fas fa-bell"></i> Enable Browser Notifications
+            </button>
+            <div id="notifPermStatus" style="font-size:0.85em;text-align:center;margin-bottom:12px;"></div>
+            <div id="upcoming-reminders-list"></div>
+        </div>
+    </div>
 
     <!-- Desktop only: full Admin Panel button row — hidden on mobile via CSS -->
     <div class="admin-btn-desktop" id="adminBtnDesktop">
@@ -252,12 +276,34 @@
                 <div class="payment-autodebit-section">
                     <h3><i class="fas fa-sync-alt" style="margin-right: 8px; color: #388e3c;"></i> Payment For Auto
                         Debits</h3>
-                    <ul id="auto-debit-loans-list"></ul>
+                    <div id="auto-debit-loans-list"></div>
                 </div>
 
                 <div class="top-loans-section">
                     <h3><i class="fas fa-university" style="margin-right: 8px; color: #388e3c;"></i> Debt by Bank</h3>
                     <div id="debt-by-bank-list" class="bank-debt-list"></div>
+                </div>
+
+                <!-- ===== INTEREST RATE COMPARISON ===== -->
+                <div class="top-loans-section" id="interest-rate-section">
+                    <h3><i class="fas fa-percentage" style="margin-right:8px;color:#dc2626;"></i> Interest Rate
+                        Comparison</h3>
+                    <div id="interest-rate-list"></div>
+                    <div id="attack-order-tip" class="attack-order-tip" style="display:none;"></div>
+                </div>
+
+                <!-- ===== MONTHLY CASH FLOW PLANNER ===== -->
+                <div class="top-loans-section" id="cashflow-section">
+                    <h3><i class="fas fa-calendar-alt" style="margin-right:8px;color:#3b82f6;"></i> Monthly Cash Flow
+                        Planner</h3>
+                    <div class="cashflow-nav">
+                        <button id="cashflow-prev" class="cashflow-nav-btn"><i class="fas fa-chevron-left"></i></button>
+                        <span id="cashflow-month-label" class="cashflow-month-label"></span>
+                        <button id="cashflow-next" class="cashflow-nav-btn"><i
+                                class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div id="cashflow-calendar" class="cashflow-calendar"></div>
+                    <div id="cashflow-summary" class="cashflow-summary"></div>
                 </div>
 
                 <div class="emi-forecast-section">
@@ -310,8 +356,14 @@
     <div id="panelCards" class="page-container" style="padding-top: 0;">
         <section class="dashboard-section credit-cards-outer" id="credit-cards-section">
 
-            <div class="section-header">
-                <h2><i class="fas fa-credit-card"></i> Your Credit Cards (updated as of 05/03/26)</h2>
+            <div class="section-header"
+                style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                <h2 style="margin:0;"><i class="fas fa-credit-card"></i> Your Credit Cards <span id="cards-as-of-date"
+                        style="font-size:0.6em;font-weight:400;opacity:0.75;"></span></h2>
+                <button id="markCardsUpdatedBtn"
+                    title="Stamp today's date as the last time you updated credit card figures">
+                    <i class="fas fa-stamp"></i> Mark as Updated Today
+                </button>
             </div>
 
             <div id="credit-cards-overview" class="credit-cards-overview">
@@ -331,6 +383,14 @@
 
             <div class="credit-cards-grid" id="credit-cards-grid">
                 <p class="no-credit-cards-message" style="display: none;">No credit card data available.</p>
+            </div>
+
+            <!-- ===== CC EMI TRACKER ===== -->
+            <div class="cc-emi-tracker-section">
+                <h3><i class="fas fa-exchange-alt"></i> Credit Card EMI Conversions</h3>
+                <p class="cc-emi-subtitle">Loans drawn against your credit cards — active EMI conversions detected from
+                    loan data.</p>
+                <div id="cc-emi-tracker-grid" class="cc-emi-tracker-grid"></div>
             </div>
 
         </section>
@@ -410,6 +470,24 @@
         </div>
     </div>
 
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+    <!-- Calendar Hover Tooltip -->
+    <div id="cal-tooltip" class="cal-tooltip"></div>
+
+    <!-- Confirm Dialog -->
+    <div id="confirm-overlay">
+        <div id="confirm-box">
+            <div class="confirm-icon">🗑️</div>
+            <p id="confirm-message">Are you sure?</p>
+            <div class="confirm-actions">
+                <button class="btn-confirm-yes" id="confirm-yes">Delete</button>
+                <button class="btn-confirm-no" id="confirm-no">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <!-- ===== MOBILE TAB SWITCHING SCRIPT ===== -->
     <script>
