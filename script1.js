@@ -1,4 +1,73 @@
 document.addEventListener('DOMContentLoaded', function () {
+
+    // ============= TOAST NOTIFICATION SYSTEM =============
+    function showToast(message, type = 'info', duration = 3200) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        const icon = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' }[type] || 'ℹ️';
+        toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.classList.add('toast-out');
+            toast.addEventListener('animationend', () => toast.remove());
+        }, duration);
+    }
+
+    // ============= CONFIRM DIALOG SYSTEM =============
+    function showConfirm(message, onConfirm) {
+        const overlay = document.getElementById('confirm-overlay');
+        const msgEl = document.getElementById('confirm-message');
+        if (!overlay || !msgEl) { if (confirm(message)) onConfirm(); return; }
+        msgEl.textContent = message;
+        overlay.classList.add('active');
+
+        const yesBtn = document.getElementById('confirm-yes');
+        const noBtn = document.getElementById('confirm-no');
+
+        const cleanup = () => overlay.classList.remove('active');
+        const onYes = () => { cleanup(); onConfirm(); yesBtn.removeEventListener('click', onYes); noBtn.removeEventListener('click', onNo); };
+        const onNo  = () => { cleanup(); yesBtn.removeEventListener('click', onYes); noBtn.removeEventListener('click', onNo); };
+
+        yesBtn.addEventListener('click', onYes);
+        noBtn.addEventListener('click', onNo);
+    }
+
+    // ============= CREDIT CARD "LAST UPDATED" STAMP =============
+    function formatStampDate(date) {
+        const dd = String(date.getDate()).padStart(2, '0');
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const yy = String(date.getFullYear()).slice(-2);
+        return `${dd}/${mm}/${yy}`;
+    }
+
+    function loadCardsUpdatedDate() {
+        const cardsDateEl = document.getElementById('cards-as-of-date');
+        if (!cardsDateEl) return;
+        const saved = localStorage.getItem('cardsLastUpdated');
+        if (saved) {
+            cardsDateEl.textContent = `(updated as of ${saved})`;
+        } else {
+            cardsDateEl.textContent = '(not yet stamped — click "Mark as Updated Today")';
+            cardsDateEl.style.fontStyle = 'italic';
+        }
+    }
+
+    const markBtn = document.getElementById('markCardsUpdatedBtn');
+    if (markBtn) {
+        markBtn.addEventListener('click', () => {
+            const stamp = formatStampDate(new Date());
+            localStorage.setItem('cardsLastUpdated', stamp);
+            loadCardsUpdatedDate();
+            const cardsDateEl = document.getElementById('cards-as-of-date');
+            if (cardsDateEl) cardsDateEl.style.fontStyle = '';
+            showToast(`Credit card data stamped as updated on ${stamp}`, 'success');
+        });
+    }
+
+    loadCardsUpdatedDate();
+    // ============================================================
     // --- DOM Element References ---
     const debtTableBody = document.getElementById('bank-a-debts');
     const summarySection = document.querySelector('.summary-section');
@@ -410,7 +479,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // NEW: Display estimated interest before foreclosure (total interest)
         if (totalInterestDisplay) totalInterestDisplay.textContent = `₹ ${Math.max(0, totalInterest).toLocaleString('en-IN', indianRupeeOptions)}`;
 
-        document.getElementById('foreclosureResults').style.display = 'none !important;';
+        document.getElementById('foreclosureResults').style.display = 'none';
 
         // Show the modal
         foreclosureModal.style.display = 'block';
@@ -614,72 +683,67 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // --- Auto Debit Loans List Population ---
+    // --- Auto Debit Loans List Population (Dynamic) ---
     function populateAutoDebitLoans() {
-        const autoDebitLoans = [
-            { bank: "KOTAK BANK", emiAmount: 3915, debitDate: 2 },
-            { bank: "CREDIT SAISON", emiAmount: 9037, debitDate: 3 },
-            { bank: "INDUSIND BANK", emiAmount: 5823, debitDate: 4 },
-            { bank: "AXIS BANK", emiAmount: 4560, debitDate: 5 },
-            { bank: "DMI FINANCE", emiAmount: 11457, debitDate: 5 }
+        if (!autoDebitLoansList) return;
 
-        ];
+        // Use live currentLoanData — only active loans
+        const activeLoans = currentLoanData.filter(l => l.monthsRemaining > 0);
 
-        const consolidatedLoans = {};
-
-        autoDebitLoans.forEach(loan => {
-            if ([2, 3, 4, 5].includes(loan.debitDate)) {
-                const debitDate = loan.debitDate;
-                if (!consolidatedLoans[debitDate]) {
-                    consolidatedLoans[debitDate] = {
-                        date: debitDate,
-                        totalAmount: 0,
-                        loans: []
-                    };
-                }
-                consolidatedLoans[debitDate].totalAmount += loan.emiAmount;
-                consolidatedLoans[debitDate].loans.push({ bank: loan.bank, emiAmount: loan.emiAmount });
-            }
+        // Group by emiDay
+        const grouped = {};
+        activeLoans.forEach(loan => {
+            const day = loan.emiDay;
+            if (!grouped[day]) grouped[day] = { day, loans: [], total: 0 };
+            grouped[day].loans.push(loan);
+            grouped[day].total += loan.emi;
         });
 
-        autoDebitLoansList.innerHTML = ''; // Clear existing list items
-        for (const date in consolidatedLoans) {
-            const loanInfo = consolidatedLoans[date];
-            const listItem = document.createElement('li');
-            const dateWithSuffix = `${loanInfo.date}${formatDateSuffix(loanInfo.date)}`;
-            const formattedTotalAmount = `₹ ${loanInfo.totalAmount.toLocaleString('en-IN', indianRupeeOptions)}`;
+        // Sort groups by day ascending
+        const sortedGroups = Object.values(grouped).sort((a, b) => a.day - b.day);
 
-            const loanDetailsDiv = document.createElement('div');
-            loanDetailsDiv.classList.add('loan-details');
+        autoDebitLoansList.innerHTML = '';
 
-            const bankEmiGroupSpan = document.createElement('span');
-            bankEmiGroupSpan.classList.add('bank-emi-group');
-
-            loanInfo.loans.forEach((loan, index) => {
-                const bankEmisSpan = document.createElement('span');
-                bankEmisSpan.classList.add('bank-emi');
-                bankEmisSpan.textContent = `${loan.bank} (₹ ${loan.emiAmount.toLocaleString('en-IN', indianRupeeOptions)})`;
-                bankEmiGroupSpan.appendChild(bankEmisSpan);
-                if (index < loanInfo.loans.length - 1) {
-                    bankEmiGroupSpan.appendChild(document.createTextNode(''));
-                }
-            });
-            loanDetailsDiv.appendChild(bankEmiGroupSpan);
-
-            const dueDateSpan = document.createElement('span');
-            dueDateSpan.classList.add('due-date');
-            dueDateSpan.textContent = `due on the ${dateWithSuffix}`;
-            loanDetailsDiv.appendChild(dueDateSpan);
-
-            listItem.appendChild(loanDetailsDiv);
-
-            const totalAmountDiv = document.createElement('div');
-            totalAmountDiv.classList.add('total-amount');
-            totalAmountDiv.textContent = `(Total: ${formattedTotalAmount})`;
-            listItem.appendChild(totalAmountDiv);
-
-            autoDebitLoansList.appendChild(listItem);
+        if (!sortedGroups.length) {
+            autoDebitLoansList.innerHTML = '<p style="color:#64748b;font-size:0.85em;">No active loans.</p>';
+            return;
         }
+
+        const today = new Date();
+        const currentDay = today.getDate();
+
+        sortedGroups.forEach(group => {
+            const suffix = formatDateSuffix(group.day);
+            const isDanger = group.loans.length >= 2;
+            const isPast   = currentDay > group.day;
+            const isToday  = currentDay === group.day;
+
+            let statusClass = 'autodebit-future';
+            let statusText  = `Due on ${group.day}${suffix}`;
+            if (isToday)  { statusClass = 'autodebit-today';  statusText = `Due TODAY (${group.day}${suffix})`; }
+            else if (isPast) { statusClass = 'autodebit-past'; statusText = `Paid — ${group.day}${suffix}`; }
+
+            const card = document.createElement('div');
+            card.className = `autodebit-card${isDanger ? ' autodebit-danger' : ''}`;
+
+            const loanLines = group.loans.map(l => `
+                <div class="autodebit-loan-row">
+                    <span class="autodebit-bank">${l.bankName}</span>
+                    <span class="autodebit-desc">${l.description}</span>
+                    <span class="autodebit-emi">₹${l.emi.toLocaleString('en-IN')}</span>
+                </div>`).join('');
+
+            card.innerHTML = `
+                <div class="autodebit-header">
+                    <span class="autodebit-status ${statusClass}">${statusText}</span>
+                    <span class="autodebit-total ${isDanger ? 'autodebit-total-danger' : ''}">
+                        ${isDanger ? `<i class="fas fa-exclamation-triangle"></i> ` : ''}Total ₹${group.total.toLocaleString('en-IN')}
+                    </span>
+                </div>
+                <div class="autodebit-loans">${loanLines}</div>`;
+
+            autoDebitLoansList.appendChild(card);
+        });
     }
 
     /**
@@ -1537,7 +1601,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- Initialization on DOMContentLoaded ---
     populateCreditCards();
     populateCreditCardTable();
-    populateAutoDebitLoans();
     // Initial call to populate all sections
 
     // Overall Loan End Date Countdown Timer setup
@@ -2000,6 +2063,41 @@ document.addEventListener('DOMContentLoaded', function () {
         loanForm.addEventListener('submit', function (e) {
             e.preventDefault();
 
+            // Clear previous validation errors
+            loanForm.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+            loanForm.querySelectorAll('.field-error').forEach(el => el.remove());
+
+            let hasError = false;
+            const requiredFields = ['bankName', 'description', 'initialAmount', 'emi', 'interestRate', 'tenure', 'startDay', 'startMonth', 'startYear', 'emiDay'];
+
+            requiredFields.forEach(id => {
+                const input = document.getElementById(id);
+                if (!input || input.value.trim() === '') {
+                    if (input) {
+                        input.classList.add('invalid');
+                        const err = document.createElement('span');
+                        err.className = 'field-error';
+                        err.textContent = 'Required';
+                        input.parentNode.appendChild(err);
+                    }
+                    hasError = true;
+                }
+            });
+
+            const initialAmt = parseFloat(document.getElementById('initialAmount').value);
+            const emiAmt = parseFloat(document.getElementById('emi').value);
+            const rate = parseFloat(document.getElementById('interestRate').value);
+            const tenure = parseInt(document.getElementById('tenure').value);
+
+            if (!hasError && emiAmt * tenure < initialAmt) {
+                showToast('Warning: Total EMI payments are less than the initial amount. Please check the values.', 'warning', 5000);
+            }
+
+            if (hasError) {
+                showToast('Please fill in all required fields.', 'error');
+                return;
+            }
+
             const loanData = {
                 id: document.getElementById('loanId').value || Date.now() + Math.random(),
                 bankName: document.getElementById('bankName').value,
@@ -2031,9 +2129,11 @@ document.addEventListener('DOMContentLoaded', function () {
             saveToLocalStorage();
             renderLoansFromDatabase();
             refreshAdminLoansList();
+            updateDashboard();
+            runNewFeatures();
             resetForm();
 
-            alert(editMode ? 'Loan updated successfully!' : 'Loan added successfully!');
+            showToast(editMode ? 'Loan updated successfully!' : 'Loan added successfully!', 'success');
         });
     }
 
@@ -2058,12 +2158,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Delete loan function
     window.deleteLoan = function (index) {
-        if (confirm('Are you sure you want to delete this loan?')) {
+        showConfirm('Are you sure you want to delete this loan? This cannot be undone.', () => {
             loansDatabase.splice(index, 1);
             saveToLocalStorage();
             renderLoansFromDatabase();
             refreshAdminLoansList();
-        }
+            updateDashboard();
+            runNewFeatures();
+            showToast('Loan deleted.', 'warning');
+        });
     };
 
     // Export loans to JSON file
@@ -2100,12 +2203,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         saveToLocalStorage();
                         renderLoansFromDatabase();
                         refreshAdminLoansList();
-                        alert('Loans imported successfully!');
+                        showToast('Loans imported successfully!', 'success');
                     } else {
-                        alert('Invalid file format');
+                        showToast('Invalid file format — expected a JSON array.', 'error');
                     }
                 } catch (error) {
-                    alert('Error importing file: ' + error.message);
+                    showToast('Error importing file: ' + error.message, 'error');
                 }
             };
             reader.readAsText(file);
@@ -2118,10 +2221,14 @@ document.addEventListener('DOMContentLoaded', function () {
         adminBtn.addEventListener('click', openAdminPanel);
     }
 
-    const closeBtn = document.querySelector('.close-admin');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', closeAdminPanel);
-    }
+    // Use querySelectorAll and wire each .close-admin to its own modal
+    document.querySelectorAll('.close-admin').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const modal = this.closest('.modal');
+            if (modal) modal.style.display = 'none';
+            if (modal && modal.id === 'adminModal') resetForm();
+        });
+    });
 
     window.addEventListener('click', function (event) {
         const modal = document.getElementById('adminModal');
@@ -2130,9 +2237,423 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // ================================================================
+    // FEATURE 1: INTEREST RATE COMPARISON
+    // ================================================================
+    function renderInterestRateComparison() {
+        const container = document.getElementById('interest-rate-list');
+        const tipEl = document.getElementById('attack-order-tip');
+        if (!container) return;
+
+        // Only active loans
+        const activeLoans = currentLoanData.filter(l => l.monthsRemaining > 0);
+        if (!activeLoans.length) { container.innerHTML = '<p style="color:#64748b;font-size:0.85em;">No active loans.</p>'; return; }
+
+        // Pre-compute interestPct for each loan so we can sort by it
+        const loansWithPct = activeLoans.map(loan => {
+            const totalPayable = loan.emi * loan.tenureMonths;
+            const totalInterest = Math.max(0, totalPayable - loan.principalAmount);
+            const interestPct = totalPayable > 0 ? (totalInterest / totalPayable) * 100 : 0;
+            const principalPct = 100 - interestPct;
+            return { loan, totalPayable, totalInterest, interestPct, principalPct };
+        });
+
+        // Sort by actual interest cost % descending
+        loansWithPct.sort((a, b) => b.interestPct - a.interestPct);
+        const maxInterestPct = loansWithPct[0].interestPct;
+
+        container.innerHTML = '';
+        loansWithPct.forEach(({ loan, totalPayable, totalInterest, interestPct, principalPct }, i) => {
+            const rate = loan.annualInterestRate;
+            // Bar width relative to highest interest cost loan
+            const barPct = maxInterestPct > 0 ? (interestPct / maxInterestPct) * 100 : 0;
+            let colorClass = 'rate-low';
+            if (interestPct >= 20) colorClass = 'rate-high';
+            else if (interestPct >= 12) colorClass = 'rate-medium';
+
+            const row = document.createElement('div');
+            row.className = 'rate-row';
+            row.innerHTML = `
+                <div class="rate-row-header">
+                    <span class="rate-rank">#${i + 1}</span>
+                    <span class="rate-bank">${loan.bankName}</span>
+                    <span class="rate-desc">${loan.description}</span>
+                    <span class="rate-badge ${colorClass}">${interestPct.toFixed(1)}% <span class="rate-annual">(${rate}% p.a.)</span></span>
+                </div>
+                <div class="rate-meta">
+                    <span>EMI ₹${loan.emi.toLocaleString('en-IN')} · ${loan.monthsRemaining}m left</span>
+                    <span>Outstanding ₹${loan.currentRemainingAmount.toLocaleString('en-IN')}</span>
+                </div>`;
+            container.appendChild(row);
+        });
+
+        // Attack order tip
+        if (tipEl && loansWithPct.length >= 1) {
+            const { loan: top, interestPct: topPct } = loansWithPct[0];
+            tipEl.style.display = 'block';
+            tipEl.innerHTML = `<i class="fas fa-crosshairs"></i> <strong>Attack first:</strong> ${top.bankName} ${top.description} — <strong>${topPct.toFixed(1)}%</strong> of total payments is pure interest.`;
+        }
+    }
+
+    // ================================================================
+    // FEATURE 2: EMI REMINDERS (Web Notifications API)
+    // ================================================================
+    function getReminderDays() {
+        return parseInt(localStorage.getItem('reminderDays') || '3');
+    }
+
+    function getUpcomingEmiReminders(daysAhead) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const upcoming = [];
+        currentLoanData.forEach(loan => {
+            if (loan.monthsRemaining <= 0) return;
+            const emiDay = loan.emiDay;
+            const thisMonth = new Date(today.getFullYear(), today.getMonth(), emiDay);
+            const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, emiDay);
+            [thisMonth, nextMonth].forEach(dueDate => {
+                const diff = Math.ceil((dueDate - today) / 86400000);
+                if (diff >= 0 && diff <= daysAhead) {
+                    upcoming.push({ loan, dueDate, daysLeft: diff });
+                }
+            });
+        });
+        return upcoming.sort((a, b) => a.daysLeft - b.daysLeft);
+    }
+
+    function updateReminderBadge() {
+        const badge = document.getElementById('reminderBadge');
+        if (!badge) return;
+        const days = getReminderDays();
+        const upcoming = getUpcomingEmiReminders(days);
+        if (upcoming.length > 0) {
+            badge.textContent = upcoming.length;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    function fireNotificationsIfDue() {
+        if (Notification.permission !== 'granted') return;
+        const days = getReminderDays();
+        const upcoming = getUpcomingEmiReminders(days);
+        const fired = JSON.parse(localStorage.getItem('firedNotifs') || '{}');
+        const todayKey = new Date().toISOString().slice(0, 10);
+        if (!fired[todayKey]) fired[todayKey] = [];
+
+        upcoming.forEach(({ loan, daysLeft }) => {
+            const key = `${loan.bankName}-${loan.description}-${daysLeft}`;
+            if (!fired[todayKey].includes(key)) {
+                const title = daysLeft === 0 ? `EMI Due TODAY — ${loan.bankName}` : `EMI in ${daysLeft} day${daysLeft > 1 ? 's' : ''} — ${loan.bankName}`;
+                new Notification(title, {
+                    body: `${loan.description}: ₹${loan.emi.toLocaleString('en-IN')} due on ${loan.emiDay}${['th','st','nd','rd'][Math.min(loan.emiDay % 10, 3) * (loan.emiDay < 11 || loan.emiDay > 13 ? 1 : 0)] || 'th'}`,
+                    icon: 'images/favicon.png'
+                });
+                fired[todayKey].push(key);
+            }
+        });
+        // Prune old keys
+        Object.keys(fired).forEach(k => { if (k < todayKey) delete fired[k]; });
+        localStorage.setItem('firedNotifs', JSON.stringify(fired));
+    }
+
+    function renderReminderModal() {
+        const statusEl = document.getElementById('notifPermStatus');
+        const listEl = document.getElementById('upcoming-reminders-list');
+        const slider = document.getElementById('reminderDaysSlider');
+        if (!statusEl || !listEl) return;
+
+        const perm = Notification.permission;
+        if (perm === 'granted') {
+            statusEl.innerHTML = '<span style="color:#16a34a;">✅ Notifications enabled</span>';
+        } else if (perm === 'denied') {
+            statusEl.innerHTML = '<span style="color:#dc2626;">❌ Notifications blocked — please enable in browser settings</span>';
+        } else {
+            statusEl.innerHTML = '<span style="color:#f59e0b;">⚠️ Permission not yet granted</span>';
+        }
+
+        const days = getReminderDays();
+        if (slider) slider.value = days;
+        const label = document.getElementById('reminderDaysLabel');
+        if (label) label.textContent = days;
+
+        const upcoming = getUpcomingEmiReminders(days);
+        if (!upcoming.length) {
+            listEl.innerHTML = `<p style="color:#64748b;font-size:0.85em;text-align:center;">No EMIs due within the next ${days} day${days > 1 ? 's' : ''}.</p>`;
+            return;
+        }
+        listEl.innerHTML = `<h4 style="margin:0 0 8px;font-size:0.9em;color:#1f3a5f;">Upcoming within ${days} day${days > 1 ? 's' : ''}:</h4>`;
+        upcoming.forEach(({ loan, daysLeft }) => {
+            const urgencyClass = daysLeft === 0 ? 'reminder-today' : daysLeft <= 2 ? 'reminder-soon' : 'reminder-upcoming';
+            const urgencyText = daysLeft === 0 ? 'TODAY' : `in ${daysLeft}d`;
+            const item = document.createElement('div');
+            item.className = `reminder-item ${urgencyClass}`;
+            item.innerHTML = `
+                <div class="reminder-item-left">
+                    <span class="reminder-urgency">${urgencyText}</span>
+                    <span class="reminder-bank">${loan.bankName}</span>
+                    <span class="reminder-desc">${loan.description}</span>
+                </div>
+                <span class="reminder-amt">₹${loan.emi.toLocaleString('en-IN')}</span>`;
+            listEl.appendChild(item);
+        });
+    }
+
+    // Reminder modal wiring
+    const bellBtn = document.getElementById('reminderBellBtn');
+    const reminderModal = document.getElementById('reminderModal');
+    const closeReminderBtn = document.getElementById('closeReminderModal');
+    const reqPermBtn = document.getElementById('requestNotifPermBtn');
+    const daysSlider = document.getElementById('reminderDaysSlider');
+    const daysLabel = document.getElementById('reminderDaysLabel');
+
+    if (bellBtn && reminderModal) {
+        bellBtn.addEventListener('click', () => {
+            renderReminderModal();
+            reminderModal.style.display = 'block';
+        });
+    }
+    if (closeReminderBtn && reminderModal) {
+        closeReminderBtn.addEventListener('click', () => { reminderModal.style.display = 'none'; });
+    }
+    window.addEventListener('click', e => { if (e.target === reminderModal) reminderModal.style.display = 'none'; });
+
+    if (reqPermBtn) {
+        reqPermBtn.addEventListener('click', () => {
+            if (!('Notification' in window)) { showToast('Your browser does not support notifications.', 'error'); return; }
+            Notification.requestPermission().then(perm => {
+                if (perm === 'granted') {
+                    showToast('Notifications enabled! You\'ll be reminded before each EMI.', 'success');
+                    fireNotificationsIfDue();
+                } else {
+                    showToast('Notification permission denied.', 'error');
+                }
+                renderReminderModal();
+                updateReminderBadge();
+            });
+        });
+    }
+
+    if (daysSlider && daysLabel) {
+        daysSlider.addEventListener('input', () => {
+            daysLabel.textContent = daysSlider.value;
+            localStorage.setItem('reminderDays', daysSlider.value);
+            renderReminderModal();
+            updateReminderBadge();
+        });
+    }
+
+    // ================================================================
+    // FEATURE 3: CREDIT CARD EMI TRACKER
+    // ================================================================
+    function renderCCEmiTracker() {
+        const grid = document.getElementById('cc-emi-tracker-grid');
+        if (!grid) return;
+
+        // CC EMI loans = loans where description includes "credit card" (case-insensitive)
+        const ccEmiLoans = currentLoanData.filter(l =>
+            l.description.toLowerCase().includes('credit card') && l.monthsRemaining > 0
+        );
+
+        // Also match by bank name to the credit card list
+        const ccBankMap = {};
+        creditCardData1.forEach(c => {
+            const bankKey = c.name.toUpperCase();
+            ccBankMap[bankKey] = c;
+        });
+
+        grid.innerHTML = '';
+        if (!ccEmiLoans.length) {
+            grid.innerHTML = '<p style="color:#64748b;font-size:0.85em;padding:12px 0;">No active credit card EMI conversions detected.</p>';
+            return;
+        }
+
+        ccEmiLoans.forEach(loan => {
+            // Try to match this EMI loan to a credit card
+            let matchedCard = null;
+            for (const [key, card] of Object.entries(ccBankMap)) {
+                if (key.includes(loan.bankName.replace(' BANK','').replace(' FINANCE','')) ||
+                    loan.bankName.includes(key.split(' ')[0])) {
+                    matchedCard = card;
+                    break;
+                }
+            }
+
+            const totalOutstanding = matchedCard ? matchedCard.currentOutstanding : null;
+            const emiOutstanding = loan.currentRemainingAmount;
+            const rawOutstanding = totalOutstanding !== null ? Math.max(0, totalOutstanding - emiOutstanding) : null;
+
+            const card = document.createElement('div');
+            card.className = 'cc-emi-card';
+            card.innerHTML = `
+                <div class="cc-emi-card-header">
+                    <span class="cc-emi-bank">${loan.bankName}</span>
+                    <span class="cc-emi-badge">EMI Conversion</span>
+                </div>
+                <div class="cc-emi-desc">${loan.description}</div>
+                <div class="cc-emi-rows">
+                    <div class="cc-emi-row"><span>Monthly EMI</span><strong>₹${loan.emi.toLocaleString('en-IN')}</strong></div>
+                    <div class="cc-emi-row"><span>EMI Outstanding</span><strong class="emi-amt">₹${emiOutstanding.toLocaleString('en-IN')}</strong></div>
+                    ${rawOutstanding !== null ? `<div class="cc-emi-row"><span>Raw CC Outstanding</span><strong class="raw-amt">₹${rawOutstanding.toLocaleString('en-IN')}</strong></div>` : ''}
+                    <div class="cc-emi-row"><span>Months Remaining</span><strong>${loan.monthsRemaining}</strong></div>
+                    <div class="cc-emi-row"><span>Interest Rate</span><strong>${loan.annualInterestRate}%</strong></div>
+                    <div class="cc-emi-row"><span>Next EMI Due</span><strong>${loan.nextEmiDate}</strong></div>
+                </div>
+                <div class="cc-emi-status ${loan.dueCountdownClass}">${loan.dueCountdown}</div>`;
+            grid.appendChild(card);
+        });
+    }
+
+    // ================================================================
+    // FEATURE 4: MONTHLY CASH FLOW PLANNER
+    // ================================================================
+    let cashflowDate = new Date();
+    cashflowDate.setDate(1);
+
+    function positionCalTip(e, tipBox) {
+        const margin = 12;
+        const tw = tipBox.offsetWidth || 220;
+        const th = tipBox.offsetHeight || 100;
+        let x = e.clientX + margin;
+        let y = e.clientY + margin;
+        if (x + tw > window.innerWidth - 8) x = e.clientX - tw - margin;
+        if (y + th > window.innerHeight - 8) y = e.clientY - th - margin;
+        tipBox.style.left = x + 'px';
+        tipBox.style.top  = y + 'px';
+    }
+
+    function renderCashflowCalendar() {
+        const calEl = document.getElementById('cashflow-calendar');
+        const labelEl = document.getElementById('cashflow-month-label');
+        const summaryEl = document.getElementById('cashflow-summary');
+        if (!calEl || !labelEl) return;
+
+        const year = cashflowDate.getFullYear();
+        const month = cashflowDate.getMonth();
+        const monthName = cashflowDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+        labelEl.textContent = monthName;
+
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const firstDow = new Date(year, month, 1).getDay(); // 0=Sun
+
+        // Build EMI map for this month: day -> [{bank, emi, description}]
+        const emiMap = {};
+        currentLoanData.forEach(loan => {
+            if (loan.monthsRemaining <= 0) return;
+            const loanStart = new Date(
+                parseInt(loan.rowElement.dataset.startYear),
+                parseInt(loan.rowElement.dataset.startMonth) - 1,
+                parseInt(loan.rowElement.dataset.startDay) || 1
+            );
+            const loanEnd = new Date(
+                parseInt(loan.rowElement.dataset.endYear),
+                parseInt(loan.rowElement.dataset.endMonth) - 1,
+                parseInt(loan.rowElement.dataset.endDay) || 28
+            );
+            const emiDay = loan.emiDay;
+            if (emiDay < 1 || emiDay > daysInMonth) return;
+            const emiDate = new Date(year, month, emiDay);
+            if (emiDate >= loanStart && emiDate <= loanEnd) {
+                if (!emiMap[emiDay]) emiMap[emiDay] = [];
+                emiMap[emiDay].push(loan);
+            }
+        });
+
+        // Render calendar grid
+        const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        let html = '<div class="cal-grid">';
+        dayNames.forEach(d => { html += `<div class="cal-header-cell">${d}</div>`; });
+
+        // Empty cells before first day
+        for (let i = 0; i < firstDow; i++) html += '<div class="cal-cell cal-empty"></div>';
+
+        const today = new Date();
+        for (let day = 1; day <= daysInMonth; day++) {
+            const emis = emiMap[day] || [];
+            const totalEmi = emis.reduce((s, l) => s + l.emi, 0);
+            const isDanger = emis.length >= 2;
+            const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
+            const hasEmi = emis.length > 0;
+
+            let cellClass = 'cal-cell';
+            if (isToday) cellClass += ' cal-today';
+            if (isDanger) cellClass += ' cal-danger';
+            else if (hasEmi) cellClass += ' cal-has-emi';
+
+            // Build rich tooltip HTML (rendered into a data attribute, shown via JS)
+            const tooltipLines = emis.map(l =>
+                `<div class="cal-tip-line"><span class="cal-tip-bank">${l.bankName}</span><span class="cal-tip-desc">${l.description}</span><span class="cal-tip-emi">₹${l.emi.toLocaleString('en-IN')}</span></div>`
+            ).join('');
+            const tooltipTotal = emis.length > 1
+                ? `<div class="cal-tip-total">Total: ₹${totalEmi.toLocaleString('en-IN')}</div>`
+                : '';
+            const tooltipHtml = hasEmi
+                ? `<div class="cal-tip-header">${day} ${cashflowDate.toLocaleString('default',{month:'short'})} — ${emis.length} EMI${emis.length>1?'s':''}</div>${tooltipLines}${tooltipTotal}`
+                : '';
+
+            html += `<div class="${cellClass}" data-cal-tip="${hasEmi ? encodeURIComponent(tooltipHtml) : ''}">
+                <span class="cal-day-num">${day}</span>
+                ${hasEmi ? `<span class="cal-emi-dot"></span>` : ''}
+                ${hasEmi ? `<span class="cal-emi-total">₹${(totalEmi/1000).toFixed(0)}k</span>` : ''}
+            </div>`;
+        }
+        html += '</div>';
+        calEl.innerHTML = html;
+
+        // Attach hover tooltip to cells with EMI data
+        const tipBox = document.getElementById('cal-tooltip');
+        calEl.querySelectorAll('.cal-cell[data-cal-tip]').forEach(cell => {
+            const raw = cell.getAttribute('data-cal-tip');
+            if (!raw) return;
+            cell.addEventListener('mouseenter', (e) => {
+                tipBox.innerHTML = decodeURIComponent(raw);
+                tipBox.style.display = 'block';
+                positionCalTip(e, tipBox);
+            });
+            cell.addEventListener('mousemove', (e) => positionCalTip(e, tipBox));
+            cell.addEventListener('mouseleave', () => { tipBox.style.display = 'none'; });
+        });
+
+        // Summary below calendar
+        const dangerDays = Object.entries(emiMap).filter(([,loans]) => loans.length >= 2);
+        const totalMonthEmi = Object.values(emiMap).flat().reduce((s,l) => s + l.emi, 0);
+        const emiDaysSorted = Object.keys(emiMap).map(Number).sort((a,b)=>a-b);
+
+        let summaryHtml = `<div class="cashflow-summary-row"><span>Total EMI this month</span><strong>₹${totalMonthEmi.toLocaleString('en-IN')}</strong></div>`;
+        summaryHtml += `<div class="cashflow-summary-row"><span>EMI dates</span><strong>${emiDaysSorted.join(', ')}</strong></div>`;
+        if (dangerDays.length) {
+            const dangerList = dangerDays.map(([d, loans]) => `${d}${['th','st','nd','rd'][[0,1,2,3].includes(+d%10) && (+d<11||+d>13) ? +d%10 : 0]||'th'} (${loans.length} EMIs, ₹${loans.reduce((s,l)=>s+l.emi,0).toLocaleString('en-IN')})`).join('; ');
+            summaryHtml += `<div class="cashflow-summary-row danger-row"><span><i class="fas fa-exclamation-triangle"></i> Danger days</span><strong>${dangerList}</strong></div>`;
+        }
+        summaryEl.innerHTML = summaryHtml;
+    }
+
+    document.getElementById('cashflow-prev')?.addEventListener('click', () => {
+        cashflowDate.setMonth(cashflowDate.getMonth() - 1);
+        renderCashflowCalendar();
+    });
+    document.getElementById('cashflow-next')?.addEventListener('click', () => {
+        cashflowDate.setMonth(cashflowDate.getMonth() + 1);
+        renderCashflowCalendar();
+    });
+
+    // ================================================================
+    // Hook new features into updateDashboard
+    // ================================================================
+    function runNewFeatures() {
+        renderInterestRateComparison();
+        renderCCEmiTracker();
+        renderCashflowCalendar();
+        populateAutoDebitLoans();
+        updateReminderBadge();
+        fireNotificationsIfDue();
+    }
+
     // Initialize database
     initializeDatabase();
     updateDashboard();
+    runNewFeatures();
 
 
     // ============= END LOAN DATABASE MANAGEMENT =============
