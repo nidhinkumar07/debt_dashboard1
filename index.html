@@ -24,23 +24,59 @@
         </button>
     </header>
 
-    <!-- EMI Reminder Settings Modal -->
+    <!-- EMI Reminder Settings Modal — Redesigned -->
     <div id="reminderModal" class="modal">
-        <div class="modal-content" style="max-width:420px;">
-            <span class="close-admin" id="closeReminderModal">&times;</span>
-            <h2><i class="fas fa-bell"></i> EMI Reminder Settings</h2>
-            <div style="margin-bottom:16px;">
-                <label style="font-weight:600;display:block;margin-bottom:6px;">Notify me <strong><span
-                            id="reminderDaysLabel">3</span> days</strong> before each EMI is due</label>
-                <input type="range" id="reminderDaysSlider" min="1" max="10" value="3" style="width:100%;">
-                <div style="display:flex;justify-content:space-between;font-size:0.78em;color:#64748b;"><span>1
-                        day</span><span>10 days</span></div>
+        <div class="modal-content rmd-modal">
+            <button class="rmd-close" id="closeReminderModal"><i class="fas fa-times"></i></button>
+
+            <!-- Header -->
+            <div class="rmd-header">
+                <div class="rmd-header-icon"><i class="fas fa-bell"></i></div>
+                <div>
+                    <h2 class="rmd-title">EMI Reminders</h2>
+                    <p class="rmd-subtitle">Schedule when you want to be notified</p>
+                </div>
+                <div id="notifPermStatus" class="rmd-perm-badge"></div>
             </div>
-            <button id="requestNotifPermBtn" class="btn-save" style="width:100%;margin-bottom:10px;">
-                <i class="fas fa-bell"></i> Enable Browser Notifications
-            </button>
-            <div id="notifPermStatus" style="font-size:0.85em;text-align:center;margin-bottom:12px;"></div>
-            <div id="upcoming-reminders-list"></div>
+
+            <!-- Tab Row -->
+            <div class="rmd-tabs">
+                <button class="rmd-tab active" data-tab="schedule"><i class="fas fa-clock"></i> Schedule</button>
+                <button class="rmd-tab" data-tab="upcoming"><i class="fas fa-list"></i> Upcoming</button>
+            </div>
+
+            <!-- TAB: Schedule -->
+            <div class="rmd-tab-panel" id="rmdTab-schedule">
+
+                <!-- Days-before slider -->
+                <div class="rmd-section">
+                    <label class="rmd-label">Remind me <span class="rmd-accent" id="reminderDaysLabel">3</span> days
+                        before EMI due date</label>
+                    <input type="range" id="reminderDaysSlider" min="1" max="10" value="3" class="rmd-slider">
+                    <div class="rmd-slider-ticks"><span>1d</span><span>5d</span><span>10d</span></div>
+                </div>
+
+                <!-- Notification Time -->
+                <div class="rmd-section">
+                    <label class="rmd-label"><i class="fas fa-clock" style="margin-right:6px;color:#3b82f6;"></i>Send
+                        notification at</label>
+                    <div class="rmd-time-row">
+                        <input type="time" id="reminderTime" class="rmd-time-input" value="09:00">
+                        <span class="rmd-time-hint">Daily at this time</span>
+                    </div>
+                </div>
+
+                <!-- Enable Notifications -->
+                <button id="requestNotifPermBtn" class="rmd-btn-enable">
+                    <i class="fas fa-bell"></i> Enable Browser Notifications
+                </button>
+            </div>
+
+            <!-- TAB: Upcoming -->
+            <div class="rmd-tab-panel" id="rmdTab-upcoming" style="display:none;">
+                <div id="upcoming-reminders-list" class="rmd-upcoming-list"></div>
+            </div>
+
         </div>
     </div>
 
