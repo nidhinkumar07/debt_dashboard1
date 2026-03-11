@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentLoanData = []; // Store processed loan data globally
 
     // --- Bank Logo Mapping (Placeholder Images) ---
-    const bankLogos = { "IDFC BANK": "images/idfc.png", "SBI BANK": "images/sbi.png", "ICICI BANK": "images/icicibank.png", "KOTAK BANK": "images/kotakbank.png", "DMI FINANCE": "images/dmifinance.png", "AXIS BANK": "images/axisbank.png", "RBL BANK": "images/rblbank.png", "CREDIT SAISON": "images/creditsaison.png", "INDUSIND BANK": "images/indusindbank.png" };
+    const bankLogos = { "IDFC BANK": "images/idfc.png", "SBI BANK": "images/sbi.png", "ICICI BANK": "images/icicibank.png", "KOTAK BANK": "images/kotakbank.png", "DMI FINANCE": "images/dmifinance.png", "AXIS BANK": "images/axisbank.png", "RBL BANK": "images/rblbank.png", "CREDIT SAISON": "images/creditsaison.png", "INDUSIND BANK": "images/indusindbank.png", "HDFC BANK": "images/hdfcbank.png" };
 
 
     const BANK_FORECLOSURE_RULES = {
@@ -2302,6 +2302,10 @@ document.addEventListener('DOMContentLoaded', function () {
         return parseInt(localStorage.getItem('reminderDays') || '3');
     }
 
+    function getReminderTime() {
+        return localStorage.getItem('reminderTime') || '09:00';
+    }
+
     function getUpcomingEmiReminders(daysAhead) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -2326,12 +2330,23 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!badge) return;
         const days = getReminderDays();
         const upcoming = getUpcomingEmiReminders(days);
-        if (upcoming.length > 0) {
-            badge.textContent = upcoming.length;
+        const total = upcoming.length;
+        if (total > 0) {
+            badge.textContent = total;
             badge.style.display = 'flex';
         } else {
             badge.style.display = 'none';
         }
+    }
+
+    function getBankIcon(bankName) {
+        if (!bankName) return 'images/favicon.png';
+        const upper = bankName.toUpperCase();
+        // Exact match first
+        if (bankLogos[upper]) return bankLogos[upper];
+        // Fuzzy match — find first key that appears in the bank name or vice versa
+        const match = Object.keys(bankLogos).find(k => upper.includes(k) || k.includes(upper));
+        return match ? bankLogos[match] : 'images/favicon.png';
     }
 
     function fireNotificationsIfDue() {
@@ -2342,48 +2357,108 @@ document.addEventListener('DOMContentLoaded', function () {
         const todayKey = new Date().toISOString().slice(0, 10);
         if (!fired[todayKey]) fired[todayKey] = [];
 
-        upcoming.forEach(({ loan, daysLeft }) => {
-            const key = `${loan.bankName}-${loan.description}-${daysLeft}`;
-            if (!fired[todayKey].includes(key)) {
-                const title = daysLeft === 0 ? `EMI Due TODAY — ${loan.bankName}` : `EMI in ${daysLeft} day${daysLeft > 1 ? 's' : ''} — ${loan.bankName}`;
-                new Notification(title, {
-                    body: `${loan.description}: ₹${loan.emi.toLocaleString('en-IN')} due on ${loan.emiDay}${['th','st','nd','rd'][Math.min(loan.emiDay % 10, 3) * (loan.emiDay < 11 || loan.emiDay > 13 ? 1 : 0)] || 'th'}`,
-                    icon: 'images/favicon.png'
-                });
-                fired[todayKey].push(key);
-            }
-        });
-        // Prune old keys
+        const [rh, rm] = getReminderTime().split(':').map(Number);
+        const now = new Date();
+        // Only fire if current time is at or past the scheduled reminder time
+        const scheduledToday = new Date();
+        scheduledToday.setHours(rh, rm, 0, 0);
+        if (now < scheduledToday) {
+            // Schedule them for later today
+            upcoming.forEach(({ loan, daysLeft }) => {
+                const key = `${loan.bankName}-${loan.description}-${daysLeft}`;
+                if (!fired[todayKey].includes(key)) {
+                    const emiAmt = `₹${loan.emi.toLocaleString('en-IN')}`;
+                    const loanLabel = `${loan.bankName} ${loan.description}`;
+                    const dueDate = new Date();
+                    dueDate.setDate(dueDate.getDate() + daysLeft);
+                    const dueDateStr = dueDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+                    let title, body;
+                    if (daysLeft === 0) {
+                        title = `⚠️ EMI Alert: ${emiAmt} for ${loanLabel}`;
+                        body = `Your EMI is due TODAY! Don't miss your payment.`;
+                    } else if (daysLeft === 1) {
+                        title = `⚠️ EMI Alert: ${emiAmt} for ${loanLabel}`;
+                        body = `is due tomorrow.`;
+                    } else {
+                        title = `🔔 EMI Reminder: ${emiAmt} for ${loanLabel}`;
+                        body = `is due in ${daysLeft} days (${dueDateStr}).`;
+                    }
+                    const bankIcon = getBankIcon(loan.bankName);
+                    const delay = scheduledToday - now;
+                    setTimeout(() => {
+                        if (Notification.permission === 'granted') {
+                            new Notification(title, { body, icon: bankIcon });
+                        }
+                    }, delay);
+                    fired[todayKey].push(key);
+                }
+            });
+        } else {
+            upcoming.forEach(({ loan, daysLeft }) => {
+                const key = `${loan.bankName}-${loan.description}-${daysLeft}`;
+                if (!fired[todayKey].includes(key)) {
+                    const emiAmt = `₹${loan.emi.toLocaleString('en-IN')}`;
+                    const loanLabel = `${loan.bankName} ${loan.description}`;
+                    const dueDate = new Date();
+                    dueDate.setDate(dueDate.getDate() + daysLeft);
+                    const dueDateStr = dueDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+                    let title, body;
+                    if (daysLeft === 0) {
+                        title = `⚠️ EMI Alert: ${emiAmt} for ${loanLabel}`;
+                        body = `Your EMI is due TODAY! Don't miss your payment.`;
+                    } else if (daysLeft === 1) {
+                        title = `⚠️ EMI Alert: ${emiAmt} for ${loanLabel}`;
+                        body = `is due tomorrow.`;
+                    } else {
+                        title = `🔔 EMI Reminder: ${emiAmt} for ${loanLabel}`;
+                        body = `is due in ${daysLeft} days (${dueDateStr}).`;
+                    }
+                    new Notification(title, {
+                        body,
+                        icon: getBankIcon(loan.bankName)
+                    });
+                    fired[todayKey].push(key);
+                }
+            });
+        }
         Object.keys(fired).forEach(k => { if (k < todayKey) delete fired[k]; });
         localStorage.setItem('firedNotifs', JSON.stringify(fired));
     }
 
     function renderReminderModal() {
         const statusEl = document.getElementById('notifPermStatus');
-        const listEl = document.getElementById('upcoming-reminders-list');
         const slider = document.getElementById('reminderDaysSlider');
-        if (!statusEl || !listEl) return;
+        const timeInput = document.getElementById('reminderTime');
 
         const perm = Notification.permission;
-        if (perm === 'granted') {
-            statusEl.innerHTML = '<span style="color:#16a34a;">✅ Notifications enabled</span>';
-        } else if (perm === 'denied') {
-            statusEl.innerHTML = '<span style="color:#dc2626;">❌ Notifications blocked — please enable in browser settings</span>';
-        } else {
-            statusEl.innerHTML = '<span style="color:#f59e0b;">⚠️ Permission not yet granted</span>';
+        if (statusEl) {
+            if (perm === 'granted') {
+                statusEl.innerHTML = '✅ Enabled';
+                statusEl.style.color = '#d1fae5';
+            } else if (perm === 'denied') {
+                statusEl.innerHTML = '❌ Blocked';
+                statusEl.style.color = '#fecaca';
+            } else {
+                statusEl.innerHTML = '⚠️ Not set';
+                statusEl.style.color = '#fde68a';
+            }
         }
 
         const days = getReminderDays();
         if (slider) slider.value = days;
         const label = document.getElementById('reminderDaysLabel');
         if (label) label.textContent = days;
+        if (timeInput) timeInput.value = getReminderTime();
 
+        // Upcoming tab
+        const listEl = document.getElementById('upcoming-reminders-list');
+        if (!listEl) return;
         const upcoming = getUpcomingEmiReminders(days);
         if (!upcoming.length) {
-            listEl.innerHTML = `<p style="color:#64748b;font-size:0.85em;text-align:center;">No EMIs due within the next ${days} day${days > 1 ? 's' : ''}.</p>`;
+            listEl.innerHTML = `<p class="rmd-empty" style="padding:20px 0;">No EMIs due within the next ${days} day${days > 1 ? 's' : ''}.</p>`;
             return;
         }
-        listEl.innerHTML = `<h4 style="margin:0 0 8px;font-size:0.9em;color:#1f3a5f;">Upcoming within ${days} day${days > 1 ? 's' : ''}:</h4>`;
+        listEl.innerHTML = `<p style="font-size:0.78em;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;">Within next ${days} day${days > 1 ? 's' : ''}</p>`;
         upcoming.forEach(({ loan, daysLeft }) => {
             const urgencyClass = daysLeft === 0 ? 'reminder-today' : daysLeft <= 2 ? 'reminder-soon' : 'reminder-upcoming';
             const urgencyText = daysLeft === 0 ? 'TODAY' : `in ${daysLeft}d`;
@@ -2407,6 +2482,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const reqPermBtn = document.getElementById('requestNotifPermBtn');
     const daysSlider = document.getElementById('reminderDaysSlider');
     const daysLabel = document.getElementById('reminderDaysLabel');
+    const timeInput = document.getElementById('reminderTime');
 
     if (bellBtn && reminderModal) {
         bellBtn.addEventListener('click', () => {
@@ -2418,6 +2494,18 @@ document.addEventListener('DOMContentLoaded', function () {
         closeReminderBtn.addEventListener('click', () => { reminderModal.style.display = 'none'; });
     }
     window.addEventListener('click', e => { if (e.target === reminderModal) reminderModal.style.display = 'none'; });
+
+    // Tab switching
+    document.querySelectorAll('.rmd-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.rmd-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.rmd-tab-panel').forEach(p => p.style.display = 'none');
+            tab.classList.add('active');
+            const target = document.getElementById('rmdTab-' + tab.dataset.tab);
+            if (target) target.style.display = 'block';
+            if (tab.dataset.tab === 'upcoming') renderReminderModal();
+        });
+    });
 
     if (reqPermBtn) {
         reqPermBtn.addEventListener('click', () => {
@@ -2439,8 +2527,14 @@ document.addEventListener('DOMContentLoaded', function () {
         daysSlider.addEventListener('input', () => {
             daysLabel.textContent = daysSlider.value;
             localStorage.setItem('reminderDays', daysSlider.value);
-            renderReminderModal();
             updateReminderBadge();
+        });
+    }
+
+    if (timeInput) {
+        timeInput.addEventListener('change', () => {
+            localStorage.setItem('reminderTime', timeInput.value);
+            showToast(`Daily reminder time set to ${timeInput.value}`, 'success');
         });
     }
 
