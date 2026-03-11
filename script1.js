@@ -2482,12 +2482,24 @@ document.addEventListener('DOMContentLoaded', function () {
     const reqPermBtn = document.getElementById('requestNotifPermBtn');
     const daysSlider = document.getElementById('reminderDaysSlider');
     const daysLabel = document.getElementById('reminderDaysLabel');
-    const timeInput = document.getElementById('reminderTime');
 
     if (bellBtn && reminderModal) {
         bellBtn.addEventListener('click', () => {
             renderReminderModal();
             reminderModal.style.display = 'block';
+
+            // Attach time input listener after modal is visible
+            const ti = document.getElementById('reminderTime');
+            if (ti && !ti._listenerAttached) {
+                ti._listenerAttached = true;
+                const saveTime = () => {
+                    if (!ti.value) return;
+                    localStorage.setItem('reminderTime', ti.value);
+                    showToast(`Reminder time set to ${ti.value}`, 'success');
+                };
+                ti.addEventListener('change', saveTime);
+                ti.addEventListener('input', saveTime);
+            }
         });
     }
     if (closeReminderBtn && reminderModal) {
@@ -2528,13 +2540,6 @@ document.addEventListener('DOMContentLoaded', function () {
             daysLabel.textContent = daysSlider.value;
             localStorage.setItem('reminderDays', daysSlider.value);
             updateReminderBadge();
-        });
-    }
-
-    if (timeInput) {
-        timeInput.addEventListener('change', () => {
-            localStorage.setItem('reminderTime', timeInput.value);
-            showToast(`Daily reminder time set to ${timeInput.value}`, 'success');
         });
     }
 
