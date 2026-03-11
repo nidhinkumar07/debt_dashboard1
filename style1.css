@@ -3940,17 +3940,260 @@ header {
 }
 
 /* ================================================================
-   REMINDER MODAL ITEMS
+   REDESIGNED REMINDER MODAL
 ================================================================ */
+.rmd-modal {
+    max-width: 460px;
+    padding: 0;
+    border-radius: 18px;
+    overflow: hidden;
+    font-family: inherit;
+}
+
+.rmd-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: rgba(0, 0, 0, 0.06);
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #64748b;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 0.2s;
+}
+
+.rmd-close:hover {
+    background: rgba(0, 0, 0, 0.12);
+}
+
+.rmd-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 24px 24px 16px;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+    color: #fff;
+    position: relative;
+}
+
+.rmd-header-icon {
+    width: 46px;
+    height: 46px;
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.rmd-title {
+    margin: 0 0 2px;
+    font-size: 1.15em;
+    font-weight: 700;
+}
+
+.rmd-subtitle {
+    margin: 0;
+    font-size: 0.78em;
+    opacity: 0.75;
+}
+
+.rmd-perm-badge {
+    margin-left: auto;
+    font-size: 0.72em;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.rmd-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid #e8eef6;
+    background: #f8fafc;
+}
+
+.rmd-tab {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 0.84em;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.rmd-tab.active {
+    color: #2563eb;
+    border-bottom-color: #2563eb;
+    background: #fff;
+}
+
+.rmd-tab-panel {
+    padding: 20px 24px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.rmd-section {
+    margin-bottom: 20px;
+}
+
+.rmd-label {
+    display: block;
+    font-size: 0.82em;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.rmd-accent {
+    color: #2563eb;
+    font-size: 1.1em;
+}
+
+.rmd-slider {
+    width: 100%;
+    accent-color: #2563eb;
+    height: 6px;
+    cursor: pointer;
+}
+
+.rmd-slider-ticks {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72em;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+.rmd-time-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rmd-time-input {
+    padding: 10px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1em;
+    font-weight: 600;
+    color: #1f3a5f;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.rmd-time-input:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: #fff;
+}
+
+.rmd-time-hint {
+    font-size: 0.78em;
+    color: #94a3b8;
+}
+
+/* Scheduled Alerts List */
+/* Buttons */
+.rmd-btn-enable {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9em;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.2s, transform 0.15s;
+    margin-top: 4px;
+}
+
+.rmd-btn-enable:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.rmd-btn-primary {
+    flex: 1;
+    padding: 10px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.84em;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+
+.rmd-btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.rmd-btn-ghost {
+    padding: 10px 16px;
+    background: none;
+    color: #64748b;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.84em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.rmd-btn-ghost:hover {
+    background: #f1f5f9;
+}
+
+/* Upcoming tab items */
+.rmd-upcoming-list {
+    padding-top: 4px;
+}
+
 .reminder-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 9px 12px;
-    border-radius: 8px;
-    margin-bottom: 6px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 8px;
     font-size: 0.85em;
-    gap: 8px;
+    gap: 10px;
+    border: 1px solid transparent;
 }
 
 .reminder-item-left {
@@ -3962,14 +4205,15 @@ header {
 
 .reminder-urgency {
     font-weight: 700;
-    font-size: 0.78em;
-    padding: 2px 7px;
-    border-radius: 5px;
+    font-size: 0.76em;
+    padding: 3px 8px;
+    border-radius: 6px;
     white-space: nowrap;
 }
 
 .reminder-today {
     background: #fef2f2;
+    border-color: #fecaca;
 }
 
 .reminder-today .reminder-urgency {
@@ -3979,6 +4223,7 @@ header {
 
 .reminder-soon {
     background: #fffbeb;
+    border-color: #fde68a;
 }
 
 .reminder-soon .reminder-urgency {
@@ -3988,6 +4233,7 @@ header {
 
 .reminder-upcoming {
     background: #f0f9ff;
+    border-color: #bae6fd;
 }
 
 .reminder-upcoming .reminder-urgency {
@@ -3996,12 +4242,13 @@ header {
 }
 
 .reminder-bank {
-    font-weight: 600;
+    font-weight: 700;
     color: #1f3a5f;
 }
 
 .reminder-desc {
     color: #64748b;
+    font-size: 0.92em;
 }
 
 .reminder-amt {
