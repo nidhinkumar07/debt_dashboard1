@@ -4117,6 +4117,31 @@ header {
     color: #94a3b8;
 }
 
+.rmd-time-save-btn {
+    padding: 9px 16px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.85em;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.2s, transform 0.15s;
+    white-space: nowrap;
+}
+
+.rmd-time-save-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.rmd-time-save-btn.saved {
+    background: #10b981;
+}
+
 /* Scheduled Alerts List */
 /* Buttons */
 .rmd-btn-enable {
@@ -4140,43 +4165,6 @@ header {
 .rmd-btn-enable:hover {
     opacity: 0.9;
     transform: translateY(-1px);
-}
-
-.rmd-btn-primary {
-    flex: 1;
-    padding: 10px;
-    background: #2563eb;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.84em;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: background 0.2s;
-}
-
-.rmd-btn-primary:hover {
-    background: #1d4ed8;
-}
-
-.rmd-btn-ghost {
-    padding: 10px 16px;
-    background: none;
-    color: #64748b;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 0.84em;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.rmd-btn-ghost:hover {
-    background: #f1f5f9;
 }
 
 /* Upcoming tab items */
