@@ -1,5 +1,50 @@
 document.addEventListener('DOMContentLoaded', function () {
 
+    // ============= SECURITY HELPERS =============
+
+    // Sanitize user input before injecting into innerHTML (prevents XSS)
+    function sanitize(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#x27;');
+    }
+
+    // Safe localStorage JSON read — returns fallback if corrupted
+    function safeLocalStorageGet(key, fallback) {
+        try {
+            const val = localStorage.getItem(key);
+            return val ? JSON.parse(val) : fallback;
+        } catch (e) {
+            console.warn(`localStorage key "${key}" corrupted, resetting.`, e);
+            localStorage.removeItem(key);
+            return fallback;
+        }
+    }
+
+    // Validate a loan object has all required fields with sane values
+    function isValidLoan(loan) {
+        if (!loan || typeof loan !== 'object') return false;
+        const requiredStr = ['bankName', 'description'];
+        const requiredNum = ['initialAmount', 'emi', 'interestRate', 'tenure', 'startDay', 'startMonth', 'startYear', 'emiDay'];
+        for (const f of requiredStr) {
+            if (!loan[f] || typeof loan[f] !== 'string' || !loan[f].trim()) return false;
+        }
+        for (const f of requiredNum) {
+            if (loan[f] === undefined || isNaN(Number(loan[f]))) return false;
+        }
+        if (loan.initialAmount <= 0 || loan.emi <= 0 || loan.tenure <= 0) return false;
+        if (loan.interestRate < 0 || loan.interestRate > 100) return false;
+        if (loan.startDay < 1 || loan.startDay > 31) return false;
+        if (loan.startMonth < 1 || loan.startMonth > 12) return false;
+        if (loan.startYear < 2000 || loan.startYear > 2100) return false;
+        if (loan.emiDay < 1 || loan.emiDay > 31) return false;
+        return true;
+    }
+
     // ============= TOAST NOTIFICATION SYSTEM =============
     function showToast(message, type = 'info', duration = 3200) {
         const container = document.getElementById('toast-container');
@@ -98,20 +143,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // --- Foreclosure Calculator References ---
-    const foreclosureModal = document.getElementById('foreclosureModal');
     const foreclosureChargesInput = document.getElementById('foreclosureCharges');
     const foreclosureGSTInput = document.getElementById('foreclosureGST');
-    const foreclosureWarning = document.getElementById('foreclosureWarning');
-    const remainingPrincipalDisplay = document.getElementById('remainingPrincipalDisplay');
     const chargesPercentDisplay = document.getElementById('chargesPercentDisplay');
     const chargesAmountDisplay = document.getElementById('chargesAmountDisplay');
     const gstPercentDisplay = document.getElementById('gstPercentDisplay');
     const gstAmountDisplay = document.getElementById('gstAmountDisplay');
     const totalForeclosureAmountDisplay = document.getElementById('totalForeclosureAmountDisplay');
-    const interestSavedDisplay = document.getElementById('interestSavedDisplay');
-    const monthsPendingDisplay = document.getElementById('monthsPendingDisplay');
-    const interestPaidDisplay = document.getElementById('interestPaidDisplay');
-    const totalInterestDisplay = document.getElementById('totalInterestDisplay');
 
 
 
@@ -401,13 +439,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const foreclosureModal = document.getElementById('foreclosureModal');
         const monthsPendingDisplay = document.getElementById('monthsPendingDisplay');
         const foreclosureWarning = document.getElementById('foreclosureWarning');
-        const foreclosureChargesInput = document.getElementById('foreclosureCharges');
-        const foreclosureGSTInput = document.getElementById('foreclosureGST');
-        const chargesPercentDisplay = document.getElementById('chargesPercentDisplay');
-        const chargesAmountDisplay = document.getElementById('chargesAmountDisplay');
-        const gstPercentDisplay = document.getElementById('gstPercentDisplay');
-        const gstAmountDisplay = document.getElementById('gstAmountDisplay');
-        const totalForeclosureAmountDisplay = document.getElementById('totalForeclosureAmountDisplay');
         const interestPaidDisplay = document.getElementById('interestPaidDisplay');
         const interestSavedDisplay = document.getElementById('interestSavedDisplay');
         const totalInterestDisplay = document.getElementById('totalInterestDisplay');
@@ -897,7 +928,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 : 'Completed';
 
             // Calculate Due Countdown Text
+            // eslint-disable-next-line no-useless-assignment
             let dueCountdownText = '';
+            // eslint-disable-next-line no-useless-assignment
             let dueCountdownClass = '';
             if (monthsRemaining <= 0) {
                 dueCountdownText = 'Loan Completed!';
@@ -1073,6 +1106,7 @@ document.addEventListener('DOMContentLoaded', function () {
      * @param {number} totalRemainingAmount - The total remaining loan amount.
      * @param {number} totalEmi - The total monthly EMI.
      */
+    // eslint-disable-next-line no-unused-vars
     function updateOverallProgressSection(estimatedTotalInitialAmount, totalRemainingAmount, totalEmi) {
         if (overallProgressBar && overallProgressRaised && overallProgressTotal && estimatedTotalInitialAmount > 0) {
             const totalPaidAmount = estimatedTotalInitialAmount - totalRemainingAmount;
@@ -1134,10 +1168,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 loanBox.innerHTML = `
                     <div class="card-header">
-                        <h3 class="bank-name">${loan.bankName}</h3>
-                        <img src="${logoUrl}" alt="${loan.bankName} Logo" class="bank-logo">
+                        <h3 class="bank-name">${sanitize(loan.bankName)}</h3>
+                        <img src="${sanitize(logoUrl)}" alt="${sanitize(loan.bankName)} Logo" class="bank-logo">
                     </div>
-                    <p>${loan.description}</p>
+                    <p>${sanitize(loan.description)}</p>
                     <p>EMI: ₹${loan.emi.toLocaleString('en-IN', indianRupeeOptions)}</p>
                     <p>Interest Rate: ${loan.annualInterestRate}%</p>
 
@@ -1198,6 +1232,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 forecastElement.classList.add('yearly-forecast-item');
 
                 const yearLabel = document.createElement('h3');
+                // eslint-disable-next-line no-useless-assignment
                 let amountDisplay = '';
                 let additionalInfo = '';
 
@@ -1233,7 +1268,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 emiForecastSection.appendChild(forecastElement);
             }
         } else {
-            console.log("EMI Forecast section not found in the HTML.");
+            // EMI Forecast section not present — skip render
         }
     }
 
@@ -1408,7 +1443,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             item.innerHTML = `
                 <div class="top-loan-header">
-                    <span class="top-loan-bank">${loan.bankName}</span>
+                    <span class="top-loan-bank">${sanitize(loan.bankName)}</span>
                     <span class="top-loan-emi">
                         EMI: ₹<span>${loan.emi.toLocaleString('en-IN')}</span>
                     </span>
@@ -1627,7 +1662,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function initializeDatabase() {
         const savedLoans = localStorage.getItem('loansDatabase');
         if (savedLoans) {
-            loansDatabase = JSON.parse(savedLoans);
+            loansDatabase = safeLocalStorageGet('loansDatabase', []);
             renderLoansFromDatabase();
         } else {
             loadHardcodedLoans();
@@ -1994,8 +2029,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
             row.innerHTML = `
-                <td>${loan.bankName}</td>
-                <td>${loan.description}</td>
+                <td>${sanitize(loan.bankName)}</td>
+                <td>${sanitize(loan.description)}</td>
                 <td class="end-date"></td>
                 <td>₹ ${loan.emi.toLocaleString('en-IN')}</td>
                 <td class="remaining-amount"></td>
@@ -2021,7 +2056,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const modal = document.getElementById('adminModal');
         if (modal) {
             modal.style.display = 'none';
-            resetForm();
+            resetForm(); // eslint-disable-line no-undef
         }
     };
 
@@ -2040,8 +2075,8 @@ document.addEventListener('DOMContentLoaded', function () {
         loansDatabase.forEach((loan, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${loan.bankName}</td>
-                <td>${loan.description}</td>
+                <td>${sanitize(loan.bankName)}</td>
+                <td>${sanitize(loan.description)}</td>
                 <td>₹ ${loan.initialAmount.toLocaleString('en-IN')}</td>
                 <td>₹ ${loan.emi.toLocaleString('en-IN')}</td>
                 <td>
@@ -2086,11 +2121,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const initialAmt = parseFloat(document.getElementById('initialAmount').value);
             const emiAmt = parseFloat(document.getElementById('emi').value);
-            const rate = parseFloat(document.getElementById('interestRate').value);
             const tenure = parseInt(document.getElementById('tenure').value);
 
             if (!hasError && emiAmt * tenure < initialAmt) {
                 showToast('Warning: Total EMI payments are less than the initial amount. Please check the values.', 'warning', 5000);
+            }
+
+            // Numeric range validation
+            const interestRate = parseFloat(document.getElementById('interestRate').value);
+            const startDay = parseInt(document.getElementById('startDay').value);
+            const startMonth = parseInt(document.getElementById('startMonth').value);
+            const startYear = parseInt(document.getElementById('startYear').value);
+            const emiDay = parseInt(document.getElementById('emiDay').value);
+
+            if (!hasError) {
+                if (initialAmt <= 0) { showToast('Initial amount must be greater than 0.', 'error'); return; }
+                if (emiAmt <= 0)     { showToast('EMI amount must be greater than 0.', 'error'); return; }
+                if (tenure <= 0)     { showToast('Tenure must be at least 1 month.', 'error'); return; }
+                if (interestRate < 0 || interestRate > 100) { showToast('Interest rate must be between 0 and 100.', 'error'); return; }
+                if (startDay < 1 || startDay > 31)         { showToast('Start day must be between 1 and 31.', 'error'); return; }
+                if (startMonth < 1 || startMonth > 12)     { showToast('Start month must be between 1 and 12.', 'error'); return; }
+                if (startYear < 2000 || startYear > 2100)  { showToast('Start year must be between 2000 and 2100.', 'error'); return; }
+                if (emiDay < 1 || emiDay > 31)             { showToast('EMI day must be between 1 and 31.', 'error'); return; }
             }
 
             if (hasError) {
@@ -2131,9 +2183,7 @@ document.addEventListener('DOMContentLoaded', function () {
             refreshAdminLoansList();
             updateDashboard();
             runNewFeatures();
-            resetForm();
-
-            showToast(editMode ? 'Loan updated successfully!' : 'Loan added successfully!', 'success');
+            resetForm(); // eslint-disable-line no-undef
         });
     }
 
@@ -2199,11 +2249,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 try {
                     const importedLoans = JSON.parse(e.target.result);
                     if (Array.isArray(importedLoans)) {
-                        loansDatabase = importedLoans;
+                        const validLoans = importedLoans.filter(isValidLoan);
+                        const skipped = importedLoans.length - validLoans.length;
+                        if (validLoans.length === 0) {
+                            showToast('No valid loans found in file.', 'error');
+                            return;
+                        }
+                        loansDatabase = validLoans;
                         saveToLocalStorage();
                         renderLoansFromDatabase();
                         refreshAdminLoansList();
-                        showToast('Loans imported successfully!', 'success');
+                        const msg = skipped > 0
+                            ? `Imported ${validLoans.length} loans (${skipped} invalid entries skipped).`
+                            : `Loans imported successfully! (${validLoans.length} loans)`;
+                        showToast(msg, skipped > 0 ? 'warning' : 'success');
                     } else {
                         showToast('Invalid file format — expected a JSON array.', 'error');
                     }
@@ -2218,7 +2277,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Admin panel event listeners
     const adminBtn = document.getElementById('adminToggleBtn');
     if (adminBtn) {
-        adminBtn.addEventListener('click', openAdminPanel);
+        adminBtn.addEventListener('click', openAdminPanel); // eslint-disable-line no-undef
     }
 
     // Use querySelectorAll and wire each .close-admin to its own modal
@@ -2226,14 +2285,14 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.addEventListener('click', function () {
             const modal = this.closest('.modal');
             if (modal) modal.style.display = 'none';
-            if (modal && modal.id === 'adminModal') resetForm();
+            if (modal && modal.id === 'adminModal') resetForm(); // eslint-disable-line no-undef
         });
     });
 
     window.addEventListener('click', function (event) {
         const modal = document.getElementById('adminModal');
         if (event.target === modal) {
-            closeAdminPanel();
+            closeAdminPanel(); // eslint-disable-line no-undef
         }
     });
 
@@ -2260,13 +2319,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Sort by actual interest cost % descending
         loansWithPct.sort((a, b) => b.interestPct - a.interestPct);
-        const maxInterestPct = loansWithPct[0].interestPct;
 
         container.innerHTML = '';
-        loansWithPct.forEach(({ loan, totalPayable, totalInterest, interestPct, principalPct }, i) => {
+        loansWithPct.forEach(({ loan, interestPct }, i) => {
             const rate = loan.annualInterestRate;
-            // Bar width relative to highest interest cost loan
-            const barPct = maxInterestPct > 0 ? (interestPct / maxInterestPct) * 100 : 0;
             let colorClass = 'rate-low';
             if (interestPct >= 20) colorClass = 'rate-high';
             else if (interestPct >= 12) colorClass = 'rate-medium';
@@ -2276,8 +2332,8 @@ document.addEventListener('DOMContentLoaded', function () {
             row.innerHTML = `
                 <div class="rate-row-header">
                     <span class="rate-rank">#${i + 1}</span>
-                    <span class="rate-bank">${loan.bankName}</span>
-                    <span class="rate-desc">${loan.description}</span>
+                    <span class="rate-bank">${sanitize(loan.bankName)}</span>
+                    <span class="rate-desc">${sanitize(loan.description)}</span>
                     <span class="rate-badge ${colorClass}">${interestPct.toFixed(1)}% <span class="rate-annual">(${rate}% p.a.)</span></span>
                 </div>
                 <div class="rate-meta">
@@ -2291,7 +2347,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (tipEl && loansWithPct.length >= 1) {
             const { loan: top, interestPct: topPct } = loansWithPct[0];
             tipEl.style.display = 'block';
-            tipEl.innerHTML = `<i class="fas fa-crosshairs"></i> <strong>Attack first:</strong> ${top.bankName} ${top.description} — <strong>${topPct.toFixed(1)}%</strong> of total payments is pure interest.`;
+            tipEl.innerHTML = `<i class="fas fa-crosshairs"></i> <strong>Attack first:</strong> ${sanitize(top.bankName)} ${sanitize(top.description)} — <strong>${topPct.toFixed(1)}%</strong> of total payments is pure interest.`;
         }
     }
 
@@ -2353,7 +2409,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (Notification.permission !== 'granted') return;
         const days = getReminderDays();
         const upcoming = getUpcomingEmiReminders(days);
-        const fired = JSON.parse(localStorage.getItem('firedNotifs') || '{}');
+        const fired = safeLocalStorageGet('firedNotifs', {});
         const todayKey = new Date().toISOString().slice(0, 10);
         if (!fired[todayKey]) fired[todayKey] = [];
 
@@ -2467,8 +2523,8 @@ document.addEventListener('DOMContentLoaded', function () {
             item.innerHTML = `
                 <div class="reminder-item-left">
                     <span class="reminder-urgency">${urgencyText}</span>
-                    <span class="reminder-bank">${loan.bankName}</span>
-                    <span class="reminder-desc">${loan.description}</span>
+                    <span class="reminder-bank">${sanitize(loan.bankName)}</span>
+                    <span class="reminder-desc">${sanitize(loan.description)}</span>
                 </div>
                 <span class="reminder-amt">₹${loan.emi.toLocaleString('en-IN')}</span>`;
             listEl.appendChild(item);
@@ -2488,17 +2544,23 @@ document.addEventListener('DOMContentLoaded', function () {
             renderReminderModal();
             reminderModal.style.display = 'block';
 
-            // Attach time input listener after modal is visible
+            // Attach time input + Set button listener after modal is visible
             const ti = document.getElementById('reminderTime');
-            if (ti && !ti._listenerAttached) {
-                ti._listenerAttached = true;
-                const saveTime = () => {
+            const saveBtn = document.getElementById('saveReminderTimeBtn');
+            if (ti && saveBtn && !saveBtn._listenerAttached) {
+                saveBtn._listenerAttached = true;
+                saveBtn.addEventListener('click', () => {
                     if (!ti.value) return;
                     localStorage.setItem('reminderTime', ti.value);
                     showToast(`Reminder time set to ${ti.value}`, 'success');
-                };
-                ti.addEventListener('change', saveTime);
-                ti.addEventListener('input', saveTime);
+                    // Brief green flash on button
+                    saveBtn.classList.add('saved');
+                    saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+                    setTimeout(() => {
+                        saveBtn.classList.remove('saved');
+                        saveBtn.innerHTML = '<i class="fas fa-check"></i> Set';
+                    }, 1500);
+                });
             }
         });
     }
@@ -2587,10 +2649,10 @@ document.addEventListener('DOMContentLoaded', function () {
             card.className = 'cc-emi-card';
             card.innerHTML = `
                 <div class="cc-emi-card-header">
-                    <span class="cc-emi-bank">${loan.bankName}</span>
+                    <span class="cc-emi-bank">${sanitize(loan.bankName)}</span>
                     <span class="cc-emi-badge">EMI Conversion</span>
                 </div>
-                <div class="cc-emi-desc">${loan.description}</div>
+                <div class="cc-emi-desc">${sanitize(loan.description)}</div>
                 <div class="cc-emi-rows">
                     <div class="cc-emi-row"><span>Monthly EMI</span><strong>₹${loan.emi.toLocaleString('en-IN')}</strong></div>
                     <div class="cc-emi-row"><span>EMI Outstanding</span><strong class="emi-amt">₹${emiOutstanding.toLocaleString('en-IN')}</strong></div>
