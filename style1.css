@@ -56,9 +56,12 @@
     --shadow-md: 0 6px 18px rgba(0, 0, 0, .08);
     --shadow-lg: 0 12px 30px rgba(0, 0, 0, .10);
 
-    /* Transitions */
-    --transition-fast: all 0.2s ease;
-    --transition-std: all 0.3s ease;
+    /* Transitions
+     * BATTERY FIX 2: Only animate transform + opacity — both run on the
+     * GPU compositor thread and cost almost nothing. Removed 'all' which
+     * was animating box-shadow/background and causing full repaints. */
+    --transition-fast: transform 0.2s ease, opacity 0.2s ease;
+    --transition-std: transform 0.3s ease, opacity 0.3s ease;
 
     /* Z-index layers */
     --z-sticky: 200;
@@ -171,8 +174,10 @@ header h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: var(--transition-fast);
-    backdrop-filter: blur(4px);
+    /* BATTERY FIX 3: removed backdrop-filter:blur(4px) — forces a permanent
+       GPU compositing layer on every screen load. Semi-transparent background
+       already looks correct without blur. */
+    transition: background 0.2s ease;
 }
 
 .reminder-bell-btn:hover {
@@ -430,7 +435,8 @@ th.sortable:hover {
     border-radius: var(--radius-lg);
     padding: 18px 20px;
     box-shadow: 0 6px 18px rgba(22, 163, 74, .06);
-    transition: var(--transition-fast);
+    /* BATTERY FIX 2: explicit properties only - transform is GPU, box-shadow is cheap here since it only changes on hover not continuously */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     width: 100%;
     min-width: 0;
     overflow: hidden;
@@ -526,7 +532,7 @@ th.sortable:hover {
     padding: 14px 16px;
     margin-top: 15px;
     box-shadow: var(--shadow-md);
-    transition: var(--transition-std);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     width: 100%;
 }
 
@@ -611,7 +617,7 @@ th.sortable:hover {
     box-shadow: 0 4px 10px rgba(0, 0, 0, .04);
     padding: 15px;
     border-radius: 12px;
-    transition: var(--transition-fast);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     position: relative;
 }
 
@@ -1474,9 +1480,9 @@ th.sortable:hover {
     font-weight: 700;
     border: none;
     border-radius: 999px;
-    /* pill shape */
     cursor: pointer;
-    transition: var(--transition-fast);
+    /* BATTERY FIX 2: transform + box-shadow only, not 'all' */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
     white-space: nowrap;
     letter-spacing: 0.3px;
@@ -1563,7 +1569,7 @@ th.sortable:hover {
     justify-content: space-around;
     flex-wrap: wrap;
     gap: 20px;
-    transition: var(--transition-std);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     width: 100%;
 }
 
@@ -1638,7 +1644,7 @@ th.sortable:hover {
     padding: 26px 24px;
     box-shadow: 0 12px 30px rgba(0, 0, 0, .06), inset 0 1px 0 rgba(255, 255, 255, .8);
     position: relative;
-    transition: var(--transition-fast);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     width: 100%;
     min-width: 0;
 }
@@ -2162,7 +2168,7 @@ th.sortable:hover {
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: var(--transition-std);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
 }
 
