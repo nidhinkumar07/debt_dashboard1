@@ -1420,6 +1420,8 @@ document.addEventListener('DOMContentLoaded', function () {
         updateTopLoansList();
         updateDebtByBankSection();
         updateTableLoanRowColors();
+        // BATTERY FIX 1: refresh cached end date whenever loan data changes
+        refreshCachedEndDate();
         updateOverallCountdown();
     }
 
@@ -2178,14 +2180,16 @@ document.addEventListener('DOMContentLoaded', function () {
         html += '</div>';
         calEl.innerHTML = html;
 
-        // Tooltip wiring
+        // Attach hover tooltip to cells with EMI data
+        // BATTERY FIX 4: mousemove throttled — only reposition if cursor
+        // moved more than 4px since last update, not on every pixel
         const tipBox = document.getElementById('cal-tooltip');
+        let _lastTipX = 0, _lastTipY = 0;
         calEl.querySelectorAll('.cal-cell[data-cal-tip]').forEach(cell => {
             const raw = cell.getAttribute('data-cal-tip');
             if (!raw) return;
-            cell.addEventListener('mouseenter', e => {
+            cell.addEventListener('mouseenter', (e) => {
                 try {
-                    // SECURITY FIX: wrap decodeURIComponent in try/catch
                     tipBox.innerHTML = decodeURIComponent(raw);
                 } catch {
                     tipBox.textContent = 'EMI due';
@@ -2193,8 +2197,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 tipBox.style.display = 'block';
                 tipBox.setAttribute('aria-hidden', 'false');
                 positionCalTip(e, tipBox);
+                _lastTipX = e.clientX; _lastTipY = e.clientY;
             });
-            cell.addEventListener('mousemove', e => positionCalTip(e, tipBox));
+            cell.addEventListener('mousemove', (e) => {
+                const dx = e.clientX - _lastTipX;
+                const dy = e.clientY - _lastTipY;
+                if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+                    positionCalTip(e, tipBox);
+                    _lastTipX = e.clientX; _lastTipY = e.clientY;
+                }
+            });
             cell.addEventListener('mouseleave', () => {
                 tipBox.style.display = 'none';
                 tipBox.setAttribute('aria-hidden', 'true');
@@ -2251,11 +2263,47 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ============================================================
     // COUNTDOWN TIMER
-    // BUG FIX: Store interval ID so it can be cleared on unload
+    // BATTERY FIX 1:
+    //  - End date cached once — no DOM querySelectorAll every second
+    //  - Fires every 60s not 1s (display shows days, not seconds)
+    //  - Pauses when tab is hidden; resumes on tab return
     // ============================================================
-    const countdownInterval = setInterval(updateOverallCountdown, 1000);
-    window.addEventListener('beforeunload', () => clearInterval(countdownInterval));
+
+    let _cachedEndDate = null;
+
+    function refreshCachedEndDate() {
+        _cachedEndDate = getMaxEndDate();
+    }
+
+    function updateOverallCountdown() {
+        const endDate = _cachedEndDate;
+        const now = new Date();
+        const el = document.getElementById('overallFreedomText');
+        if (!el) return;
+        if (!endDate || endDate < now) {
+            el.textContent = '🎉 Loan Free!';
+            return;
+        }
+        const { years, months, days } = getTimeComponents(now, endDate);
+        el.textContent = `Freedom In: ${years} yrs ${months} mo ${days} days`;
+    }
+
+    refreshCachedEndDate();
     updateOverallCountdown();
+
+    let countdownInterval = setInterval(updateOverallCountdown, 60000);
+
+    // Pause when tab hidden, resume when visible — saves CPU in background
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            clearInterval(countdownInterval);
+        } else {
+            updateOverallCountdown();
+            countdownInterval = setInterval(updateOverallCountdown, 60000);
+        }
+    });
+
+    window.addEventListener('beforeunload', () => clearInterval(countdownInterval));
 
     if (overallProgressSection) {
         const overallCountdownContainer = document.createElement('div');
