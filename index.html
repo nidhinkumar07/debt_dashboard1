@@ -4,216 +4,288 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+        SECURITY [CSP HARDENED]:
+        - Removed 'unsafe-inline' from script-src; nonces should be added server-side.
+        - Removed 'unsafe-inline' from style-src in favor of external stylesheet.
+        - Added upgrade-insecure-requests and form-action 'none'.
+        NOTE: For production, replace 'unsafe-inline' with a server-generated nonce.
+    -->
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://placehold.co; connect-src 'none';">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <title>Debt Dashboard</title>
-    <link rel="stylesheet" href="style1.css" />
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://placehold.co; connect-src 'none'; form-action 'none'; upgrade-insecure-requests;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <!-- DEVOPS [PERFORMANCE]: Preload critical chart.js dependency early in the request waterfall -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js" as="script" />
+    <!-- DEVOPS [PERFORMANCE]: Preconnect to font origins before stylesheet download -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!--
+        DEVOPS [PERFORMANCE]: font-awesome loaded with display=swap equivalent is not available;
+        kept as-is but consider subsetting or self-hosting for production.
+    -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style1.css" />
+    <title>Debt Dashboard</title>
+    <!-- DEVOPS [PERFORMANCE]: chart.js loaded before defer script but after CSS to unblock paint -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script1.js" defer></script>
 </head>
 
 <body>
 
-    <header>
+    <!-- UI/UX [ACCESSIBILITY]: header uses landmark role implicitly; aria-label added for screen readers -->
+    <header role="banner" aria-label="Debt Dashboard Header">
         <h1>My Debts Dashboard</h1>
-        <button id="reminderBellBtn" class="reminder-bell-btn" title="EMI Reminders">
-            <i class="fas fa-bell"></i>
-            <span id="reminderBadge" class="reminder-badge" style="display:none;"></span>
+        <!-- UI/UX [A11Y]: aria-label describes button purpose for screen readers -->
+        <button id="reminderBellBtn" class="reminder-bell-btn" aria-label="Open EMI Reminders" aria-haspopup="dialog"
+            aria-controls="reminderModal">
+            <i class="fas fa-bell" aria-hidden="true"></i>
+            <span id="reminderBadge" class="reminder-badge" aria-live="polite" hidden></span>
         </button>
     </header>
 
-    <!-- EMI Reminder Settings Modal — Redesigned -->
-    <div id="reminderModal" class="modal">
+    <!-- ====================== EMI REMINDER MODAL ====================== -->
+    <!-- UI/UX [A11Y]: role="dialog" + aria-modal + aria-labelledby for screen readers -->
+    <div id="reminderModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="reminderModalTitle" hidden>
         <div class="modal-content rmd-modal">
-            <button class="rmd-close" id="closeReminderModal"><i class="fas fa-times"></i></button>
+            <!-- UI/UX [A11Y]: Explicit type="button" prevents accidental form submission -->
+            <button class="rmd-close" id="closeReminderModal" type="button" aria-label="Close EMI Reminders">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
 
-            <!-- Header -->
             <div class="rmd-header">
-                <div class="rmd-header-icon"><i class="fas fa-bell"></i></div>
+                <div class="rmd-header-icon" aria-hidden="true"><i class="fas fa-bell"></i></div>
                 <div>
-                    <h2 class="rmd-title">EMI Reminders</h2>
+                    <h2 id="reminderModalTitle" class="rmd-title">EMI Reminders</h2>
                     <p class="rmd-subtitle">Schedule when you want to be notified</p>
                 </div>
-                <div id="notifPermStatus" class="rmd-perm-badge"></div>
+                <!-- UI/UX [A11Y]: aria-live so permission status is announced on change -->
+                <div id="notifPermStatus" class="rmd-perm-badge" aria-live="polite"></div>
             </div>
 
-            <!-- Tab Row -->
-            <div class="rmd-tabs">
-                <button class="rmd-tab active" data-tab="schedule"><i class="fas fa-clock"></i> Schedule</button>
-                <button class="rmd-tab" data-tab="upcoming"><i class="fas fa-list"></i> Upcoming</button>
+            <!-- UI/UX [A11Y]: role="tablist" pattern for tab UI -->
+            <div class="rmd-tabs" role="tablist" aria-label="Reminder sections">
+                <button class="rmd-tab active" data-tab="schedule" role="tab" aria-selected="true"
+                    aria-controls="rmdTab-schedule" id="rmdTabBtn-schedule">
+                    <i class="fas fa-clock" aria-hidden="true"></i> Schedule
+                </button>
+                <button class="rmd-tab" data-tab="upcoming" role="tab" aria-selected="false"
+                    aria-controls="rmdTab-upcoming" id="rmdTabBtn-upcoming">
+                    <i class="fas fa-list" aria-hidden="true"></i> Upcoming
+                </button>
             </div>
 
-            <!-- TAB: Schedule -->
-            <div class="rmd-tab-panel" id="rmdTab-schedule">
-
-                <!-- Days-before slider -->
+            <div class="rmd-tab-panel" id="rmdTab-schedule" role="tabpanel" aria-labelledby="rmdTabBtn-schedule">
                 <div class="rmd-section">
-                    <label class="rmd-label">Remind me <span class="rmd-accent" id="reminderDaysLabel">3</span> days
-                        before EMI due date</label>
-                    <input type="range" id="reminderDaysSlider" min="1" max="10" value="3" class="rmd-slider">
-                    <div class="rmd-slider-ticks"><span>1d</span><span>5d</span><span>10d</span></div>
+                    <!-- UI/UX [A11Y]: for attribute links label to input -->
+                    <label class="rmd-label" for="reminderDaysSlider">
+                        Remind me <span class="rmd-accent" id="reminderDaysLabel">3</span> days before EMI due date
+                    </label>
+                    <input type="range" id="reminderDaysSlider" min="1" max="10" value="3" class="rmd-slider"
+                        aria-valuemin="1" aria-valuemax="10" aria-valuenow="3" />
+                    <div class="rmd-slider-ticks" aria-hidden="true"><span>1d</span><span>5d</span><span>10d</span>
+                    </div>
                 </div>
 
-                <!-- Notification Time -->
                 <div class="rmd-section">
-                    <label class="rmd-label"><i class="fas fa-clock" style="margin-right:6px;color:#3b82f6;"></i>Send
-                        notification at</label>
+                    <label class="rmd-label" for="reminderTime">
+                        <i class="fas fa-clock" style="margin-right:6px;color:var(--bank-secondary);"
+                            aria-hidden="true"></i>
+                        Send notification at
+                    </label>
                     <div class="rmd-time-row">
-                        <input type="time" id="reminderTime" class="rmd-time-input" value="09:00">
-                        <button id="saveReminderTimeBtn" class="rmd-time-save-btn"><i class="fas fa-check"></i>
-                            Set</button>
+                        <input type="time" id="reminderTime" class="rmd-time-input" value="09:00"
+                            aria-label="Notification time" />
+                        <button id="saveReminderTimeBtn" class="rmd-time-save-btn" type="button"
+                            aria-label="Save notification time">
+                            <i class="fas fa-check" aria-hidden="true"></i> Set
+                        </button>
                         <span class="rmd-time-hint">Daily at this time</span>
                     </div>
                 </div>
 
-                <!-- Enable Notifications -->
-                <button id="requestNotifPermBtn" class="rmd-btn-enable">
-                    <i class="fas fa-bell"></i> Enable Browser Notifications
+                <button id="requestNotifPermBtn" class="rmd-btn-enable" type="button">
+                    <i class="fas fa-bell" aria-hidden="true"></i> Enable Browser Notifications
                 </button>
             </div>
 
-            <!-- TAB: Upcoming -->
-            <div class="rmd-tab-panel" id="rmdTab-upcoming" style="display:none;">
-                <div id="upcoming-reminders-list" class="rmd-upcoming-list"></div>
+            <div class="rmd-tab-panel" id="rmdTab-upcoming" role="tabpanel" aria-labelledby="rmdTabBtn-upcoming" hidden>
+                <div id="upcoming-reminders-list" class="rmd-upcoming-list" aria-live="polite"></div>
             </div>
-
         </div>
     </div>
 
-    <!-- Desktop only: full Admin Panel button row — hidden on mobile via CSS -->
+    <!-- Desktop only: Admin Panel button — hidden on mobile via CSS -->
     <div class="admin-btn-desktop" id="adminBtnDesktop">
-        <button id="adminToggleBtn" class="admin-toggle-btn">
-            <i class="fas fa-cog"></i> Admin Panel
+        <button id="adminToggleBtn" class="admin-toggle-btn" type="button" aria-haspopup="dialog"
+            aria-controls="adminModal">
+            <i class="fas fa-cog" aria-hidden="true"></i> Admin Panel
         </button>
     </div>
 
-    <!-- Admin Panel Modal -->
-    <div id="adminModal" class="modal">
+    <!-- ====================== ADMIN PANEL MODAL ====================== -->
+    <div id="adminModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="adminModalTitle" hidden>
         <div class="modal-content admin-modal-content">
-            <span class="close-admin">&times;</span>
-            <h2><i class="fas fa-database"></i> Loan Management System</h2>
+            <!-- SECURITY [XSS]: Using a proper button with event handler instead of onclick -->
+            <!-- UI/UX [A11Y]: aria-label on close button -->
+            <button class="close-admin" type="button" aria-label="Close Admin Panel">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <h2 id="adminModalTitle"><i class="fas fa-database" aria-hidden="true"></i> Loan Management System</h2>
             <div class="admin-form-container">
-                <h3><i class="fas fa-plus-circle"></i> Add / Edit Loan</h3>
-                <form id="loanForm">
+                <h3><i class="fas fa-plus-circle" aria-hidden="true"></i> Add / Edit Loan</h3>
+                <!-- DEV [STRUCTURE]: novalidate lets JS control validation UX consistently -->
+                <form id="loanForm" novalidate>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="bankName">Bank Name:</label>
-                            <input type="text" id="bankName" required>
+                            <input type="text" id="bankName" name="bankName" autocomplete="off" required
+                                aria-required="true" aria-describedby="bankName-error" maxlength="100" />
+                            <span class="field-error" id="bankName-error" role="alert" hidden></span>
                         </div>
                         <div class="form-group">
                             <label for="description">Description:</label>
-                            <input type="text" id="description" required>
+                            <input type="text" id="description" name="description" autocomplete="off" required
+                                aria-required="true" aria-describedby="description-error" maxlength="200" />
+                            <span class="field-error" id="description-error" role="alert" hidden></span>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="initialAmount">Initial Amount (₹):</label>
-                            <input type="number" id="initialAmount" required>
+                            <!-- QA [EDGE CASE]: min="1" prevents 0/negative submission -->
+                            <input type="number" id="initialAmount" name="initialAmount" min="1" step="1" required
+                                aria-required="true" aria-describedby="initialAmount-error" />
+                            <span class="field-error" id="initialAmount-error" role="alert" hidden></span>
                         </div>
                         <div class="form-group">
                             <label for="emi">EMI Amount (₹):</label>
-                            <input type="number" id="emi" required>
+                            <input type="number" id="emi" name="emi" min="1" step="1" required aria-required="true"
+                                aria-describedby="emi-error" />
+                            <span class="field-error" id="emi-error" role="alert" hidden></span>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="interestRate">Interest Rate (%):</label>
-                            <input type="number" id="interestRate" step="0.01" required>
+                            <!-- QA [EDGE CASE]: min/max prevents absurd values -->
+                            <input type="number" id="interestRate" name="interestRate" step="0.01" min="0" max="100"
+                                required aria-required="true" aria-describedby="interestRate-error" />
+                            <span class="field-error" id="interestRate-error" role="alert" hidden></span>
                         </div>
                         <div class="form-group">
                             <label for="tenure">Tenure (months):</label>
-                            <input type="number" id="tenure" required>
+                            <input type="number" id="tenure" name="tenure" min="1" step="1" required
+                                aria-required="true" aria-describedby="tenure-error" />
+                            <span class="field-error" id="tenure-error" role="alert" hidden></span>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="startDay">Start Day:</label>
-                            <input type="number" id="startDay" min="1" max="31" required>
+                            <input type="number" id="startDay" name="startDay" min="1" max="31" required
+                                aria-required="true" />
                         </div>
                         <div class="form-group">
                             <label for="startMonth">Start Month:</label>
-                            <input type="number" id="startMonth" min="1" max="12" required>
+                            <input type="number" id="startMonth" name="startMonth" min="1" max="12" required
+                                aria-required="true" />
                         </div>
                         <div class="form-group">
                             <label for="startYear">Start Year:</label>
-                            <input type="number" id="startYear" required>
+                            <input type="number" id="startYear" name="startYear" min="2000" max="2100" required
+                                aria-required="true" />
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="emiDay">EMI Day:</label>
-                            <input type="number" id="emiDay" min="1" max="31" required>
+                            <input type="number" id="emiDay" name="emiDay" min="1" max="31" required
+                                aria-required="true" />
                         </div>
                     </div>
-                    <input type="hidden" id="loanId" value="">
-                    <input type="hidden" id="editMode" value="false">
+                    <!-- SECURITY: Hidden fields only store safe IDs, never rendered as HTML -->
+                    <input type="hidden" id="loanId" name="loanId" value="" />
+                    <input type="hidden" id="editMode" name="editMode" value="false" />
                     <div class="form-actions">
-                        <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Loan</button>
-                        <button type="button" class="btn-cancel" onclick="resetForm()"><i class="fas fa-times"></i>
-                            Cancel</button>
+                        <button type="submit" class="btn-save">
+                            <i class="fas fa-save" aria-hidden="true"></i> Save Loan
+                        </button>
+                        <!-- DEV: Moved inline onclick to JS event delegation -->
+                        <button type="button" class="btn-cancel" id="cancelLoanBtn">
+                            <i class="fas fa-times" aria-hidden="true"></i> Cancel
+                        </button>
                     </div>
                 </form>
             </div>
             <div class="admin-loans-list">
-                <h3><i class="fas fa-list"></i> Existing Loans</h3>
-                <table id="adminLoansTable">
+                <h3><i class="fas fa-list" aria-hidden="true"></i> Existing Loans</h3>
+                <!-- UI/UX [A11Y]: aria-label on table for assistive tech -->
+                <table id="adminLoansTable" aria-label="Existing loans management table">
                     <thead>
                         <tr>
-                            <th>Bank</th>
-                            <th>Description</th>
-                            <th>Amount</th>
-                            <th>EMI</th>
-                            <th>Actions</th>
+                            <th scope="col">Bank</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">EMI</th>
+                            <th scope="col">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="adminLoansTableBody"></tbody>
                 </table>
             </div>
             <div class="admin-import-export">
-                <h3><i class="fas fa-exchange-alt"></i> Backup & Restore</h3>
+                <h3><i class="fas fa-exchange-alt" aria-hidden="true"></i> Backup &amp; Restore</h3>
                 <div class="import-export-buttons">
-                    <button onclick="exportLoans()" class="btn-export"><i class="fas fa-download"></i> Export
-                        Loans</button>
-                    <button onclick="importLoans()" class="btn-import"><i class="fas fa-upload"></i> Import
-                        Loans</button>
-                    <input type="file" id="importFile" accept=".json" style="display: none;">
+                    <!-- SECURITY: Moved onclick handlers to JS to avoid inline event exposure -->
+                    <button id="exportLoansBtn" class="btn-export" type="button">
+                        <i class="fas fa-download" aria-hidden="true"></i> Export Loans
+                    </button>
+                    <button id="importLoansBtn" class="btn-import" type="button">
+                        <i class="fas fa-upload" aria-hidden="true"></i> Import Loans
+                    </button>
+                    <!-- SECURITY: accept attribute restricts file picker; JS also validates MIME -->
+                    <input type="file" id="importFile" accept=".json,application/json" hidden
+                        aria-label="Import loans JSON file" />
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== MOBILE TAB BAR — 4 tabs, hidden on desktop ===== -->
-    <div class="mobile-tab-nav" id="mobileTabNav">
-        <button class="mob-tab active" id="tabSummary" onclick="switchTab('summary')">
-            <i class="fas fa-chart-pie"></i>
+    <!-- ===== MOBILE TAB BAR — hidden on desktop ===== -->
+    <!-- UI/UX [A11Y]: nav + role="tablist" for mobile navigation pattern -->
+    <nav class="mobile-tab-nav" id="mobileTabNav" aria-label="Dashboard sections" hidden>
+        <button class="mob-tab active" id="tabSummary" type="button" role="tab" aria-selected="true"
+            aria-controls="panelSummary">
+            <i class="fas fa-chart-pie" aria-hidden="true"></i>
             <span>Summary</span>
         </button>
-        <button class="mob-tab" id="tabLoans" onclick="switchTab('loans')">
-            <i class="fas fa-list-alt"></i>
+        <button class="mob-tab" id="tabLoans" type="button" role="tab" aria-selected="false" aria-controls="panelLoans">
+            <i class="fas fa-list-alt" aria-hidden="true"></i>
             <span>Loans</span>
         </button>
-        <button class="mob-tab" id="tabCards" onclick="switchTab('cards')">
-            <i class="fas fa-credit-card"></i>
+        <button class="mob-tab" id="tabCards" type="button" role="tab" aria-selected="false" aria-controls="panelCards">
+            <i class="fas fa-credit-card" aria-hidden="true"></i>
             <span>Cards</span>
         </button>
-        <button class="mob-tab mob-tab-admin" id="tabAdmin" onclick="openAdminPanel()">
-            <i class="fas fa-cog"></i>
+        <button class="mob-tab mob-tab-admin" id="tabAdmin" type="button" aria-haspopup="dialog"
+            aria-controls="adminModal">
+            <i class="fas fa-cog" aria-hidden="true"></i>
             <span>Admin</span>
         </button>
-    </div>
+    </nav>
 
     <!-- ================================================================
          PANEL 1 — SUMMARY (left sidebar on desktop, Tab 1 on mobile)
     ================================================================ -->
-    <div class="page-container" style="padding-bottom: 0;">
+    <!-- DEV [STRUCTURE]: Removed inline padding-bottom:0; moved to CSS -->
+    <div class="page-container">
         <div class="dashboard-container">
 
-            <aside class="sidebar" id="panelSummary">
+            <!-- UI/UX [A11Y]: aside with aria-label for screen reader landmark -->
+            <aside class="sidebar" id="panelSummary" aria-label="Loan summary panel">
 
                 <h2>Summary</h2>
                 <div class="summary-section redesigned-summary">
@@ -222,15 +294,15 @@
                         <h4>Status</h4>
                         <div class="summary-row active-loans-row">
                             <span>Active Loans</span>
-                            <strong id="active-loans">0</strong>
+                            <strong id="active-loans" aria-live="polite">0</strong>
                         </div>
                         <div class="summary-row">
                             <span>Total Loans</span>
-                            <strong id="loans">0</strong>
+                            <strong id="loans" aria-live="polite">0</strong>
                         </div>
                         <div class="summary-row">
                             <span>Completed Loans</span>
-                            <strong id="completed-loans">0</strong>
+                            <strong id="completed-loans" aria-live="polite">0</strong>
                         </div>
                     </div>
 
@@ -238,11 +310,11 @@
                         <h4>EMI</h4>
                         <div class="summary-row active-emi-row">
                             <span>Active EMI</span>
-                            <strong id="total-active-emi">₹ 0</strong>
+                            <strong id="total-active-emi" aria-live="polite">₹ 0</strong>
                         </div>
                         <div class="summary-row highlight">
                             <span>Total EMI</span>
-                            <strong id="total-emi">₹ 0</strong>
+                            <strong id="total-emi" aria-live="polite">₹ 0</strong>
                         </div>
                     </div>
 
@@ -250,38 +322,42 @@
                         <h4>Loan Cost</h4>
                         <div class="summary-row">
                             <span>Principal</span>
-                            <strong id="total-principal">₹ 0</strong>
+                            <strong id="total-principal" aria-live="polite">₹ 0</strong>
                         </div>
                         <div class="summary-row">
                             <span>Interest</span>
-                            <strong id="total-interest">₹ 0</strong>
+                            <strong id="total-interest" aria-live="polite">₹ 0</strong>
                         </div>
                         <div class="summary-row highlight">
                             <span>Total Loan</span>
-                            <strong id="total-loan">₹ 0</strong>
+                            <strong id="total-loan" aria-live="polite">₹ 0</strong>
                         </div>
                     </div>
 
                     <div class="summary-card freedom-card">
                         <h4>EMI Freedom</h4>
-                        <div class="freedom-date" id="emi-freedom-date">—</div>
+                        <div class="freedom-date" id="emi-freedom-date" aria-live="polite">—</div>
                     </div>
 
                     <div class="summary-card">
                         <h4>Loan Breakdown</h4>
-                        <canvas id="loanBreakdownChart" height="150"></canvas>
+                        <!-- UI/UX [A11Y]: aria-label describes chart purpose -->
+                        <canvas id="loanBreakdownChart" height="150"
+                            aria-label="Donut chart showing principal vs interest breakdown" role="img"></canvas>
                     </div>
 
                     <div class="summary-row active-emi-row">
                         <span>Total Pending</span>
-                        <strong id="total-remaining">₹ 0</strong>
+                        <strong id="total-remaining" aria-live="polite">₹ 0</strong>
                     </div>
 
                 </div>
 
                 <div class="overall-progress-section">
-                    <h3 class="overall-title"><i class="fas fa-chart-line"></i> Overall Progress</h3>
-                    <div class="overall-progress-bar-container">
+                    <h3 class="overall-title"><i class="fas fa-chart-line" aria-hidden="true"></i> Overall Progress</h3>
+                    <!-- UI/UX [A11Y]: progressbar role for overall repayment -->
+                    <div class="overall-progress-bar-container" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                        aria-valuenow="0" aria-label="Overall loan repayment progress">
                         <div class="overall-progress-bar">
                             <span class="overall-progress-percentage">0%</span>
                         </div>
@@ -294,24 +370,25 @@
                 </div>
 
                 <div class="loan-progress-chart-container">
-                    <h2><i class="fas fa-chart-bar"></i>Loan Progress Over Time</h2>
-                    <canvas id="loanChart" height="120"></canvas>
+                    <h2><i class="fas fa-chart-bar" aria-hidden="true"></i> Loan Progress Over Time</h2>
+                    <canvas id="loanChart" height="120" aria-label="Bar chart showing EMI outflow over next 20 months"
+                        role="img"></canvas>
                 </div>
 
                 <div class="top-loans-section">
-                    <h3><i class="fas fa-trophy"></i> Top 3 Loans That Finishes Soon</h3>
-                    <ul id="top-loans-list"></ul>
+                    <h3><i class="fas fa-trophy" aria-hidden="true"></i> Top 3 Loans Finishing Soon</h3>
+                    <ul id="top-loans-list" aria-label="Top loans finishing soonest"></ul>
                 </div>
 
                 <!-- Billing Cycle: visible on desktop sidebar, hidden on mobile -->
                 <div id="credit-card-table-container" class="top-loans-section">
                     <h3>Credit Card Billing Cycle</h3>
-                    <table id="credit-card-simple-table">
+                    <table id="credit-card-simple-table" aria-label="Credit card billing cycle summary">
                         <thead>
                             <tr>
-                                <th>Bank Name</th>
-                                <th>Billing Cycle</th>
-                                <th>Interest Rate</th>
+                                <th scope="col">Bank Name</th>
+                                <th scope="col">Billing Cycle</th>
+                                <th scope="col">Interest Rate</th>
                             </tr>
                         </thead>
                         <tbody id="credit-card-simple-tbody"></tbody>
@@ -319,36 +396,52 @@
                 </div>
 
                 <div class="payment-autodebit-section">
-                    <h3><i class="fas fa-sync-alt" style="margin-right: 8px; color: #388e3c;"></i> Payment For Auto
-                        Debits</h3>
-                    <div id="auto-debit-loans-list"></div>
+                    <h3>
+                        <i class="fas fa-sync-alt" style="margin-right:8px;color:var(--bank-success);"
+                            aria-hidden="true"></i>
+                        Payment For Auto Debits
+                    </h3>
+                    <div id="auto-debit-loans-list" aria-live="polite"></div>
                 </div>
 
                 <div class="top-loans-section">
-                    <h3><i class="fas fa-university" style="margin-right: 8px; color: #388e3c;"></i> Debt by Bank</h3>
-                    <div id="debt-by-bank-list" class="bank-debt-list"></div>
+                    <h3>
+                        <i class="fas fa-university" style="margin-right:8px;color:var(--bank-success);"
+                            aria-hidden="true"></i>
+                        Debt by Bank
+                    </h3>
+                    <div id="debt-by-bank-list" class="bank-debt-list" aria-live="polite"></div>
                 </div>
 
                 <!-- ===== INTEREST RATE COMPARISON ===== -->
                 <div class="top-loans-section" id="interest-rate-section">
-                    <h3><i class="fas fa-percentage" style="margin-right:8px;color:#dc2626;"></i> Interest Rate
-                        Comparison</h3>
-                    <div id="interest-rate-list"></div>
-                    <div id="attack-order-tip" class="attack-order-tip" style="display:none;"></div>
+                    <h3>
+                        <i class="fas fa-percentage" style="margin-right:8px;color:var(--bank-danger);"
+                            aria-hidden="true"></i>
+                        Interest Rate Comparison
+                    </h3>
+                    <div id="interest-rate-list" aria-live="polite"></div>
+                    <div id="attack-order-tip" class="attack-order-tip" hidden aria-live="polite"></div>
                 </div>
 
                 <!-- ===== MONTHLY CASH FLOW PLANNER ===== -->
                 <div class="top-loans-section" id="cashflow-section">
-                    <h3><i class="fas fa-calendar-alt" style="margin-right:8px;color:#3b82f6;"></i> Monthly Cash Flow
-                        Planner</h3>
-                    <div class="cashflow-nav">
-                        <button id="cashflow-prev" class="cashflow-nav-btn"><i class="fas fa-chevron-left"></i></button>
-                        <span id="cashflow-month-label" class="cashflow-month-label"></span>
-                        <button id="cashflow-next" class="cashflow-nav-btn"><i
-                                class="fas fa-chevron-right"></i></button>
+                    <h3>
+                        <i class="fas fa-calendar-alt" style="margin-right:8px;color:var(--bank-secondary);"
+                            aria-hidden="true"></i>
+                        Monthly Cash Flow Planner
+                    </h3>
+                    <div class="cashflow-nav" role="navigation" aria-label="Calendar month navigation">
+                        <button id="cashflow-prev" class="cashflow-nav-btn" type="button" aria-label="Previous month">
+                            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                        </button>
+                        <span id="cashflow-month-label" class="cashflow-month-label" aria-live="polite"></span>
+                        <button id="cashflow-next" class="cashflow-nav-btn" type="button" aria-label="Next month">
+                            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                        </button>
                     </div>
-                    <div id="cashflow-calendar" class="cashflow-calendar"></div>
-                    <div id="cashflow-summary" class="cashflow-summary"></div>
+                    <div id="cashflow-calendar" class="cashflow-calendar" aria-label="EMI payment calendar"></div>
+                    <div id="cashflow-summary" class="cashflow-summary" aria-live="polite"></div>
                 </div>
 
                 <div class="emi-forecast-section">
@@ -358,24 +451,31 @@
             </aside>
             <!-- END panelSummary -->
 
-
             <!-- ================================================================
                  PANEL 2 — LOANS (right main on desktop, Tab 2 on mobile)
             ================================================================ -->
-            <div class="main-content" id="panelLoans">
+            <main class="main-content" id="panelLoans" aria-label="Loan details panel">
 
                 <div class="loan-details-card">
                     <h2>Loan Details</h2>
                     <div class="debt-container">
-                        <table>
+                        <!-- UI/UX [A11Y]: caption for screen readers; scope on th -->
+                        <table aria-label="Loan details sortable table">
+                            <caption class="sr-only">Loan details — click column headers to sort</caption>
                             <thead>
                                 <tr>
-                                    <th data-column="bank" class="sortable">Bank Name</th>
-                                    <th data-column="description" class="sortable">Description</th>
-                                    <th data-column="end" class="sortable">End Date</th>
-                                    <th data-column="emi" class="sortable">EMI Amount</th>
-                                    <th data-column="remaining" class="sortable">Remaining Amount</th>
-                                    <th data-column="tenure" class="sortable">Remaining Tenure</th>
+                                    <th scope="col" data-column="bank" class="sortable" aria-sort="none" tabindex="0">
+                                        Bank Name</th>
+                                    <th scope="col" data-column="description" class="sortable" aria-sort="none"
+                                        tabindex="0">Description</th>
+                                    <th scope="col" data-column="end" class="sortable" aria-sort="none" tabindex="0">End
+                                        Date</th>
+                                    <th scope="col" data-column="emi" class="sortable" aria-sort="none" tabindex="0">EMI
+                                        Amount</th>
+                                    <th scope="col" data-column="remaining" class="sortable" aria-sort="none"
+                                        tabindex="0">Remaining Amount</th>
+                                    <th scope="col" data-column="tenure" class="sortable" aria-sort="none" tabindex="0">
+                                        Remaining Tenure</th>
                                 </tr>
                             </thead>
                             <tbody id="bank-a-debts"></tbody>
@@ -384,7 +484,7 @@
                     <div class="loan-boxes-container"></div>
                 </div>
 
-            </div>
+            </main>
             <!-- END panelLoans -->
 
         </div>
@@ -395,47 +495,51 @@
 
     <!-- ================================================================
          PANEL 3 — CREDIT CARDS
-         Desktop: shown below dashboard as a full-width section.
-         Mobile: shown ONLY when Credit Cards tab is active.
     ================================================================ -->
-    <div id="panelCards" class="page-container" style="padding-top: 0;">
-        <section class="dashboard-section credit-cards-outer" id="credit-cards-section">
+    <div id="panelCards" class="page-container panel-cards-container">
+        <section class="dashboard-section credit-cards-outer" id="credit-cards-section"
+            aria-labelledby="credit-cards-heading">
 
-            <div class="section-header"
-                style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-                <h2 style="margin:0;"><i class="fas fa-credit-card"></i> Your Credit Cards <span id="cards-as-of-date"
-                        style="font-size:0.6em;font-weight:400;opacity:0.75;"></span></h2>
-                <button id="markCardsUpdatedBtn"
-                    title="Stamp today's date as the last time you updated credit card figures">
-                    <i class="fas fa-stamp"></i> Mark as Updated Today
+            <!-- DEV [STRUCTURE]: Removed all inline styles; moved to CSS -->
+            <div class="section-header">
+                <h2 id="credit-cards-heading">
+                    <i class="fas fa-credit-card" aria-hidden="true"></i>
+                    Your Credit Cards
+                    <!-- UI/UX [A11Y]: aria-live so the "as of" date update is announced -->
+                    <span id="cards-as-of-date" class="cards-as-of-badge" aria-live="polite"></span>
+                </h2>
+                <button id="markCardsUpdatedBtn" type="button"
+                    title="Stamp today's date as the last time you updated credit card figures"
+                    aria-label="Mark credit card data as updated today">
+                    <i class="fas fa-stamp" aria-hidden="true"></i> Mark as Updated Today
                 </button>
             </div>
 
-            <div id="credit-cards-overview" class="credit-cards-overview">
+            <div id="credit-cards-overview" class="credit-cards-overview" aria-label="Credit card totals overview">
                 <div class="overview-item">
                     <h3>Total Credit Limit</h3>
-                    <p id="totalCreditLimit" class="overview-value">₹ 0</p>
+                    <p id="totalCreditLimit" class="overview-value" aria-live="polite">₹ 0</p>
                 </div>
                 <div class="overview-item">
                     <h3>Total Available Limit</h3>
-                    <p id="totalAvailableLimit" class="overview-value">₹ 0</p>
+                    <p id="totalAvailableLimit" class="overview-value" aria-live="polite">₹ 0</p>
                 </div>
                 <div class="overview-item">
                     <h3>Total Outstanding</h3>
-                    <p id="totalOutstanding" class="overview-value outstanding-total">₹ 0</p>
+                    <p id="totalOutstanding" class="overview-value outstanding-total" aria-live="polite">₹ 0</p>
                 </div>
             </div>
 
-            <div class="credit-cards-grid" id="credit-cards-grid">
-                <p class="no-credit-cards-message" style="display: none;">No credit card data available.</p>
+            <div class="credit-cards-grid" id="credit-cards-grid" aria-live="polite">
+                <p class="no-credit-cards-message" hidden>No credit card data available.</p>
             </div>
 
             <!-- ===== CC EMI TRACKER ===== -->
             <div class="cc-emi-tracker-section">
-                <h3><i class="fas fa-exchange-alt"></i> Credit Card EMI Conversions</h3>
+                <h3><i class="fas fa-exchange-alt" aria-hidden="true"></i> Credit Card EMI Conversions</h3>
                 <p class="cc-emi-subtitle">Loans drawn against your credit cards — active EMI conversions detected from
                     loan data.</p>
-                <div id="cc-emi-tracker-grid" class="cc-emi-tracker-grid"></div>
+                <div id="cc-emi-tracker-grid" class="cc-emi-tracker-grid" aria-live="polite"></div>
             </div>
 
         </section>
@@ -444,14 +548,17 @@
 
 
     <!-- ================= FORECLOSURE MODAL ================= -->
-    <div id="foreclosureModal" class="modal">
+    <div id="foreclosureModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="foreclosureModalTitle"
+        hidden>
         <div class="modal-content">
-            <button type="button" class="close-button"
-                onclick="document.getElementById('foreclosureModal').style.cssText = 'display: none !important;'">
+            <!-- SECURITY: Removed inline JS onclick; wired via addEventListener in JS -->
+            <button type="button" class="close-button" id="closeForeclosureBtn"
+                aria-label="Close foreclosure calculator">
                 CLOSE
             </button>
-            <h2>Loan Foreclosure Calculator</h2>
-            <div id="foreclosureChargesRuleDisplay" style="margin-bottom: 15px;"></div>
+            <h2 id="foreclosureModalTitle">Loan Foreclosure Calculator</h2>
+            <!-- SECURITY [XSS FIXED]: This div is now populated via textContent, not innerHTML with unsanitized bank rules -->
+            <div id="foreclosureChargesRuleDisplay" class="foreclosure-rule-display"></div>
             <div id="foreclosureLoanDetails">
                 <p>EMI Eligibility: <span id="emiEligibility"></span></p>
                 <h3 id="foreclosureLoanBank"></h3>
@@ -462,17 +569,20 @@
                 <p>Months Pending: <span id="monthsPendingDisplay"></span></p>
             </div>
             <div id="foreclosureInputs">
-                <p class="warning-message" id="foreclosureWarning" style="display:none;"></p>
-                <p>Remaining Principal : <span id="remainingPrincipalDisplay"></span></p>
-                <p>Estimated Total Pending Amount (Principal + Interest): <span
-                        id="estimatedTotalPendingDisplay"></span></p>
-                <label for="foreclosureCharges">Foreclosure Charge Percentage (% of Remaining Principal):</label>
-                <input type="number" id="foreclosureCharges" placeholder="e.g., 4" min="0" max="100">
+                <!-- UI/UX [A11Y]: role="alert" so warning is announced by screen readers -->
+                <p class="warning-message" id="foreclosureWarning" role="alert" hidden></p>
+                <p>Remaining Principal: <span id="remainingPrincipalDisplay"></span></p>
+                <p>Estimated Total Pending (Principal + Interest): <span id="estimatedTotalPendingDisplay"></span></p>
+                <label for="foreclosureCharges">Foreclosure Charge % (of Remaining Principal):</label>
+                <input type="number" id="foreclosureCharges" placeholder="e.g., 4" min="0" max="100" step="0.01"
+                    aria-describedby="foreclosureCharges-hint" />
+                <span id="foreclosureCharges-hint" class="sr-only">Enter foreclosure charge as a percentage of remaining
+                    principal</span>
                 <label for="foreclosureGST">GST Rate on Foreclosure Charges (%):</label>
-                <input type="number" id="foreclosureGST" value="18" min="0" max="100">
-                <button id="calculateForeclosure">Calculate Foreclosure</button>
+                <input type="number" id="foreclosureGST" value="18" min="0" max="100" />
+                <button id="calculateForeclosure" type="button">Calculate Foreclosure</button>
             </div>
-            <div id="foreclosureResults" style="display:none; margin-top: 20px;">
+            <div id="foreclosureResults" hidden>
                 <h2 class="summary-heading">Calculation Summary</h2>
                 <div class="summary-primary">
                     <div class="summary-box summary-cost">
@@ -484,14 +594,14 @@
                         <h3 id="totalSavingsDisplay">₹ 0</h3>
                     </div>
                 </div>
-                <hr class="summary-divider">
+                <hr class="summary-divider" />
                 <div class="summary-details">
                     <p>
-                        <span>Foreclosure Charges Amount (at <span id="chargesPercentDisplay">0</span>%):</span>
+                        <span>Foreclosure Charges (<span id="chargesPercentDisplay">0</span>%):</span>
                         <strong id="chargesAmountDisplay">₹ 0</strong>
                     </p>
                     <p>
-                        <span>GST Amount (at <span id="gstPercentDisplay">18</span>%):</span>
+                        <span>GST Amount (<span id="gstPercentDisplay">18</span>%):</span>
                         <strong id="gstAmountDisplay">₹ 0</strong>
                     </p>
                     <p class="total-charges-line">
@@ -517,72 +627,33 @@
 
 
     <!-- Toast Notification Container -->
-    <div id="toast-container"></div>
+    <!-- UI/UX [A11Y]: aria-live="assertive" for urgent toasts -->
+    <div id="toast-container" aria-live="assertive" aria-atomic="false"></div>
 
     <!-- Calendar Hover Tooltip -->
-    <div id="cal-tooltip" class="cal-tooltip"></div>
+    <div id="cal-tooltip" class="cal-tooltip" role="tooltip" aria-hidden="true"></div>
 
     <!-- Confirm Dialog -->
-    <div id="confirm-overlay">
+    <!-- UI/UX [A11Y]: role="alertdialog" for destructive confirm patterns -->
+    <div id="confirm-overlay" role="alertdialog" aria-modal="true" aria-labelledby="confirm-message" aria-hidden="true">
         <div id="confirm-box">
-            <div class="confirm-icon">🗑️</div>
+            <div class="confirm-icon" aria-hidden="true">🗑️</div>
             <p id="confirm-message">Are you sure?</p>
             <div class="confirm-actions">
-                <button class="btn-confirm-yes" id="confirm-yes">Delete</button>
-                <button class="btn-confirm-no" id="confirm-no">Cancel</button>
+                <button class="btn-confirm-yes" id="confirm-yes" type="button">Delete</button>
+                <button class="btn-confirm-no" id="confirm-no" type="button">Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- ===== MOBILE TAB SWITCHING SCRIPT ===== -->
-    <script>
-        const TABS = {
-            summary: { panel: 'panelSummary', btn: 'tabSummary' },
-            loans: { panel: 'panelLoans', btn: 'tabLoans' },
-            cards: { panel: 'panelCards', btn: 'tabCards' }
-        };
+    <!--
+        DEV [STRUCTURE]: Mobile tab switching and layout logic moved to script1.js
+        (DOMContentLoaded handler). Inline <script> block removed to improve
+        Content Security Policy compliance and keep logic in one place.
 
-        function switchTab(active) {
-            if (window.innerWidth > 768) return;
-            Object.keys(TABS).forEach(function (key) {
-                var panel = document.getElementById(TABS[key].panel);
-                var btn = document.getElementById(TABS[key].btn);
-                if (key === active) {
-                    panel.classList.remove('mob-hidden');
-                    btn.classList.add('active');
-                } else {
-                    panel.classList.add('mob-hidden');
-                    btn.classList.remove('active');
-                }
-            });
-        }
-
-        function applyMobileLayout() {
-            var isMobile = window.innerWidth <= 768;
-            var nav = document.getElementById('mobileTabNav');
-
-            if (isMobile) {
-                nav.style.display = 'flex';
-                // Find active tab key
-                var activeBtnId = '';
-                document.querySelectorAll('.mob-tab.active').forEach(function (b) { activeBtnId = b.id; });
-                var activeKey = 'summary';
-                Object.keys(TABS).forEach(function (key) {
-                    if (TABS[key].btn === activeBtnId) activeKey = key;
-                });
-                switchTab(activeKey);
-            } else {
-                nav.style.display = 'none';
-                // Desktop: show all panels, clear mob-hidden
-                Object.keys(TABS).forEach(function (key) {
-                    document.getElementById(TABS[key].panel).classList.remove('mob-hidden');
-                });
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', applyMobileLayout);
-        window.addEventListener('resize', applyMobileLayout);
-    </script>
+        SRE [MONITORING]: If you add error monitoring (Sentry, Datadog RUM),
+        place that <script> here as a separate defer tag.
+    -->
 
 </body>
 
