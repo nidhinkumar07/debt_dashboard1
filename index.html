@@ -38,11 +38,16 @@
     <!-- UI/UX [ACCESSIBILITY]: header uses landmark role implicitly; aria-label added for screen readers -->
     <header role="banner" aria-label="Debt Dashboard Header">
         <h1>My Debts Dashboard</h1>
-        <!-- UI/UX [A11Y]: aria-label describes button purpose for screen readers -->
+        <!-- Bell button (left) -->
         <button id="reminderBellBtn" class="reminder-bell-btn" aria-label="Open EMI Reminders" aria-haspopup="dialog"
             aria-controls="reminderModal">
             <i class="fas fa-bell" aria-hidden="true"></i>
             <span id="reminderBadge" class="reminder-badge" aria-live="polite" hidden></span>
+        </button>
+        <!-- User icon button (right) -->
+        <button id="userProfileBtn" class="user-profile-btn" aria-label="Open User Profile" aria-haspopup="dialog"
+            aria-controls="userProfileModal">
+            <i class="fas fa-user-circle" aria-hidden="true"></i>
         </button>
     </header>
 
@@ -369,12 +374,6 @@
                     <div class="overall-progress-freedom" id="overallFreedomText">Freedom In: —</div>
                 </div>
 
-                <div class="loan-progress-chart-container">
-                    <h2><i class="fas fa-chart-bar" aria-hidden="true"></i> Loan Progress Over Time</h2>
-                    <canvas id="loanChart" height="120" aria-label="Bar chart showing EMI outflow over next 20 months"
-                        role="img"></canvas>
-                </div>
-
                 <div class="top-loans-section">
                     <h3><i class="fas fa-trophy" aria-hidden="true"></i> Top 3 Loans Finishing Soon</h3>
                     <ul id="top-loans-list" aria-label="Top loans finishing soonest"></ul>
@@ -626,6 +625,227 @@
     </div>
 
 
+    <!-- ====================== USER PROFILE MODAL ====================== -->
+    <div id="userProfileModal" class="modal up-modal-overlay" role="dialog" aria-modal="true"
+        aria-labelledby="upModalTitle" hidden>
+        <div class="up-panel">
+
+            <!-- Close -->
+            <button class="up-close" id="closeUserProfileModal" type="button" aria-label="Close Profile Panel">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+
+            <!-- ── Avatar + name ── -->
+            <div class="up-hero">
+                <div class="up-avatar" id="upAvatar">
+                    <i class="fas fa-user" aria-hidden="true"></i>
+                </div>
+                <div class="up-hero-info">
+                    <h2 id="upModalTitle" class="up-name"><span id="upDisplayName">John Doe</span></h2>
+                    <p class="up-email" id="upEmailDisplay"><a href="/cdn-cgi/l/email-protection" class="__cf_email__"
+                            data-cfemail="88e2e7e0e6a6ece7edc8edf0e9e5f8e4eda6ebe7e5">[email&#160;protected]</a></p>
+                    <span class="up-badge"><i class="fas fa-shield-alt"></i> Verified</span>
+                </div>
+            </div>
+
+            <!-- ── Tab bar ── -->
+            <div class="up-tabs" role="tablist" aria-label="Profile sections">
+                <button class="up-tab active" data-uptab="profile" role="tab" aria-selected="true"
+                    aria-controls="upTab-profile" id="upTabBtn-profile"><i
+                        class="fas fa-id-card"></i><span>Profile</span></button>
+                <button class="up-tab" data-uptab="security" role="tab" aria-selected="false"
+                    aria-controls="upTab-security" id="upTabBtn-security"><i
+                        class="fas fa-lock"></i><span>Security</span></button>
+                <button class="up-tab" data-uptab="technical" role="tab" aria-selected="false"
+                    aria-controls="upTab-technical" id="upTabBtn-technical"><i
+                        class="fas fa-microchip"></i><span>Technical</span></button>
+            </div>
+
+            <!-- ── Tab panels ── -->
+            <div class="up-tab-body">
+
+                <!-- PROFILE INFO -->
+                <div class="up-tab-panel" id="upTab-profile" role="tabpanel" aria-labelledby="upTabBtn-profile">
+                    <h3 class="up-section-title">Profile Information</h3>
+                    <div class="up-fields">
+                        <div class="up-field"><label for="upFieldName">Full Name</label><input id="upFieldName"
+                                type="text" value="John Doe" /></div>
+                        <div class="up-field"><label for="upFieldEmail">Email</label><input id="upFieldEmail"
+                                type="email" value="john.doe@example.com" /></div>
+                        <div class="up-field"><label for="upFieldPhone">Phone</label><input id="upFieldPhone" type="tel"
+                                placeholder="+91 98765 43210" /></div>
+                        <div class="up-field"><label for="upFieldDob">Date of Birth</label><input id="upFieldDob"
+                                type="date" /></div>
+                        <div class="up-field up-field--full"><label for="upFieldBio">Bio</label><textarea
+                                id="upFieldBio" placeholder="Tell us a bit about yourself…" rows="3"></textarea></div>
+                    </div>
+                    <div class="up-row-actions">
+                        <button class="up-btn-primary" type="button" id="upSaveProfileBtn"><i class="fas fa-save"></i>
+                            Save Changes</button>
+                    </div>
+                </div>
+
+
+                <!-- SECURITY -->
+                <div class="up-tab-panel" id="upTab-security" role="tabpanel" aria-labelledby="upTabBtn-security"
+                    hidden>
+                    <h3 class="up-section-title">Security & Credentials</h3>
+                    <div class="up-fields">
+                        <div class="up-field up-field--full">
+                            <label>Current Password</label>
+                            <div class="up-pw-row">
+                                <input type="password" id="upCurrPw" placeholder="Enter current password" />
+                                <button class="up-eye-btn" type="button" data-target="upCurrPw"
+                                    aria-label="Toggle password visibility"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <div class="up-field">
+                            <label>New Password</label>
+                            <div class="up-pw-row">
+                                <input type="password" id="upNewPw" placeholder="New password" />
+                                <button class="up-eye-btn" type="button" data-target="upNewPw"
+                                    aria-label="Toggle password visibility"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <div class="up-field">
+                            <label>Confirm Password</label>
+                            <div class="up-pw-row">
+                                <input type="password" id="upConfirmPw" placeholder="Confirm new password" />
+                                <button class="up-eye-btn" type="button" data-target="upConfirmPw"
+                                    aria-label="Toggle password visibility"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="up-row-actions">
+                        <button class="up-btn-primary" type="button" id="upSaveProfileBtn"><i class="fas fa-save"></i>
+                            Save Changes</button>
+                    </div>
+                </div>
+
+
+                <!-- SECURITY -->
+                <div class="up-tab-panel" id="upTab-security" role="tabpanel" aria-labelledby="upTabBtn-security"
+                    hidden>
+                    <h3 class="up-section-title">Security & Credentials</h3>
+                    <div class="up-fields">
+                        <div class="up-field up-field--full">
+                            <label>Current Password</label>
+                            <div class="up-pw-row">
+                                <input type="password" id="upCurrPw" placeholder="Enter current password" />
+                                <button class="up-eye-btn" type="button" data-target="upCurrPw"
+                                    aria-label="Toggle password visibility"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <div class="up-field">
+                            <label>New Password</label>
+                            <div class="up-pw-row">
+                                <input type="password" id="upNewPw" placeholder="New password" />
+                                <button class="up-eye-btn" type="button" data-target="upNewPw"
+                                    aria-label="Toggle password visibility"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <div class="up-field">
+                            <label>Confirm Password</label>
+                            <div class="up-pw-row">
+                                <input type="password" id="upConfirmPw" placeholder="Confirm new password" />
+                                <button class="up-eye-btn" type="button" data-target="upConfirmPw"
+                                    aria-label="Toggle password visibility"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="up-row-actions">
+                        <button class="up-btn-primary" type="button" id="upUpdatePwBtn"><i class="fas fa-key"></i>
+                            Update Password</button>
+                    </div>
+                </div>
+                <!-- TECHNICAL -->
+                <div class="up-tab-panel" id="upTab-technical" role="tabpanel" aria-labelledby="upTabBtn-technical"
+                    hidden>
+                    <h3 class="up-section-title">Technical Details</h3>
+                    <div class="up-tech-grid">
+                        <div class="up-tech-item"><span class="up-tech-label">App Version</span><span
+                                class="up-tech-val" id="upAppVersion">v2.4.1</span></div>
+                        <div class="up-tech-item"><span class="up-tech-label">Browser</span><span class="up-tech-val"
+                                id="upBrowser">—</span></div>
+                        <div class="up-tech-item"><span class="up-tech-label">Platform</span><span class="up-tech-val"
+                                id="upPlatform">—</span></div>
+                        <div class="up-tech-item"><span class="up-tech-label">Screen</span><span class="up-tech-val"
+                                id="upScreen">—</span></div>
+                        <div class="up-tech-item"><span class="up-tech-label">Language</span><span class="up-tech-val"
+                                id="upLang">—</span></div>
+                        <div class="up-tech-item"><span class="up-tech-label">Timezone</span><span class="up-tech-val"
+                                id="upTZ">—</span></div>
+                        <div class="up-tech-item"><span class="up-tech-label">Online Status</span><span
+                                class="up-tech-val" id="upOnline">—</span></div>
+                        <div class="up-tech-item"><span class="up-tech-label">localStorage</span><span
+                                class="up-tech-val" id="upStorage">—</span></div>
+                        <div class="up-tech-item"><span class="up-tech-label">Cookies</span><span class="up-tech-val"
+                                id="upCookies">—</span></div>
+                        <div class="up-tech-item"><span class="up-tech-label">Last Session</span><span
+                                class="up-tech-val" id="upLastSession">—</span></div>
+                    </div>
+                    <button class="up-btn-secondary up-refresh-tech" type="button" id="upRefreshTech">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+
+
+            </div><!-- /.up-tab-body -->
+
+            <!-- ── Footer: Login / Logout ── -->
+            <div class="up-footer-actions">
+                <button class="up-btn-logout" type="button" id="upLogoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Log Out
+                </button>
+                <button class="up-btn-login" type="button" id="upLoginBtn" hidden>
+                    <i class="fas fa-sign-in-alt"></i> Log In
+                </button>
+            </div>
+
+        </div><!-- /.up-panel -->
+    </div><!-- /#userProfileModal -->
+
+    <!-- ====================== FOOTER ====================== -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <span class="footer-logo" aria-hidden="true"><i class="fas fa-wallet"></i></span>
+                <span class="footer-app-name">Debt Dashboard</span>
+            </div>
+
+            <p class="footer-tagline">Track smarter. Pay faster. Stress less.</p>
+
+            <div class="footer-connect">
+                <span class="footer-connect-label">Connect with the Developer</span>
+                <div class="footer-links">
+                    <a href="https://github.com/nidhinkumar07/" target="_blank" rel="noopener noreferrer"
+                        class="footer-link" aria-label="GitHub Profile">
+                        <i class="fab fa-github" aria-hidden="true"></i>
+                        <span>GitHub</span>
+                    </a>
+                    <a href="https://www.linkedin.com/in/nidhin-kumar-n-4a4623231/" target="_blank"
+                        rel="noopener noreferrer" class="footer-link" aria-label="LinkedIn Profile">
+                        <i class="fab fa-linkedin-in" aria-hidden="true"></i>
+                        <span>LinkedIn</span>
+                    </a>
+                    <a href="mailto:nidhinchristy@gmail.com" class="footer-link" aria-label="Send Email">
+                        <i class="fas fa-envelope" aria-hidden="true"></i>
+                        <span>Email</span>
+                    </a>
+
+                </div>
+            </div>
+
+            <p class="footer-copy">
+                &copy; <span id="footer-year"></span> Debt Dashboard. Built with
+                <i class="fas fa-heart footer-heart" aria-hidden="true"></i> for financial clarity.
+            </p>
+        </div>
+    </footer>
+    <script>
+        document.getElementById('footer-year').textContent = new Date().getFullYear();
+    </script>
+
     <!-- Toast Notification Container -->
     <!-- UI/UX [A11Y]: aria-live="assertive" for urgent toasts -->
     <div id="toast-container" aria-live="assertive" aria-atomic="false"></div>
@@ -651,9 +871,207 @@
         (DOMContentLoaded handler). Inline <script> block removed to improve
         Content Security Policy compliance and keep logic in one place.
 
-        SRE [MONITORING]: If you add error monitoring (Sentry, Datadog RUM),
+        SRE [MONITORING]: If you        add error monitoring (Sentry, Datadog RUM),
         place that <script> here as a separate defer tag.
     -->
+    <script>
+        /* =========================================================
+           USER PROFILE MODAL — Full Working Logic
+           All state persisted in localStorage under key "up_prefs"
+        ========================================================= */
+        (function () {
+            'use strict';
+
+            /* ── Storage helpers ── */
+            var STORE_KEY = 'up_prefs';
+
+            function loadPrefs() {
+                try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { return {}; }
+            }
+            function savePrefs(obj) {
+                try { localStorage.setItem(STORE_KEY, JSON.stringify(obj)); } catch (e) { }
+            }
+
+            /* ── Toast helper (delegates to script1.js showToast if available) ── */
+            function upShowToast(msg, type) {
+                // Use the existing showToast from script1.js if available
+                if (typeof showToast === 'function') {
+                    showToast(msg, type || 'success');
+                    return;
+                }
+                var tc = document.getElementById('toast-container');
+                if (!tc) return;
+                var t = document.createElement('div');
+                t.className = 'toast ' + (type || 'success');
+                var sp = document.createElement('span'); sp.textContent = msg;
+                t.appendChild(sp);
+                tc.appendChild(t);
+                setTimeout(function () {
+                    t.classList.add('toast-out');
+                    t.addEventListener('animationend', function () { t.remove(); }, { once: true });
+                }, 3000);
+            }
+
+
+
+
+
+
+            /* ── Restore persisted state ── */
+            function restoreState() {
+                var p = loadPrefs();
+                var g = function (id) { return document.getElementById(id); };
+
+                if (p.name) { if (g('upFieldName')) g('upFieldName').value = p.name; }
+                if (p.email) { if (g('upFieldEmail')) g('upFieldEmail').value = p.email; }
+                if (p.phone) { if (g('upFieldPhone')) g('upFieldPhone').value = p.phone; }
+                if (p.dob) { if (g('upFieldDob')) g('upFieldDob').value = p.dob; }
+                if (p.bio) { if (g('upFieldBio')) g('upFieldBio').value = p.bio; }
+
+                g('upDisplayName').textContent = p.name || 'John Doe';
+                g('upEmailDisplay').textContent = p.email || 'john.doe@example.com';
+
+
+                if (p.loggedOut) {
+                    g('upLogoutBtn').hidden = true;
+                    g('upLoginBtn').hidden = false;
+                    g('upDisplayName').textContent = 'Guest';
+                    g('upEmailDisplay').textContent = 'Not signed in';
+                    document.querySelector('.up-badge').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Not Verified';
+                }
+            }
+
+            /* ── Modal open / close ── */
+            var btn = document.getElementById('userProfileBtn');
+            var modal = document.getElementById('userProfileModal');
+            var closeBtn = document.getElementById('closeUserProfileModal');
+
+            function openModal() {
+                modal.hidden = false;
+                document.body.style.overflow = 'hidden';
+                loadTechDetails();
+            }
+            function closeModal() {
+                modal.hidden = true;
+                document.body.style.overflow = '';
+            }
+
+            btn.addEventListener('click', openModal);
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+
+            /* ── Tab switching (scoped to profile modal only) ── */
+            document.querySelectorAll('.up-tab').forEach(function (tab) {
+                tab.addEventListener('click', function () {
+                    document.querySelectorAll('.up-tab').forEach(function (t) {
+                        t.classList.remove('active');
+                        t.setAttribute('aria-selected', 'false');
+                    });
+                    document.querySelectorAll('#userProfileModal .up-tab-panel').forEach(function (p) {
+                        p.hidden = true;
+                    });
+                    tab.classList.add('active');
+                    tab.setAttribute('aria-selected', 'true');
+                    document.getElementById('upTab-' + tab.dataset.uptab).hidden = false;
+                });
+            });
+
+            /* ── Password eye toggle ── */
+            document.querySelectorAll('.up-eye-btn').forEach(function (eyeBtn) {
+                eyeBtn.addEventListener('click', function () {
+                    var input = document.getElementById(eyeBtn.dataset.target);
+                    if (!input) return;
+                    var isText = input.type === 'text';
+                    input.type = isText ? 'password' : 'text';
+                    eyeBtn.querySelector('i').className = isText ? 'fas fa-eye' : 'fas fa-eye-slash';
+                });
+            });
+
+            /* ── Profile: Save ── */
+            document.getElementById('upSaveProfileBtn').addEventListener('click', function () {
+                var p = loadPrefs();
+                p.name = document.getElementById('upFieldName').value.trim();
+                p.email = document.getElementById('upFieldEmail').value.trim();
+                p.phone = document.getElementById('upFieldPhone').value.trim();
+                p.dob = document.getElementById('upFieldDob').value;
+                p.bio = document.getElementById('upFieldBio').value.trim();
+                savePrefs(p);
+                document.getElementById('upDisplayName').textContent = p.name || 'John Doe';
+                document.getElementById('upEmailDisplay').textContent = p.email || 'john.doe@example.com';
+                upShowToast('\u2705 Profile saved successfully!', 'success');
+            });
+
+            /* ── Security: Update Password ── */
+            document.getElementById('upUpdatePwBtn').addEventListener('click', function () {
+                var curr = document.getElementById('upCurrPw').value;
+                var newPw = document.getElementById('upNewPw').value;
+                var confirm = document.getElementById('upConfirmPw').value;
+                if (!curr) { upShowToast('\u26A0\uFE0F Enter your current password', 'error'); return; }
+                if (newPw.length < 8) { upShowToast('\u26A0\uFE0F New password must be 8+ characters', 'error'); return; }
+                if (newPw !== confirm) { upShowToast('\u26A0\uFE0F Passwords do not match', 'error'); return; }
+                document.getElementById('upCurrPw').value = '';
+                document.getElementById('upNewPw').value = '';
+                document.getElementById('upConfirmPw').value = '';
+                upShowToast('\uD83D\uDD10 Password updated!', 'success');
+            });
+
+            /* ── Technical details ── */
+            function loadTechDetails() {
+                var ua = navigator.userAgent;
+                var browser = 'Unknown';
+                if (/Edg\//.test(ua)) browser = 'Microsoft Edge';
+                else if (/OPR\//.test(ua)) browser = 'Opera';
+                else if (/Chrome\//.test(ua)) browser = 'Chrome';
+                else if (/Firefox\//.test(ua)) browser = 'Firefox';
+                else if (/Safari\//.test(ua)) browser = 'Safari';
+                var g = function (id) { return document.getElementById(id); };
+                g('upBrowser').textContent = browser;
+                g('upPlatform').textContent = navigator.platform || '\u2014';
+                g('upScreen').textContent = window.screen.width + '\u00d7' + window.screen.height;
+                g('upLang').textContent = navigator.language || '\u2014';
+                g('upTZ').textContent = Intl.DateTimeFormat().resolvedOptions().timeZone || '\u2014';
+                g('upOnline').textContent = navigator.onLine ? '\uD83D\uDFE2 Online' : '\uD83D\uDD34 Offline';
+                g('upCookies').textContent = navigator.cookieEnabled ? 'Enabled' : 'Disabled';
+                g('upLastSession').textContent = new Date().toLocaleString();
+                try {
+                    localStorage.setItem('_up_test', '1'); localStorage.removeItem('_up_test');
+                    g('upStorage').textContent = 'Available';
+                } catch (e) { g('upStorage').textContent = 'Blocked'; }
+            }
+            document.getElementById('upRefreshTech').addEventListener('click', function () {
+                loadTechDetails();
+                upShowToast('\uD83D\uDD04 Technical info refreshed', 'success');
+            });
+
+            /* ── Logout ── */
+            document.getElementById('upLogoutBtn').addEventListener('click', function () {
+                var p = loadPrefs(); p.loggedOut = true; savePrefs(p);
+                document.getElementById('upLogoutBtn').hidden = true;
+                document.getElementById('upLoginBtn').hidden = false;
+                document.getElementById('upDisplayName').textContent = 'Guest';
+                document.getElementById('upEmailDisplay').textContent = 'Not signed in';
+                document.querySelector('.up-badge').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Not Verified';
+                upShowToast('\uD83D\uDC4B Logged out', 'success');
+            });
+
+            /* ── Login ── */
+            document.getElementById('upLoginBtn').addEventListener('click', function () {
+                var p = loadPrefs(); p.loggedOut = false; savePrefs(p);
+                document.getElementById('upLogoutBtn').hidden = false;
+                document.getElementById('upLoginBtn').hidden = true;
+                var name = p.name || 'John Doe';
+                var email = p.email || 'john.doe@example.com';
+                document.getElementById('upDisplayName').textContent = name;
+                document.getElementById('upEmailDisplay').textContent = email;
+                document.querySelector('.up-badge').innerHTML = '<i class="fas fa-shield-alt"></i> Verified';
+                upShowToast('\u2705 Welcome back, ' + name + '!', 'success');
+            });
+            /* ── Init ── */
+            restoreState();
+
+        })();
+    </script>
 
 </body>
 
