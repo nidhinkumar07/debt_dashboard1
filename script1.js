@@ -298,8 +298,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const overallProgressPercentage  = document.querySelector('.overall-progress-percentage');
     const overallProgressRaised      = document.querySelector('.overall-progress-amounts .overall-progress-raised');
     const overallProgressTotal       = document.querySelector('.overall-progress-amounts .overall-progress-total');
-    const loanProgressChartContainer = document.querySelector('.loan-progress-chart-container');
-    const loanChartCanvas            = document.getElementById('loanChart');
     const creditCardSimpleTbody      = document.getElementById('credit-card-simple-tbody');
     const autoDebitLoansList         = document.getElementById('auto-debit-loans-list');
     const topLoansList               = document.getElementById('top-loans-list');
@@ -1159,120 +1157,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // Bar chart
-        if (loanChartCanvas && loanProgressChartContainer && currentLoanData.length > 0) {
-            const ctx = loanChartCanvas.getContext('2d');
-            if (window.loanChartInstance) window.loanChartInstance.destroy();
-
-            const today = new Date();
-            const startMonthDate = new Date(today.getFullYear(), today.getMonth(), 1);
-            const labels  = [];
-            const values  = [];
-
-            for (let i = 0; i < 20; i++) {
-                const monthDate = new Date(startMonthDate.getFullYear(), startMonthDate.getMonth() + i, 1);
-                // Short label: "Mar '26" — compact, no overlap
-                const label = monthDate.toLocaleDateString('en-IN', { month: 'short' })
-                            + " '" + String(monthDate.getFullYear()).slice(-2);
-                let paidThisMonth = 0;
-                currentLoanData.forEach(loan => {
-                    const loanStart = new Date(
-                        parseInt(loan.rowElement.dataset.startYear),
-                        parseInt(loan.rowElement.dataset.startMonth) - 1,
-                        parseInt(loan.rowElement.dataset.startDay) || 1
-                    );
-                    const loanEnd = new Date(
-                        parseInt(loan.rowElement.dataset.endYear),
-                        parseInt(loan.rowElement.dataset.endMonth) - 1,
-                        parseInt(loan.rowElement.dataset.endDay) || 5
-                    );
-                    const emiDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), loan.emiDay);
-                    if (emiDate >= loanStart && emiDate <= loanEnd) paidThisMonth += loan.emi;
-                });
-                labels.push(label);
-                values.push(paidThisMonth);
-            }
-
-            // Compute a sensible Y-axis max: highest bar value + 15% headroom,
-            // rounded up to the nearest clean step so the axis never dwarfs the bars.
-            const maxVal = Math.max(...values, 1);
-            const rawMax = maxVal * 1.20;
-            // Round up to nearest 10k, 5k, or 1k depending on magnitude
-            const step = rawMax > 50000 ? 10000 : rawMax > 10000 ? 5000 : 1000;
-            const yMax = Math.ceil(rawMax / step) * step;
-
-            // Gradient fill: top blue → bottom lighter blue
-            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, '#3b82f6');
-            gradient.addColorStop(1, '#93c5fd');
-
-            window.loanChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels,
-                    datasets: [{
-                        label: 'EMI Outflow (₹)',
-                        data: values,
-                        backgroundColor: gradient,
-                        hoverBackgroundColor: '#2563eb',
-                        borderRadius: 6,
-                        borderSkipped: false,
-                        barPercentage: 0.7,       // bar width relative to category width
-                        categoryPercentage: 0.85  // category width relative to chart width
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,   // let CSS control the height
-                    layout: { padding: { top: 10, right: 8, bottom: 0, left: 4 } },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: c => `  ₹ ${c.raw.toLocaleString('en-IN', indianRupeeOptions)}`
-                            },
-                            backgroundColor: '#1e293b',
-                            titleColor: '#93c5fd',
-                            bodyColor: '#f1f5f9',
-                            padding: 10,
-                            borderRadius: 8,
-                            displayColors: false
-                        },
-                        title: { display: false }  // title lives in the card heading, not inside canvas
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: yMax,
-                            grid: { color: 'rgba(0,0,0,0.06)', drawBorder: false },
-                            border: { display: false },
-                            ticks: {
-                                color: '#64748b',
-                                font: { size: 11 },
-                                maxTicksLimit: 5,
-                                // Format as "₹45k" instead of "45,000" — far more readable
-                                callback: val => val === 0 ? '₹0'
-                                    : val >= 100000 ? `₹${(val/100000).toFixed(1)}L`
-                                    : val >= 1000   ? `₹${(val/1000).toFixed(0)}k`
-                                    : `₹${val}`
-                            }
-                        },
-                        x: {
-                            grid: { display: false },
-                            border: { display: false },
-                            ticks: {
-                                color: '#64748b',
-                                font: { size: 10 },
-                                maxRotation: 0,    // keep labels horizontal — no diagonal
-                                minRotation: 0,
-                                autoSkip: true,
-                                maxTicksLimit: 10  // show every other label if needed
-                            }
-                        }
-                    }
-                }
-            });
-        }
     }
 
     // ============================================================
@@ -1793,7 +1677,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <span class="rate-rank">#${i + 1}</span>
                     <span class="rate-bank">${sanitize(loan.bankName)}</span>
                     <span class="rate-desc">${sanitize(loan.description)}</span>
-                    <span class="rate-badge ${colorClass}">${interestPct.toFixed(1)}% <span class="rate-annual">(${loan.annualInterestRate}% p.a.)</span></span>
+                    <span class="rate-badge ${colorClass}">${interestPct.toFixed(1)}%</span>
                 </div>
                 <div class="rate-meta">
                     <span>EMI ₹${loan.emi.toLocaleString('en-IN')} · ${loan.monthsRemaining}m left</span>
