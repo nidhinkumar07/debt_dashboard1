@@ -146,6 +146,12 @@ header {
     }
 }
 
+@media (min-width: 769px) {
+    header {
+        margin-bottom: 0;
+    }
+}
+
 header h1 {
     margin: 0;
     font-size: 2.2em;
@@ -212,6 +218,128 @@ header h1 {
     padding-top: 0;
 }
 
+.panel-calendar-container {
+    padding-top: 0;
+}
+
+/* Desktop: single-panel view — remove excess padding waste */
+@media (min-width: 769px) {
+
+    .panel-cards-container,
+    .panel-calendar-container {
+        padding: 20px 20px 0;
+    }
+
+    #credit-cards-section {
+        margin: 0 auto !important;
+        border-radius: var(--radius-lg) !important;
+    }
+
+    .calendar-outer {
+        margin: 20px auto !important;
+    }
+
+    /* Collapse empty emi-forecast placeholder — no content yet */
+    .emi-forecast-section:empty,
+    .emi-forecast-section:has(h2:only-child) {
+        display: none;
+    }
+
+    /* Desktop forecast panel — fills empty right-side space below loan cards */
+    .desktop-forecast-panel {
+        display: block !important;
+        margin-top: 20px;
+        background: var(--bank-card);
+        border: 1px solid var(--bank-border);
+        border-radius: var(--radius-lg);
+        padding: 20px 22px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .desktop-forecast-panel h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--bank-primary);
+        margin: 0 0 16px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--bank-border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .desktop-forecast-panel h2::before {
+        content: "📅";
+        font-size: 1rem;
+    }
+
+    .desktop-forecast-panel .yearly-forecast-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        border-radius: var(--radius-sm);
+        margin-bottom: 8px;
+        border: 1px solid var(--bank-border);
+        background: var(--bank-bg);
+        transition: var(--transition-fast);
+    }
+
+    .desktop-forecast-panel .yearly-forecast-item:hover {
+        background: #eef4ff;
+        border-color: var(--bank-secondary);
+    }
+
+    .desktop-forecast-panel .yearly-forecast-item h3 {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--bank-text);
+        margin: 0;
+    }
+
+    .desktop-forecast-panel .yearly-forecast-item p {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--bank-primary);
+        margin: 0;
+    }
+
+    .desktop-forecast-panel .current-year {
+        background: #eff6ff;
+        border-color: var(--bank-secondary);
+    }
+
+    .desktop-forecast-panel .current-year h3 {
+        color: var(--bank-secondary);
+    }
+
+    .desktop-forecast-panel .past-year {
+        opacity: 0.55;
+    }
+
+    .desktop-forecast-panel .additional-info {
+        display: block;
+        font-size: 0.78rem;
+        color: var(--bank-success);
+        font-weight: 500;
+        margin-top: 2px;
+    }
+}
+
+/* Hide desktop forecast panel on mobile */
+@media (max-width: 768px) {
+    .desktop-forecast-panel {
+        display: none !important;
+    }
+}
+
+/* Hide sidebar forecast panel on desktop (desktop uses desktop-forecast-panel) */
+@media (min-width: 769px) {
+    .sidebar-forecast-panel {
+        display: none !important;
+    }
+}
+
 /* On mobile, kill the top padding on ALL page-container panels so content
    sits flush under the sticky tab bar with no dead space */
 @media (max-width: 768px) {
@@ -250,13 +378,14 @@ header h1 {
 }
 
 .sidebar h2 {
-    margin: 0 0 20px;
-    color: #1b5e20;
-    font-size: 1.6em;
-    border-bottom: 2px dotted #8bc34a;
-    background-color: #f0fff0;
-    padding: 12px 15px 12px 0;
-    border-radius: 0 8px 0 0;
+    margin: 0 0 12px;
+    color: var(--bank-primary);
+    font-size: 20px;
+    font-weight: 700;
+    background-color: transparent;
+    padding: 0 0 10px 0;
+    border-bottom: 1px solid #e5e7eb;
+    border-radius: 0;
 }
 
 /* ================================================================
@@ -264,8 +393,8 @@ header h1 {
 ================================================================ */
 .main-content {
     grid-column: 2 / 3;
-    padding-left: 20px;
-    padding-top: 10px;
+    padding-left: 0;
+    padding-top: 0;
     display: flex;
     flex-direction: column;
     min-width: 0;
@@ -274,18 +403,18 @@ header h1 {
 
 .main-content h2 {
     margin: 0 0 20px;
-    color: #1b5e20;
+    color: var(--bank-primary);
     font-size: 1.6em;
-    border-bottom: 2px dotted #8bc34a;
-    background-color: #f0fff0;
-    padding: 12px 15px 12px 0;
-    border-radius: 0 8px 0 0;
+    border-bottom: 2px solid var(--bank-border);
+    background-color: transparent;
+    padding: 12px 0 12px 0;
+    border-radius: 0;
 }
 
 .main-content h2 i {
     margin-right: 8px;
     font-size: 0.9em;
-    color: #28a745;
+    color: var(--bank-secondary);
     transition: transform 0.3s ease;
 }
 
@@ -502,8 +631,8 @@ th.sortable:hover {
 
 /* EMI Freedom card */
 .freedom-card {
-    background: linear-gradient(135deg, #eaffea 0%, #d8f8dc 100%);
-    border: 1px solid #bfe7c5;
+    background: var(--bank-card);
+    border: 1px solid var(--bank-border);
     text-align: center;
     padding: 22px;
 }
@@ -517,7 +646,7 @@ th.sortable:hover {
 .freedom-date {
     font-size: 1.6rem;
     font-weight: 700;
-    color: #14532d;
+    color: var(--bank-primary);
     letter-spacing: 0.5px;
     word-break: break-word;
 }
@@ -841,10 +970,10 @@ th.sortable:hover {
 .top-loans-section {
     margin-top: 20px;
     padding: 15px;
-    background-color: #effaf1;
+    background-color: var(--bank-card);
     border-radius: 8px;
     text-align: center;
-    border: 1px solid #d3edd4;
+    border: 1px solid var(--bank-border);
     width: 100%;
     overflow: hidden;
 }
@@ -853,22 +982,19 @@ th.sortable:hover {
     margin-bottom: 15px;
     font-size: 1.2em;
     line-height: 1.8;
-    color: #2f4f2f;
+    color: var(--bank-text);
     text-align: center;
 }
 
 .top-loans-section h3 i {
     margin-right: 8px;
-    color: #28a745;
+    color: var(--bank-secondary);
     font-size: 1.1em;
 }
 
 .top-loans-section:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 10px rgba(40, 167, 69, .1);
-    cursor: pointer;
+    box-shadow: var(--shadow-md);
     transition: var(--transition-fast);
-    background-color: #e6ffe6;
 }
 
 #top-loans-list {
@@ -881,19 +1007,19 @@ th.sortable:hover {
 }
 
 #top-loans-list li {
-    background: linear-gradient(135deg, #f0f9f0, #e6ffe6);
+    background: var(--bank-bg);
     padding: 12px 18px;
     margin-bottom: 12px;
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
+    box-shadow: var(--shadow-sm);
     text-align: left;
     transition: var(--transition-std);
-    border: 1px solid #c8e6c9;
+    border: 1px solid var(--bank-border);
     position: relative;
     overflow: hidden;
     font-size: 1em;
-    font-weight: 600;
-    color: #333;
+    font-weight: 500;
+    color: var(--bank-text);
     word-break: break-word;
 }
 
@@ -920,15 +1046,14 @@ th.sortable:hover {
 }
 
 #top-loans-list li:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, .15);
-    border-color: #28a745;
-    background: linear-gradient(135deg, #e6ffe6, #d4f8d4);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--bank-secondary);
 }
 
 #top-loans-list li span {
     font-weight: 700;
-    color: #1e843b;
+    color: var(--bank-text);
 }
 
 /* ================================================================
@@ -1174,19 +1299,22 @@ th.sortable:hover {
 
 .yearly-forecast-item .additional-info {
     font-size: 0.8em;
-    color: #666;
-    margin-left: 10px;
-    font-weight: normal;
+    color: var(--bank-secondary);
+    font-weight: 600;
+    margin-top: 2px;
 }
 
 .current-year {
-    background-color: #e6f7e6;
-    border-color: #c3e6cb;
+    background-color: #eff6ff;
+    border-color: var(--bank-secondary);
 }
 
-.current-year h3,
+.current-year h3 {
+    color: var(--bank-secondary);
+}
+
 .current-year p {
-    color: #27ae60;
+    color: var(--bank-primary);
 }
 
 .past-year {
@@ -1476,6 +1604,43 @@ th.sortable:hover {
     overflow: hidden;
 }
 
+.calendar-outer {
+    background: var(--bank-card);
+    border: 1px solid var(--bank-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    max-width: 900px;
+    margin: 30px auto;
+    width: 100%;
+    padding: 22px 24px 28px;
+    overflow: hidden;
+}
+
+.calendar-outer .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--bank-border);
+    padding-bottom: 16px;
+}
+
+.calendar-outer .section-header h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: var(--bank-text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.calendar-outer #cashflow-section {
+    border: none;
+    padding: 0;
+    box-shadow: none;
+    background: transparent;
+}
+
 #credit-cards-section {
     background: var(--bank-card);
     border: 1px solid var(--bank-border);
@@ -1509,29 +1674,27 @@ th.sortable:hover {
 /* Credit cards overview row */
 #credit-cards-overview,
 .credit-cards-overview {
-    background: linear-gradient(180deg, #e6f7ff, #d6f0fa);
+    background: linear-gradient(135deg, #e6f7ff 0%, #d6f0fa 100%);
     border: 1px solid #a7d9eb;
     border-radius: var(--radius-lg);
-    padding: 20px;
-    margin-bottom: 28px;
+    padding: 14px 20px;
+    margin-bottom: 22px;
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
-    gap: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    gap: 12px;
     width: 100%;
 }
 
 .credit-cards-overview:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .1);
 }
 
 .overview-item {
     text-align: center;
     flex: 1;
-    min-width: 150px;
-    padding: 15px;
+    min-width: 140px;
+    padding: 10px 14px;
     background-color: rgba(255, 255, 255, .7);
     border-radius: 8px;
     box-shadow: var(--shadow-sm);
@@ -1539,19 +1702,21 @@ th.sortable:hover {
 }
 
 .overview-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, .12);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
 }
 
 .overview-item h3 {
-    font-size: 1.1em;
-    color: #334e68;
-    margin-bottom: 8px;
+    font-size: 0.78em;
+    color: var(--bank-muted);
+    margin-bottom: 4px;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .overview-value {
-    font-size: 2.2em;
+    font-size: 1.6em;
     font-weight: 800;
     color: #2c3e50;
     margin: 0;
@@ -2723,14 +2888,14 @@ th.sortable:hover {
     align-items: center;
     justify-content: center;
     gap: 12px;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 }
 
 .cashflow-nav-btn {
     background: var(--bank-card);
     border: 1px solid var(--bank-border);
     border-radius: var(--radius-sm);
-    padding: 4px 10px;
+    padding: 6px 14px;
     cursor: pointer;
     color: var(--bank-primary);
     font-size: 0.9em;
@@ -2744,40 +2909,44 @@ th.sortable:hover {
 
 .cashflow-month-label {
     font-weight: 700;
-    font-size: 0.95em;
+    font-size: 1.15em;
     color: var(--bank-primary);
+    min-width: 140px;
+    text-align: center;
 }
 
 .cashflow-calendar {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 }
 
 .cal-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 2px;
+    gap: 4px;
 }
 
 .cal-header-cell {
     text-align: center;
-    font-size: 0.7em;
+    font-size: 0.72em;
     font-weight: 700;
     color: var(--bank-muted);
-    padding: 4px 0;
+    padding: 6px 0 8px;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .cal-cell {
-    min-height: 42px;
+    height: 80px;
     border-radius: var(--radius-sm);
-    border: 1px solid transparent;
+    border: 1px solid var(--bank-border);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 3px 2px 2px;
+    padding: 6px 4px 4px;
     cursor: default;
     transition: var(--transition-fast);
     position: relative;
+    background: var(--bank-bg);
 }
 
 .cal-cell.cal-has-emi {
@@ -2814,17 +2983,18 @@ th.sortable:hover {
 }
 
 .cal-day-num {
-    font-size: 0.82em;
+    font-size: 0.88em;
     font-weight: 600;
     color: #334155;
+    line-height: 1;
 }
 
 .cal-emi-dot {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: var(--bank-success);
-    margin-top: 2px;
+    margin-top: 6px;
 }
 
 .cal-danger .cal-emi-dot {
@@ -2832,10 +3002,10 @@ th.sortable:hover {
 }
 
 .cal-emi-total {
-    font-size: 0.72em;
+    font-size: 0.75em;
     color: var(--bank-success);
     font-weight: 600;
-    margin-top: 1px;
+    margin-top: 4px;
 }
 
 .cal-danger .cal-emi-total {
@@ -2845,6 +3015,31 @@ th.sortable:hover {
 .cashflow-summary {
     margin-top: 10px;
     font-size: 0.83em;
+}
+
+/* Mobile: shrink calendar cells back to compact size */
+@media (max-width: 768px) {
+    .cal-cell {
+        height: 54px;
+        padding: 4px 2px 2px;
+    }
+
+    .cal-day-num {
+        font-size: 0.78em;
+    }
+
+    .cal-emi-dot {
+        margin-top: 3px;
+    }
+
+    .cal-emi-total {
+        font-size: 0.68em;
+        margin-top: 2px;
+    }
+
+    .calendar-outer {
+        padding: 14px 10px 18px;
+    }
 }
 
 .cashflow-summary-row {
@@ -2994,6 +3189,12 @@ th.sortable:hover {
     pointer-events: none !important;
 }
 
+.desk-hidden {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
 /* ================================================================
    27. ANIMATIONS (deduplicated — was defined twice each)
 ================================================================ */
@@ -3073,6 +3274,28 @@ th.sortable:hover {
 
 /* --- ≤ 768px: mobile layout --- */
 @media (max-width: 768px) {
+
+    /* desk-hidden should not affect mobile layout */
+    .desk-hidden {
+        display: revert !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+
+    /* On mobile, the dashboard grid becomes a plain block — children hide via JS inline style */
+    .dashboard-container {
+        display: block !important;
+        padding: 0;
+        gap: 0;
+    }
+
+    /* Sidebar and main-content take full width on mobile */
+    .sidebar,
+    .main-content {
+        width: 100%;
+        grid-column: 1 / -1;
+    }
+
     header h1 {
         font-size: 1.5em;
         padding: 0 52px;
@@ -3091,8 +3314,9 @@ th.sortable:hover {
     }
 
     .sidebar h2 {
-        font-size: 1.2em;
-        margin-bottom: 14px;
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 12px;
     }
 
     /* Show mobile tab nav (display set to flex when JS removes [hidden]) */
@@ -3249,10 +3473,12 @@ th.sortable:hover {
         padding-top: 0 !important;
     }
 
-    /* Desktop panels visible without mob-hidden */
+    /* On mobile, .mob-hidden hides the non-active panels */
+    #panelCards.mob-hidden,
     #panelSummary.mob-hidden,
     #panelLoans.mob-hidden,
-    #panelCards.mob-hidden {
+    #panelCalendar.mob-hidden,
+    #panelSummaryLoans.mob-hidden {
         display: none !important;
     }
 }
@@ -3299,10 +3525,21 @@ th.sortable:hover {
     }
 
     .yearly-forecast-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-        padding: 10px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 10px 12px;
+    }
+
+    .yearly-forecast-item h3 {
+        font-size: 0.95em;
+    }
+
+    .yearly-forecast-item p {
+        font-size: 0.95em;
+        text-align: right;
+        white-space: nowrap;
     }
 
     .summary-card {
@@ -3440,47 +3677,116 @@ th.sortable:hover {
         display: none !important;
     }
 
+    /* desk-hidden hides non-active panels on desktop */
+    .desk-hidden {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    /* mob-hidden has no effect on desktop */
     .mob-hidden {
         display: revert !important;
         visibility: visible !important;
         pointer-events: auto !important;
     }
 
-    #panelCards,
-    #panelSummary,
-    #panelLoans {
-        display: revert !important;
+    /* Hide the old floating admin button — desktop tab bar has it */
+    .admin-btn-desktop {
+        display: none !important;
+    }
+}
+
+/* ================================================================
+   DESKTOP TAB NAV
+================================================================ */
+.desktop-tab-nav {
+    display: none;
+    /* shown only on desktop via JS (hidden attr toggled) */
+    background: var(--bank-card);
+    border-bottom: 2px solid var(--bank-border);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .07);
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    margin-bottom: 0;
+}
+
+@media (min-width: 769px) {
+    .desktop-tab-nav {
+        display: block;
     }
 
-    .admin-btn-desktop {
-        display: block !important;
+    .desktop-tab-nav[hidden] {
+        display: none !important;
     }
+}
+
+.desktop-tabs-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: stretch;
+    gap: 2px;
+}
+
+.desk-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 22px;
+    border: none;
+    background: transparent;
+    color: var(--bank-muted);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: var(--font-body);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: color 0.18s, border-color 0.18s, background 0.18s;
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+}
+
+.desk-tab i {
+    font-size: 15px;
+}
+
+.desk-tab:hover {
+    color: var(--bank-secondary);
+    background: rgba(59, 130, 246, .05);
+}
+
+.desk-tab.active {
+    color: var(--bank-secondary);
+    border-bottom-color: var(--bank-secondary);
+    background: rgba(59, 130, 246, .06);
+}
+
+/* Admin tab pushed to the right */
+.desk-tab-admin {
+    margin-left: auto;
+    color: var(--bank-muted);
+    border-left: 1px solid var(--bank-border);
+    padding-left: 24px;
+}
+
+.desk-tab-admin:hover {
+    color: var(--bank-primary);
+    background: rgba(31, 58, 95, .05);
+}
+
+/* Desktop: Summary tab shows sidebar+loans in a 2-col grid */
+#panelSummary.desk-panel-active {
+    display: block !important;
 }
 
 /* ================================================================
    USER PROFILE BUTTON (header — right side)
 ================================================================ */
 .user-profile-btn {
-    position: absolute;
-    top: 50%;
-    right: 16px;
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, .15);
-    border: 1.5px solid rgba(255, 255, 255, .4);
-    color: #fff;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s ease;
-}
-
-.user-profile-btn:hover {
-    background: rgba(255, 255, 255, .28);
+    display: none !important;
 }
 
 /* ================================================================
