@@ -523,40 +523,45 @@ th.sortable:hover {
 }
 
 /* When consecutive description rows follow each other, collapse the gap */
-.summary-section h3[data-description-summary]+h3[data-description-summary] {
-    margin-top: -10px;
-    /* close the flex gap between sibling desc rows */
+/* Description summary list — injected by JS */
+#description-summary-list {
+    margin-top: 14px;
 }
 
-/*
- * Dynamically-injected description breakdown rows (h3[data-description-summary]).
- * These are appended by JS directly into .summary-section. Without explicit
- * styling they inherit browser h3 defaults (large font, big margins) which
- * creates the ugly spacing seen in Image 1. Style them to match .summary-row.
- */
-.summary-section h3[data-description-summary] {
+.desc-list-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--bank-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 6px;
+    padding: 0 4px;
+}
+
+#description-summary-list h3[data-description-summary] {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 0;
-    /* kill browser h3 top/bottom margin */
-    padding: 7px 14px;
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     font-weight: 500;
     color: #334155;
-    background: #f0fdf4;
-    border: 1px solid #d1fae5;
-    border-radius: var(--radius-sm);
-    gap: 8px;
-    line-height: 1.4;
+    padding: 8px 4px;
+    border-bottom: 1px solid var(--bank-border);
+    margin: 0;
 }
 
-.summary-section h3[data-description-summary] .remaining-by-desc {
+#description-summary-list h3[data-description-summary]:last-child {
+    border-bottom: none;
+}
+
+#description-summary-list .remaining-by-desc {
     font-weight: 700;
     color: #15803d;
-    white-space: nowrap;
-    flex-shrink: 0;
+    font-size: 0.9rem;
 }
+
+
+
 
 .summary-card {
     background: #fdfefe;
@@ -629,26 +634,67 @@ th.sortable:hover {
     white-space: nowrap;
 }
 
-/* EMI Freedom card */
+/* EMI Freedom card — uniform with other sections */
 .freedom-card {
     background: var(--bank-card);
     border: 1px solid var(--bank-border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
     text-align: center;
-    padding: 22px;
+    position: relative;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    margin-top: 14px;
 }
 
-.freedom-card h4 {
-    border-bottom: none;
-    padding-bottom: 0;
-    margin-bottom: 10px;
+.freedom-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.freedom-card::before,
+.freedom-card::after {
+    display: none;
+}
+
+.freedom-icon-wrap {
+    width: 40px;
+    height: 40px;
+    background: #eff6ff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    font-size: 1.1rem;
+    color: var(--bank-secondary);
+}
+
+.freedom-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--bank-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 6px;
 }
 
 .freedom-date {
-    font-size: 1.6rem;
-    font-weight: 700;
+    font-size: 1.7rem;
+    font-weight: 800;
     color: var(--bank-primary);
     letter-spacing: 0.5px;
     word-break: break-word;
+    line-height: 1.1;
+    margin-bottom: 6px;
+}
+
+.freedom-subtitle {
+    font-size: 0.75rem;
+    color: var(--bank-muted);
+    font-weight: 400;
+    line-height: 1.4;
 }
 
 /* ================================================================
@@ -659,7 +705,7 @@ th.sortable:hover {
     border: 1px solid var(--bank-border);
     border-radius: var(--radius-lg);
     padding: 14px 16px;
-    margin-top: 15px;
+    margin-top: 14px;
     box-shadow: var(--shadow-md);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     width: 100%;
@@ -3547,7 +3593,7 @@ th.sortable:hover {
     }
 
     .freedom-date {
-        font-size: 1.3rem;
+        font-size: 1.5rem;
     }
 
     .active-emi-row strong,
