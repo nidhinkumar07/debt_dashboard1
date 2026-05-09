@@ -318,6 +318,8 @@
             <aside class="sidebar" id="panelSummary" aria-label="Loan summary panel">
 
                 <h2>Summary</h2>
+
+                <!-- 1. Stats cards: Status | EMI | Loan Cost -->
                 <div class="summary-section redesigned-summary">
 
                     <div class="summary-card">
@@ -364,28 +366,21 @@
                         </div>
                     </div>
 
-                    <div class="summary-card freedom-card">
-                        <h4>EMI Freedom</h4>
-                        <div class="freedom-date" id="emi-freedom-date" aria-live="polite">—</div>
-                    </div>
-
-                    <div class="summary-card">
-                        <h4>Loan Breakdown</h4>
-                        <!-- UI/UX [A11Y]: aria-label describes chart purpose -->
-                        <canvas id="loanBreakdownChart" height="150"
-                            aria-label="Donut chart showing principal vs interest breakdown" role="img"></canvas>
-                    </div>
-
-                    <div class="summary-row active-emi-row">
-                        <span>Total Pending</span>
-                        <strong id="total-remaining" aria-live="polite">₹ 0</strong>
-                    </div>
-
                 </div>
 
+                <!-- 2. EMI Freedom hero card -->
+                <div class="summary-card freedom-card">
+                    <div class="freedom-icon-wrap">
+                        <i class="fas fa-flag-checkered" aria-hidden="true"></i>
+                    </div>
+                    <div class="freedom-label">EMI Freedom Date</div>
+                    <div class="freedom-date" id="emi-freedom-date" aria-live="polite">—</div>
+                    <div class="freedom-subtitle">All loans fully repaid by this date</div>
+                </div>
+
+                <!-- 3. Overall Progress -->
                 <div class="overall-progress-section">
                     <h3 class="overall-title"><i class="fas fa-chart-line" aria-hidden="true"></i> Overall Progress</h3>
-                    <!-- UI/UX [A11Y]: progressbar role for overall repayment -->
                     <div class="overall-progress-bar-container" role="progressbar" aria-valuemin="0" aria-valuemax="100"
                         aria-valuenow="0" aria-label="Overall loan repayment progress">
                         <div class="overall-progress-bar">
@@ -399,12 +394,27 @@
                     <div class="overall-progress-freedom" id="overallFreedomText">Freedom In: —</div>
                 </div>
 
+                <!-- 4. Loan Breakdown chart + Total Pending -->
+                <div class="summary-card" style="margin-top:14px;">
+                    <h4>Loan Breakdown</h4>
+                    <canvas id="loanBreakdownChart" height="150"
+                        aria-label="Donut chart showing principal vs interest breakdown" role="img"></canvas>
+                    <div class="summary-row active-emi-row" style="margin-top:12px;">
+                        <span>Total Pending</span>
+                        <strong id="total-remaining" aria-live="polite">₹ 0</strong>
+                    </div>
+                </div>
+
+                <!-- 5. Remaining by description (JS-injected rows go here) -->
+                <div class="top-loans-section" id="description-summary-list"></div>
+
+                <!-- 6. Top 3 Loans -->
                 <div class="top-loans-section">
                     <h3><i class="fas fa-trophy" aria-hidden="true"></i> Top 3 Loans Finishing Soon</h3>
                     <ul id="top-loans-list" aria-label="Top loans finishing soonest"></ul>
                 </div>
 
-                <!-- Billing Cycle: visible on desktop sidebar, hidden on mobile -->
+                <!-- 7. Billing Cycle (desktop sidebar only, hidden on mobile) -->
                 <div id="credit-card-table-container" class="top-loans-section">
                     <h3>Credit Card Billing Cycle</h3>
                     <table id="credit-card-simple-table" aria-label="Credit card billing cycle summary">
@@ -419,6 +429,7 @@
                     </table>
                 </div>
 
+                <!-- 8. Debt by Bank -->
                 <div class="top-loans-section">
                     <h3>
                         <i class="fas fa-university" style="margin-right:8px;color:var(--bank-success);"
@@ -428,7 +439,7 @@
                     <div id="debt-by-bank-list" class="bank-debt-list" aria-live="polite"></div>
                 </div>
 
-                <!-- ===== INTEREST RATE COMPARISON ===== -->
+                <!-- 9. Interest Rate Comparison -->
                 <div class="top-loans-section" id="interest-rate-section">
                     <h3>
                         <i class="fas fa-percentage" style="margin-right:8px;color:var(--bank-danger);"
@@ -439,6 +450,7 @@
                     <div id="attack-order-tip" class="attack-order-tip" hidden aria-live="polite"></div>
                 </div>
 
+                <!-- 10. Yearly EMI Forecast (mobile only) -->
                 <div class="emi-forecast-section sidebar-forecast-panel" aria-label="Yearly EMI Forecast"></div>
 
             </aside>
