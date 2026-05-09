@@ -365,7 +365,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // DOM ELEMENT REFERENCES
     // ============================================================
     const debtTableBody              = document.getElementById('bank-a-debts');
-    const summarySection             = document.querySelector('.summary-section');
+    const summarySection             = document.getElementById('description-summary-list');
     const totalEmiElement            = document.getElementById('total-emi');
     const totalRemainingElement      = document.getElementById('total-remaining');
     const totalLoansElement          = document.getElementById('loans');
@@ -1044,8 +1044,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (summarySection) {
             summarySection.querySelectorAll('h3[data-description-summary]').forEach(el => el.remove());
-            Object.entries(remainingByDescription)
-                .filter(([, amt]) => amt > 0)
+            summarySection.querySelector('.desc-list-title')?.remove();
+            const entries = Object.entries(remainingByDescription).filter(([, amt]) => amt > 0);
+            entries
                 .sort(([, a], [, b]) => b - a)
                 .forEach(([desc, amt]) => {
                     const h3 = document.createElement('h3');
