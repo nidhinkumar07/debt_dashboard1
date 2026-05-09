@@ -48,68 +48,145 @@
 'use strict';
 
 // ================================================================
-// MOBILE TAB SWITCHING (was an inline <script> in HTML — moved here
-// for CSP compliance and single-responsibility)
+// TAB SWITCHING — mobile bottom bar + desktop top nav
 // ================================================================
-(function initMobileTabs() {
+(function initTabs() {
     const TABS = {
-        summary: { panel: 'panelSummary', btn: 'tabSummary' },
-        loans:   { panel: 'panelLoans',   btn: 'tabLoans'   },
-        cards:   { panel: 'panelCards',   btn: 'tabCards'   }
+        summary:  { panel: 'panelSummaryLoans', mobPanel: 'panelSummary',  mobBtn: 'tabSummary',   deskBtn: 'deskTabSummary'  },
+        loans:    { panel: 'panelSummaryLoans', mobPanel: 'panelLoans',    mobBtn: 'tabLoans',     deskBtn: null              },
+        cards:    { panel: 'panelCards',        mobPanel: 'panelCards',    mobBtn: 'tabCards',     deskBtn: 'deskTabCards'    },
+        calendar: { panel: 'panelCalendar',     mobPanel: 'panelCalendar', mobBtn: 'tabCalendar',  deskBtn: 'deskTabCalendar' }
     };
 
-    /**
-     * Shows only the active panel on mobile; on desktop all panels show.
-     */
-    function switchTab(activeKey) {
-        if (window.innerWidth > 768) return;
-        Object.entries(TABS).forEach(([key, { panel, btn }]) => {
-            const panelEl = document.getElementById(panel);
-            const btnEl   = document.getElementById(btn);
-            if (!panelEl || !btnEl) return;
-            const isActive = key === activeKey;
-            panelEl.classList.toggle('mob-hidden', !isActive);
-            btnEl.classList.toggle('active', isActive);
-            // A11Y: aria-selected on tab buttons
-            btnEl.setAttribute('aria-selected', String(isActive));
+    // All distinct mobile panel IDs (including panels inside panelSummaryLoans)
+    const ALL_MOB_PANELS = ['panelSummary', 'panelLoans', 'panelCards', 'panelCalendar'];
+    // Top-level page containers (for desktop)
+    const ALL_DESK_PANELS = ['panelSummaryLoans', 'panelCards', 'panelCalendar'];
+
+    let activeKey = 'summary';
+
+    function switchTab(key) {
+        activeKey = key;
+        const isMobile = window.innerWidth <= 768;
+
+        if (isMobile) {
+            // On mobile: show panelSummaryLoans wrapper for summary/loans tabs
+            //            show panelCards/panelCalendar for their tabs
+            //            hide all top-level panels except the relevant wrapper
+            ALL_DESK_PANELS.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (id === 'panelSummaryLoans') {
+                    // Show wrapper only for summary/loans tabs
+                    el.style.display = (key === 'summary' || key === 'loans') ? '' : 'none';
+                } else if (id === 'panelCards') {
+                    el.style.display = key === 'cards' ? '' : 'none';
+                } else if (id === 'panelCalendar') {
+                    el.style.display = key === 'calendar' ? '' : 'none';
+                }
+            });
+
+            // Within panelSummaryLoans: show correct child panel
+            if (key === 'summary' || key === 'loans') {
+                const summaryPanel = document.getElementById('panelSummary');
+                const loansPanel   = document.getElementById('panelLoans');
+                if (summaryPanel) summaryPanel.style.display = key === 'summary' ? '' : 'none';
+                if (loansPanel)   loansPanel.style.display   = key === 'loans'   ? '' : 'none';
+            }
+
+        } else {
+            // Desktop: hide/show combined wrapper panels, ignore mob-hidden classes
+            ALL_DESK_PANELS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('desk-hidden');
+            });
+            const activeTab = TABS[key];
+            if (activeTab) {
+                const el = document.getElementById(activeTab.panel);
+                if (el) el.classList.remove('desk-hidden');
+            }
+            // Reset any inline mobile styles when on desktop
+            ALL_MOB_PANELS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = '';
+            });
+        }
+
+        // Update mobile button states
+        Object.entries(TABS).forEach(([k, { mobBtn }]) => {
+            if (!mobBtn) return;
+            const el = document.getElementById(mobBtn);
+            if (!el) return;
+            const isActive = k === key;
+            el.classList.toggle('active', isActive);
+            el.setAttribute('aria-selected', String(isActive));
+        });
+
+        // Update desktop button states
+        const activePanelId = TABS[key]?.panel;
+        Object.entries(TABS).forEach(([k, { deskBtn, panel }]) => {
+            if (!deskBtn) return;
+            const el = document.getElementById(deskBtn);
+            if (!el) return;
+            const isActive = isMobile ? k === key : panel === activePanelId;
+            el.classList.toggle('active', isActive);
+            el.setAttribute('aria-selected', String(isActive));
         });
     }
 
-    function applyMobileLayout() {
+    function applyLayout() {
         const isMobile = window.innerWidth <= 768;
-        const nav = document.getElementById('mobileTabNav');
-        if (!nav) return;
+        const mobileNav  = document.getElementById('mobileTabNav');
+        const desktopNav = document.getElementById('desktopTabNav');
+        const adminDesktop = document.getElementById('adminBtnDesktop');
+
+        if (mobileNav)    mobileNav.hidden  = !isMobile;
+        if (desktopNav)   desktopNav.hidden = isMobile;
+        if (adminDesktop) adminDesktop.style.display = 'none';
 
         if (isMobile) {
-            nav.hidden = false;
-            // Determine currently active key from active button
-            let activeKey = 'summary';
-            Object.entries(TABS).forEach(([key, { btn }]) => {
-                if (document.getElementById(btn)?.classList.contains('active')) {
-                    activeKey = key;
-                }
+            // Reset desk-hidden classes — mobile uses inline display style instead
+            ALL_DESK_PANELS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('desk-hidden');
             });
+            // Re-apply the current tab state
             switchTab(activeKey);
         } else {
-            nav.hidden = true;
-            Object.values(TABS).forEach(({ panel }) => {
-                document.getElementById(panel)?.classList.remove('mob-hidden');
+            // Desktop: clear any inline mobile display styles, apply desk-hidden
+            ALL_MOB_PANELS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = '';
             });
+            ALL_DESK_PANELS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('desk-hidden');
+            });
+            const active = TABS[activeKey];
+            if (active) {
+                const el = document.getElementById(active.panel);
+                if (el) el.classList.remove('desk-hidden');
+            }
         }
     }
 
-    // Wire tab buttons
-    Object.entries(TABS).forEach(([key, { btn }]) => {
-        document.getElementById(btn)?.addEventListener('click', () => switchTab(key));
+    // Wire mobile tab buttons
+    Object.entries(TABS).forEach(([key, { mobBtn }]) => {
+        document.getElementById(mobBtn)?.addEventListener('click', () => switchTab(key));
     });
 
-    // Admin tab on mobile opens admin modal
-    document.getElementById('tabAdmin')?.addEventListener('click', () => {
-        if (typeof openAdminPanel === 'function') openAdminPanel();
+    // Wire desktop tab buttons
+    Object.entries(TABS).forEach(([key, { deskBtn }]) => {
+        document.getElementById(deskBtn)?.addEventListener('click', () => switchTab(key));
     });
 
-    window.addEventListener('DOMContentLoaded', applyMobileLayout);
-    window.addEventListener('resize', applyMobileLayout);
+    // Admin tab (mobile + desktop) opens admin modal — wired in main init block
+    // (openAdminPanel is scoped there; listener added at line ~1693)
+
+    // Script is loaded with defer, so DOM is always ready here.
+    // Run immediately + on resize.
+    applyLayout();
+    window.addEventListener('resize', applyLayout);
 })();
 
 
@@ -305,7 +382,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const totalPrincipalElement      = document.getElementById('total-principal');
     const overallProgressSection     = document.querySelector('.overall-progress-section');
     const loanBreakdownChartCanvas   = document.getElementById('loanBreakdownChart');
-    const emiForecastSection         = document.querySelector('.emi-forecast-section');
+    const emiForecastSection         = document.querySelector('.desktop-forecast-panel') || document.querySelector('.emi-forecast-section');
+    const sidebarForecastPanel       = document.querySelector('.sidebar-forecast-panel');
     const debtByBankList             = document.getElementById('debt-by-bank-list');
     const totalActiveEmiElement      = document.getElementById('total-active-emi');
     const emiFreedomDateElement      = document.getElementById('emi-freedom-date');
@@ -1092,15 +1170,15 @@ document.addEventListener('DOMContentLoaded', function () {
     // ============================================================
     // EMI FORECAST SECTION
     // ============================================================
-    function updateEmiForecastSection(yearlyForecast, totalEmiCurrentYearRemainingForecast) {
-        if (!emiForecastSection) return;
+    function buildForecastHTML(container, yearlyForecast, totalEmiCurrentYearRemainingForecast) {
+        if (!container) return;
         const today = new Date();
         const currentYear = today.getFullYear();
-        emiForecastSection.innerHTML = '';
+        container.innerHTML = '';
 
         const title = document.createElement('h2');
         title.textContent = 'Yearly EMI Forecast';
-        emiForecastSection.appendChild(title);
+        container.appendChild(title);
 
         Object.entries(yearlyForecast).forEach(([year, amount]) => {
             const yearInt = parseInt(year);
@@ -1113,20 +1191,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const h3 = document.createElement('h3');
             h3.textContent = label;
+
+            const rightCol = document.createElement('div');
+            rightCol.style.textAlign = 'right';
+
             const p = document.createElement('p');
             p.textContent = `₹ ${amount.toLocaleString('en-IN')}`;
 
+            rightCol.appendChild(p);
+
             if (yearInt === currentYear && totalEmiCurrentYearRemainingForecast > 0) {
-                const info = document.createElement('span');
+                const info = document.createElement('div');
                 info.classList.add('additional-info');
-                info.textContent = ` (Remaining: ₹ ${totalEmiCurrentYearRemainingForecast.toLocaleString('en-IN')})`;
-                p.appendChild(info);
+                info.style.display = 'block';
+                info.style.marginTop = '2px';
+                info.textContent = `Remaining: ₹ ${totalEmiCurrentYearRemainingForecast.toLocaleString('en-IN')}`;
+                rightCol.appendChild(info);
             }
 
             item.appendChild(h3);
-            item.appendChild(p);
-            emiForecastSection.appendChild(item);
+            item.appendChild(rightCol);
+            container.appendChild(item);
         });
+    }
+
+    function updateEmiForecastSection(yearlyForecast, totalEmiCurrentYearRemainingForecast) {
+        buildForecastHTML(emiForecastSection, yearlyForecast, totalEmiCurrentYearRemainingForecast);
+        buildForecastHTML(sidebarForecastPanel, yearlyForecast, totalEmiCurrentYearRemainingForecast);
     }
 
     // ============================================================
@@ -1201,7 +1292,9 @@ document.addEventListener('DOMContentLoaded', function () {
             debtByBank[loan.bankName] = (debtByBank[loan.bankName] || 0) + loan.currentRemainingAmount;
         });
         const totalDebt = Object.values(debtByBank).reduce((s, a) => s + a, 0);
-        const sorted = Object.entries(debtByBank).sort(([,a],[,b]) => b - a);
+        const sorted = Object.entries(debtByBank)
+            .filter(([, amount]) => amount > 0)
+            .sort(([,a],[,b]) => b - a);
 
         debtByBankList.innerHTML = '';
         sorted.forEach(([bank, amount]) => {
@@ -1628,6 +1721,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Admin panel wiring
     document.getElementById('adminToggleBtn')?.addEventListener('click', openAdminPanel);
     document.getElementById('tabAdmin')?.addEventListener('click', openAdminPanel);
+    document.getElementById('deskTabAdmin')?.addEventListener('click', openAdminPanel);
 
     document.querySelectorAll('.close-admin').forEach(btn => {
         btn.addEventListener('click', function () {
