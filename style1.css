@@ -513,13 +513,10 @@ th.sortable:hover {
 .summary-section {
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #c8e6c9;
+    gap: 14px;
+    margin-bottom: 0;
     width: 100%;
     overflow: hidden;
-    /* Description rows are visually lighter — reduce gap between them */
 }
 
 /* When consecutive description rows follow each other, collapse the gap */
@@ -544,10 +541,11 @@ th.sortable:hover {
     align-items: center;
     font-size: 0.9rem;
     font-weight: 500;
-    color: #334155;
+    color: var(--bank-text);
     padding: 8px 4px;
     border-bottom: 1px solid var(--bank-border);
     margin: 0;
+    transition: background 0.15s ease;
 }
 
 #description-summary-list h3[data-description-summary]:last-child {
@@ -556,7 +554,7 @@ th.sortable:hover {
 
 #description-summary-list .remaining-by-desc {
     font-weight: 700;
-    color: #15803d;
+    color: var(--bank-primary);
     font-size: 0.9rem;
 }
 
@@ -564,43 +562,52 @@ th.sortable:hover {
 
 
 .summary-card {
-    background: #fdfefe;
-    border: 1px solid #dbeedd;
+    background: var(--bank-bg);
+    border: 1px solid var(--bank-border);
     border-radius: var(--radius-lg);
-    padding: 18px 20px;
-    box-shadow: 0 6px 18px rgba(22, 163, 74, .06);
-    /* BATTERY FIX 2: explicit properties only - transform is GPU, box-shadow is cheap here since it only changes on hover not continuously */
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 14px 16px;
+    box-shadow: var(--shadow-sm);
+    transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
     width: 100%;
     min-width: 0;
     overflow: hidden;
+    position: relative;
+    z-index: 0;
 }
 
 .summary-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(22, 163, 74, .1);
+    background: #eef4ff;
+    border-color: var(--bank-secondary);
+    box-shadow: var(--shadow-md);
+    z-index: 1;
 }
 
 .summary-card h4 {
-    margin: 0 0 14px;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #14532d;
-    letter-spacing: 0.3px;
+    margin: 0 0 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--bank-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
     padding-bottom: 8px;
-    border-bottom: 1px dashed #c7e9cd;
+    border-bottom: 1px solid var(--bank-border);
 }
 
 .summary-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 6px 0;
-    font-size: 0.95rem;
-    color: #334155;
+    padding: 7px 0;
+    font-size: 0.9rem;
+    color: var(--bank-text);
     width: 100%;
     min-width: 0;
     gap: 8px;
+    border-bottom: 1px solid var(--bank-border);
+}
+
+.summary-row:last-child {
+    border-bottom: none;
 }
 
 .summary-row span {
@@ -609,65 +616,82 @@ th.sortable:hover {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: var(--bank-text);
+    font-weight: 500;
 }
 
 .summary-row strong {
     flex: 0 0 auto;
     white-space: nowrap;
     text-align: right;
-    color: #15803d;
-    font-weight: 600;
+    color: var(--bank-primary);
+    font-weight: 700;
 }
 
 .summary-row.highlight strong {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     font-weight: 700;
-    color: #166534;
+    color: var(--bank-primary);
 }
 
 .active-emi-row strong,
 .active-loans-row strong {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     font-weight: 800;
-    color: #0f5132;
+    color: var(--bank-primary);
     flex: 0 0 auto;
     white-space: nowrap;
 }
 
-/* EMI Freedom card — uniform with other sections */
-.freedom-card {
-    background: var(--bank-card);
+/* ================================================================
+   MERGED: EMI Freedom + Overall Progress card
+================================================================ */
+.freedom-progress-card {
+    background: var(--bank-bg);
     border: 1px solid var(--bank-border);
     border-radius: var(--radius-lg);
-    padding: 18px 20px;
-    text-align: center;
-    position: relative;
-    box-shadow: var(--shadow-md);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    width: 100%;
+    padding: 18px 16px 14px;
     margin-top: 14px;
+    box-shadow: var(--shadow-sm);
+    transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    width: 100%;
 }
 
-.freedom-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+.freedom-progress-card:hover {
+    background: #eef4ff;
+    border-color: var(--bank-secondary);
+    box-shadow: var(--shadow-md);
 }
 
-.freedom-card::before,
-.freedom-card::after {
-    display: none;
+/* Top half — icon + label + date */
+.freedom-progress-top {
+    text-align: center;
+    padding-bottom: 14px;
+}
+
+.freedom-progress-divider {
+    height: 1px;
+    background: var(--bank-border);
+    margin: 0 0 14px;
+}
+
+/* Bottom half — progress bar + amounts */
+.freedom-progress-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .freedom-icon-wrap {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     background: #eff6ff;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 10px;
-    font-size: 1.1rem;
+    margin: 0 auto 8px;
+    font-size: 1rem;
     color: var(--bank-secondary);
 }
 
@@ -676,53 +700,49 @@ th.sortable:hover {
     font-weight: 700;
     color: var(--bank-muted);
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    margin-bottom: 6px;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
 }
 
 .freedom-date {
-    font-size: 1.7rem;
+    font-size: 1.6rem;
     font-weight: 800;
     color: var(--bank-primary);
     letter-spacing: 0.5px;
     word-break: break-word;
     line-height: 1.1;
-    margin-bottom: 6px;
-}
-
-.freedom-subtitle {
-    font-size: 0.75rem;
-    color: var(--bank-muted);
-    font-weight: 400;
-    line-height: 1.4;
 }
 
 /* ================================================================
-   10. OVERALL PROGRESS SECTION
+   10. OVERALL PROGRESS SECTION (standalone — kept for mobile forecast)
 ================================================================ */
 .overall-progress-section {
-    background: var(--bank-card);
+    background: var(--bank-bg);
     border: 1px solid var(--bank-border);
     border-radius: var(--radius-lg);
     padding: 14px 16px;
     margin-top: 14px;
-    box-shadow: var(--shadow-md);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
     width: 100%;
 }
 
 .overall-progress-section:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 14px 30px rgba(31, 58, 95, .12);
+    background: #eef4ff;
+    border-color: var(--bank-secondary);
+    box-shadow: var(--shadow-md);
 }
 
 .overall-progress-section h3 {
-    margin: 0 0 8px;
-    font-size: 15px;
+    margin: 0 0 10px;
+    font-size: 0.78rem;
     font-weight: 700;
-    color: var(--bank-primary);
+    color: var(--bank-muted);
     text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
 }
+
 
 .overall-title {
     color: var(--bank-primary);
@@ -787,31 +807,31 @@ th.sortable:hover {
 }
 
 .loan-box {
-    background: var(--bank-card);
-    border: 1px solid var(--bank-border);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, .04);
+    background: var(--bank-bg) !important;
+    border: 1px solid var(--bank-border) !important;
+    border-left: 1px solid var(--bank-border) !important;
+    box-shadow: var(--shadow-sm);
     padding: 15px;
-    border-radius: 12px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: var(--radius-lg);
+    transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
     position: relative;
 }
 
 .loan-box:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(40, 167, 69, .15);
-    border-color: #008080;
-    background-color: #e6ffe6;
+    background: #eef4ff !important;
+    border-color: var(--bank-secondary) !important;
+    box-shadow: var(--shadow-md);
 }
 
 .loan-box .bank-name {
     font-size: 1.1em;
     font-weight: bold;
-    color: #2c4b2c;
+    color: var(--bank-primary);
     margin: 0 0 8px;
 }
 
 .loan-box p {
-    color: #3e6040;
+    color: var(--bank-text);
     margin-bottom: 6px;
     font-size: 0.85em;
 }
@@ -937,55 +957,58 @@ th.sortable:hover {
 }
 
 .loan-box .due-countdown.due-today {
-    background: #2196f3;
+    background: var(--bank-secondary);
 }
 
 .loan-box .due-countdown.due-future {
-    background: #ff9800;
+    background: var(--bank-warning);
 }
 
 .loan-box .due-countdown.paid {
-    background: #4caf50;
+    background: #64748b;
 }
 
 .loan-box .due-countdown.completed {
-    background: #4caf50;
+    background: #64748b;
 }
 
 /* Next EMI date */
 .loan-box .next-emi-date {
     font-size: 0.9em;
     font-weight: 600;
-    color: #4caf50;
+    color: var(--bank-primary);
     margin-top: 10px;
     padding-top: 8px;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid var(--bank-border);
 }
 
 /* Foreclose button */
 .foreclose-button {
-    background-color: #007bff;
+    background: var(--bank-secondary);
     color: white;
-    padding: 10px 15px;
+    padding: 9px 15px;
     border: none;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    font-size: 1em;
+    font-size: 0.88em;
     width: 100%;
-    margin-top: 15px;
-    transition: var(--transition-fast);
+    margin-top: 12px;
+    transition: background 0.18s ease, box-shadow 0.18s ease;
     font-weight: 700;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
+    box-shadow: var(--shadow-sm);
 }
 
 .foreclose-button:hover {
-    background-color: #0056b3;
+    background: var(--bank-primary);
+    box-shadow: var(--shadow-md);
 }
 
 .disabled-button {
-    background-color: #d1d5db !important;
+    background: #e2e8f0 !important;
+    color: #94a3b8 !important;
     cursor: not-allowed;
-    opacity: 0.7;
+    opacity: 1;
+    box-shadow: none !important;
 }
 
 .loan-actions {
@@ -1011,66 +1034,75 @@ th.sortable:hover {
 }
 
 /* ================================================================
-   13. TOP LOANS SECTION
+   13. TOP LOANS SECTION — forecast-unified style
 ================================================================ */
 .top-loans-section {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: var(--bank-card);
-    border-radius: 8px;
-    text-align: center;
+    margin-top: 14px;
+    padding: 14px 16px;
+    background: var(--bank-bg);
+    border-radius: var(--radius-lg);
     border: 1px solid var(--bank-border);
+    box-shadow: var(--shadow-sm);
     width: 100%;
     overflow: hidden;
-}
-
-.top-loans-section h3 {
-    margin-bottom: 15px;
-    font-size: 1.2em;
-    line-height: 1.8;
-    color: var(--bank-text);
-    text-align: center;
-}
-
-.top-loans-section h3 i {
-    margin-right: 8px;
-    color: var(--bank-secondary);
-    font-size: 1.1em;
+    text-align: left;
+    transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
 
 .top-loans-section:hover {
+    background: #eef4ff;
+    border-color: var(--bank-secondary);
     box-shadow: var(--shadow-md);
-    transition: var(--transition-fast);
+}
+
+.top-loans-section h3 {
+    margin: 0 0 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--bank-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--bank-border);
+}
+
+.top-loans-section h3 i {
+    margin-right: 6px;
+    color: var(--bank-secondary);
+    font-size: 0.9em;
 }
 
 #top-loans-list {
     list-style: none;
     padding-left: 0;
-    margin-top: 8px;
-    font-size: 13px;
-    color: #444;
+    margin-top: 4px;
     line-height: 1.6;
 }
 
 #top-loans-list li {
-    background: var(--bank-bg);
-    padding: 12px 18px;
-    margin-bottom: 12px;
-    border-radius: 10px;
-    box-shadow: var(--shadow-sm);
-    text-align: left;
-    transition: var(--transition-std);
+    display: flex;
+    flex-direction: column;
+    background: var(--bank-card);
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--bank-border);
     position: relative;
     overflow: hidden;
-    font-size: 1em;
+    font-size: 0.88em;
     font-weight: 500;
     color: var(--bank-text);
     word-break: break-word;
+    transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 #top-loans-list li:last-child {
     margin-bottom: 0;
+}
+
+#top-loans-list li:hover {
+    background: #eef4ff;
+    border-color: var(--bank-secondary);
 }
 
 #top-loans-list li::before {
@@ -1079,53 +1111,45 @@ th.sortable:hover {
     font-weight: 900;
     position: absolute;
     top: 10px;
-    right: 15px;
-    font-size: 1.5em;
-    color: #ffc107;
-    opacity: 0.7;
-    transition: transform 0.3s ease;
-}
-
-#top-loans-list li:hover::before {
-    transform: scale(1.2) rotate(10deg);
-    opacity: 1;
-}
-
-#top-loans-list li:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--bank-secondary);
+    right: 12px;
+    font-size: 0.9rem;
+    color: #fbbf24;
 }
 
 #top-loans-list li span {
     font-weight: 700;
-    color: var(--bank-text);
+    color: var(--bank-primary);
 }
 
-/* ================================================================
-   14. CREDIT CARD BILLING CYCLE TABLE
-================================================================ */
+
 #credit-card-table-container {
-    background: var(--bank-card);
+    background: var(--bank-bg);
     border: 1px solid var(--bank-border);
     border-radius: var(--radius-lg);
-    padding: 14px;
-    box-shadow: var(--shadow-lg);
+    padding: 14px 16px;
+    box-shadow: var(--shadow-sm);
+    transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+#credit-card-table-container:hover {
+    background: #eef4ff;
+    border-color: var(--bank-secondary);
+    box-shadow: var(--shadow-md);
 }
 
 #credit-card-table-container h3 {
-    margin-bottom: 10px;
-    font-size: 16px;
-}
-
-#credit-card-simple-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
+    margin: 0 0 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--bank-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--bank-border);
 }
 
 #credit-card-simple-table thead {
-    background: #f8fafc;
+    background: transparent;
 }
 
 #credit-card-simple-table th {
@@ -1139,10 +1163,10 @@ th.sortable:hover {
 }
 
 #credit-card-simple-table td {
-    padding: 10px;
+    padding: 9px 10px;
     font-size: 13px;
     color: var(--bank-text);
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--bank-border);
 }
 
 #credit-card-simple-table td:nth-child(2) {
@@ -1159,12 +1183,12 @@ th.sortable:hover {
 }
 
 #credit-card-simple-table tbody tr:hover {
-    background: #f1f5f9;
+    background: #eef4ff;
     cursor: pointer;
 }
 
 #credit-card-simple-table tbody tr:nth-child(even) {
-    background-color: #f9fbfb;
+    background-color: transparent;
 }
 
 .interest-low {
@@ -1396,11 +1420,16 @@ th.sortable:hover {
     align-items: center;
     background: var(--bank-card);
     border: 1px solid var(--bank-border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     padding: 10px 14px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, .04);
     width: 100%;
     min-width: 0;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.bank-debt-row:hover {
+    background: #eef4ff;
+    border-color: var(--bank-secondary);
 }
 
 .bank-debt-logo {
@@ -1449,11 +1478,17 @@ th.sortable:hover {
    18. INTEREST RATE COMPARISON
 ================================================================ */
 .rate-row {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     padding: 10px 12px;
-    background: #f8fafc;
-    border-radius: var(--radius-md);
+    background: var(--bank-card);
+    border-radius: var(--radius-sm);
     border: 1px solid var(--bank-border);
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.rate-row:hover {
+    background: #eef4ff;
+    border-color: var(--bank-secondary);
 }
 
 .rate-row-header {
@@ -3056,6 +3091,57 @@ th.sortable:hover {
 
 .cal-danger .cal-emi-total {
     color: var(--bank-danger);
+}
+
+.cashflow-month-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    background: var(--bank-bg);
+    border: 1px solid var(--bank-border);
+    border-radius: var(--radius-lg);
+    margin: 14px 0 18px;
+    padding: 14px 20px;
+    text-align: center;
+}
+
+.cashflow-stat-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cashflow-stat-divider {
+    width: 1px;
+    height: 48px;
+    background: var(--bank-border);
+    margin: 0 20px;
+    flex-shrink: 0;
+}
+
+.cashflow-stat-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--bank-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.cashflow-stat-value {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--bank-primary);
+    line-height: 1.1;
+}
+
+.cashflow-stat-dates {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--bank-secondary);
+    line-height: 1.4;
+    word-break: break-word;
 }
 
 .cashflow-summary {
@@ -4763,4 +4849,1134 @@ th.sortable:hover {
     .footer-links {
         gap: 0.5rem;
     }
+}
+
+/* ================================================================
+   LOANS & CALENDAR TAB — ALIGNMENT & SPACING FIX
+   Brings both tabs to the same polished standard as the Summary tab.
+================================================================ */
+
+/* ── LOANS TAB — Panel-level wrapper ──────────────────────────── */
+/* panelLoans lives inside panelSummaryLoans dashboard-container.
+   On mobile the entire container collapses to a block, so the
+   main-content (loans panel) needs its own card treatment.        */
+
+#panelLoans {
+    width: 100%;
+}
+
+/* Give the Loan Details card the same generous padding as Summary */
+.loan-details-card {
+    padding: 20px 22px 24px;
+    gap: 0;
+}
+
+.loan-details-card h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--bank-primary);
+    margin: 0 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--bank-border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── Debt table — make it cleaner on all screens ──────────────── */
+.debt-container {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    /* clip left-border-coloured rows    */
+    margin-bottom: 20px;
+    border: 1px solid var(--bank-border);
+    box-shadow: var(--shadow-sm);
+}
+
+.debt-container th {
+    background: #f0f6ff;
+    color: var(--bank-primary);
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 12px 10px;
+    border-bottom: 2px solid var(--bank-border);
+    border-color: var(--bank-border);
+}
+
+.debt-container td {
+    padding: 11px 10px;
+    font-size: 0.875rem;
+    color: var(--bank-text);
+    border-color: var(--bank-border);
+    vertical-align: middle;
+}
+
+.debt-container tbody tr {
+    transition: background 0.15s ease;
+}
+
+.debt-container tbody tr:hover {
+    background-color: #eef4ff;
+    cursor: pointer;
+}
+
+/* Status row left-border accents — keep them, widen for visibility */
+.debt-container tbody tr.today-emi {
+    border-left: 4px solid #2196f3;
+    background: #eff6ff;
+}
+
+.debt-container tbody tr.future-emi {
+    border-left: 4px solid var(--bank-danger);
+    background: #fff5f5;
+}
+
+.debt-container tbody tr.past-emi {
+    border-left: 4px solid var(--bank-success);
+    background: #f0fdf4;
+}
+
+
+/* ── LOANS — Mobile ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+
+    /* ── panelLoans wrapper: strip all default main-content padding ── */
+    #panelLoans {
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
+        background: transparent;
+    }
+
+    /* loan-details-card becomes the outer page card — same feel as Summary's sidebar */
+    .loan-details-card {
+        padding: 16px 14px 18px;
+        border-radius: 0;
+        /* edge-to-edge like Summary on mobile  */
+        margin: 0;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        box-shadow: none;
+    }
+
+    .loan-details-card h2 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--bank-primary);
+        margin: 0 0 14px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--bank-border);
+    }
+
+
+    /* ── Loan cards: full-width, clean stacked layout ───────────── */
+    .loan-boxes-container {
+        margin: 0;
+        padding: 0;
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .loan-box {
+        border-radius: var(--radius-md);
+        padding: 14px 14px 12px;
+        background: var(--bank-bg) !important;
+        border: 1px solid var(--bank-border) !important;
+        border-left: 4px solid var(--bank-secondary) !important;
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* Past/completed loans get a green left accent */
+    .loan-box.past-emi {
+        border-left-color: var(--bank-success) !important;
+    }
+
+    /* Today's EMI gets a blue accent */
+    .loan-box.today-emi {
+        border-left-color: #2196f3 !important;
+        background: #f5f9ff !important;
+    }
+
+    /* Upcoming/overdue EMI gets a red accent */
+    .loan-box.future-emi {
+        border-left-color: var(--bank-danger) !important;
+        background: #fff8f8 !important;
+    }
+
+    .loan-box .bank-name {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--bank-primary);
+        margin-bottom: 6px;
+        padding-right: 66px;
+        /* room for logo */
+    }
+
+    .loan-box p {
+        font-size: 0.84rem;
+        margin-bottom: 5px;
+        color: var(--bank-text);
+        line-height: 1.4;
+    }
+
+    .loan-box .bank-logo {
+        width: 48px;
+        height: 48px;
+        top: 12px;
+        right: 12px;
+    }
+
+    /* Progress bar slightly thinner on mobile */
+    .loan-progress-bar-container {
+        height: 12px;
+        margin-bottom: 6px;
+    }
+
+    .loan-breakdown-progress-container {
+        height: 22px;
+    }
+
+    .principal-progress,
+    .interest-progress {
+        font-size: 0.75em;
+    }
+
+    /* Due countdown badge */
+    .loan-box .due-countdown {
+        font-size: 0.88em;
+        padding: 4px 8px;
+        margin-top: 8px;
+    }
+
+    /* Next EMI date */
+    .loan-box .next-emi-date {
+        font-size: 0.82em;
+        margin-top: 8px;
+        padding-top: 6px;
+    }
+
+    /* Foreclose + action buttons */
+    .loan-actions {
+        flex-direction: row;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .foreclose-button {
+        font-size: 0.82em;
+        padding: 8px 10px;
+    }
+
+    /* Extra loan info */
+    .loan-extra-info {
+        font-size: 0.82rem;
+        margin-top: 8px;
+        padding-top: 8px;
+    }
+
+    /* Forecast section on mobile */
+    .sidebar-forecast-panel {
+        margin: 10px 0 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .loan-details-card {
+        padding: 12px 10px 14px;
+    }
+
+    .loan-box {
+        padding: 12px 12px 10px;
+    }
+
+    .loan-box .bank-name {
+        font-size: 0.95rem;
+    }
+
+    .loan-box p {
+        font-size: 0.8rem;
+    }
+
+    .loan-box .bank-logo {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* ── CALENDAR TAB — Panel wrapper ─────────────────────────────── */
+/* Give the outer container proper desktop padding to match cards  */
+.panel-calendar-container {
+    padding: 20px;
+}
+
+/* Calendar card — consistent with credit-cards-outer */
+.calendar-outer {
+    padding: 24px 26px 28px;
+    border-radius: var(--radius-lg);
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--bank-card);
+    border: 1px solid var(--bank-border);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Section heading row inside calendar */
+.calendar-outer .section-header {
+    border-bottom: 2px solid var(--bank-border);
+    padding-bottom: 14px;
+    margin-bottom: 0;
+    align-items: center;
+    gap: 10px;
+}
+
+.calendar-outer .section-header h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--bank-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.calendar-outer .section-header h2 i {
+    color: var(--bank-secondary);
+    font-size: 1.1em;
+}
+
+/* ── Cashflow nav row ─────────────────────────────────────────── */
+.cashflow-nav {
+    margin-top: 18px;
+    margin-bottom: 14px;
+}
+
+.cashflow-nav-btn {
+    padding: 7px 18px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.88rem;
+}
+
+.cashflow-month-label {
+    font-size: 1.2rem;
+    min-width: 160px;
+}
+
+/* ── Month stats bar ──────────────────────────────────────────── */
+.cashflow-month-stats {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--bank-border);
+    background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+    padding: 16px 24px;
+    margin: 0 0 20px;
+    gap: 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.cashflow-stat-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+}
+
+.cashflow-stat-value {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: var(--bank-primary);
+    letter-spacing: -0.5px;
+}
+
+.cashflow-stat-dates {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--bank-secondary);
+    margin-top: 2px;
+    word-break: break-word;
+    line-height: 1.5;
+}
+
+.cashflow-stat-divider {
+    width: 1px;
+    height: 52px;
+    background: var(--bank-border);
+    margin: 0 24px;
+}
+
+/* ── Calendar grid cells ─────────────────────────────────────── */
+.cal-grid {
+    gap: 5px;
+}
+
+.cal-header-cell {
+    font-size: 0.7rem;
+    padding: 8px 0 10px;
+    letter-spacing: 0.08em;
+    color: var(--bank-muted);
+}
+
+.cal-cell {
+    height: 84px;
+    padding: 8px 5px 5px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--bank-border);
+    background: var(--bank-card);
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.cal-cell:not(.cal-empty):hover {
+    transform: scale(1.04);
+    z-index: 1;
+    position: relative;
+}
+
+.cal-day-num {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--bank-text);
+}
+
+.cal-cell.cal-today .cal-day-num {
+    color: var(--bank-secondary);
+    font-weight: 800;
+}
+
+.cal-emi-dot {
+    width: 8px;
+    height: 8px;
+    margin-top: 6px;
+}
+
+.cal-emi-total {
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+/* ── Cashflow summary list below calendar ─────────────────────── */
+.cashflow-summary {
+    margin-top: 14px;
+    background: var(--bank-bg);
+    border: 1px solid var(--bank-border);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+}
+
+.cashflow-summary-row {
+    padding: 7px 0;
+    border-bottom: 1px solid var(--bank-border);
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--bank-text);
+}
+
+.cashflow-summary-row:last-child {
+    border-bottom: none;
+}
+
+.cashflow-summary-row strong {
+    font-weight: 700;
+    color: var(--bank-primary);
+}
+
+/* ── CALENDAR — Mobile ────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .panel-calendar-container {
+        padding: 0;
+    }
+
+    .calendar-outer {
+        padding: 14px 12px 18px;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        box-shadow: none;
+        margin: 0;
+        max-width: 100%;
+    }
+
+    .calendar-outer .section-header h2 {
+        font-size: 1.05rem;
+    }
+
+    .cashflow-nav {
+        margin-top: 14px;
+        margin-bottom: 10px;
+    }
+
+    .cashflow-month-label {
+        font-size: 1rem;
+        min-width: 130px;
+    }
+
+    .cashflow-month-stats {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        padding: 12px 14px;
+        margin: 0 0 14px;
+        align-items: center;
+        gap: 0;
+    }
+
+    .cashflow-stat-value {
+        font-size: 1.4rem;
+    }
+
+    .cashflow-stat-dates {
+        font-size: 0.82rem;
+        word-break: break-word;
+    }
+
+    .cashflow-stat-divider {
+        height: 40px;
+        margin: 0 14px;
+    }
+
+    .cal-grid {
+        gap: 3px;
+    }
+
+    .cal-cell {
+        height: 58px;
+        padding: 5px 3px 3px;
+    }
+
+    .cal-cell:not(.cal-empty):hover {
+        transform: none;
+    }
+
+    .cal-header-cell {
+        font-size: 0.62rem;
+        padding: 5px 0 7px;
+    }
+
+    .cal-day-num {
+        font-size: 0.78rem;
+    }
+
+    .cal-emi-dot {
+        width: 6px;
+        height: 6px;
+        margin-top: 3px;
+    }
+
+    .cal-emi-total {
+        font-size: 0.65rem;
+        margin-top: 2px;
+    }
+
+    .cashflow-summary {
+        margin-top: 10px;
+        padding: 10px 12px;
+    }
+
+    .cashflow-summary-row {
+        font-size: 0.82rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .cashflow-month-stats {
+        padding: 10px 12px;
+    }
+
+    .cashflow-stat-value {
+        font-size: 1.2rem;
+    }
+
+    .cashflow-stat-dates {
+        font-size: 0.75rem;
+    }
+
+    .cashflow-stat-divider {
+        margin: 0 10px;
+        height: 36px;
+    }
+
+    .cashflow-stat-label {
+        font-size: 0.6rem;
+    }
+
+    .cal-cell {
+        height: 50px;
+        padding: 4px 2px 2px;
+    }
+
+    .cal-day-num {
+        font-size: 0.72rem;
+    }
+
+    .cal-emi-total {
+        font-size: 0.6rem;
+    }
+}
+
+/* ── Dark mode extensions ─────────────────────────────────────── */
+[data-theme="dark"] .cashflow-month-stats {
+    background: linear-gradient(135deg, #0f2442 0%, #0f2a1f 100%);
+}
+
+[data-theme="dark"] .debt-container td:first-child,
+[data-theme="dark"] .debt-container th:first-child {
+    background: #1e293b;
+}
+
+[data-theme="dark"] .debt-container tbody tr.today-emi td:first-child {
+    background: #0f2240;
+}
+
+[data-theme="dark"] .debt-container tbody tr.future-emi td:first-child {
+    background: #2d1515;
+}
+
+[data-theme="dark"] .debt-container tbody tr.past-emi td:first-child {
+    background: #0f2a1f;
+}
+
+[data-theme="dark"] .cashflow-summary {
+    background: var(--bank-card);
+}
+
+[data-theme="dark"] .debt-container th {
+    background: #162033;
+    color: var(--bank-primary);
+}
+
+
+/* ================================================================
+   LOANS TAB — Mobile panel wrapper fix
+   On mobile, panelSummaryLoans wraps both sidebar+main as a block.
+   The main-content (#panelLoans) needs page-level padding to match
+   the Summary tab's sidebar card feel.
+================================================================ */
+@media (max-width: 768px) {
+
+    /* The outer page wrapper — remove side padding so cards go edge-to-edge */
+    #panelSummaryLoans.page-container {
+        padding: 0;
+    }
+
+    /* dashboard-container is display:block on mobile — just a stack */
+    #panelSummaryLoans .dashboard-container {
+        padding: 0;
+        gap: 0;
+    }
+
+    /* main-content wrapper — clean slate, loan-details-card handles styling */
+    #panelLoans.main-content {
+        padding: 0 !important;
+        margin: 0;
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        border-radius: 0 !important;
+    }
+
+    /* loan-details-card — the actual visible card, edge-to-edge like Summary */
+    .loan-details-card {
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        border-top: none !important;
+        margin: 0 !important;
+    }
+}
+
+
+/* ================================================================
+   LOANS TABLE — Mobile scrollable table (shown above loan cards)
+================================================================ */
+@media (max-width: 768px) {
+
+    /* Scrollable wrapper — swipe horizontally to see all columns */
+    .debt-container {
+        display: block !important;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 16px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--bank-border);
+        box-shadow: var(--shadow-sm);
+        /* Subtle scroll hint gradient on right edge */
+        background:
+            linear-gradient(to right, var(--bank-card) 30%, rgba(255, 255, 255, 0)),
+            linear-gradient(to right, rgba(255, 255, 255, 0), var(--bank-card) 70%) 100% 0,
+            radial-gradient(farthest-side at 0 50%, rgba(0, 0, 0, .08), transparent),
+            radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, .08), transparent) 100% 0;
+        background-repeat: no-repeat;
+        background-size: 40px 100%, 40px 100%, 12px 100%, 12px 100%;
+        background-attachment: local, local, scroll, scroll;
+        background-color: var(--bank-card);
+    }
+
+    .debt-container table {
+        min-width: 520px;
+        /* enough to show all 6 columns clearly */
+        font-size: 12px;
+    }
+
+    .debt-container th {
+        font-size: 0.68rem;
+        padding: 10px 8px;
+        white-space: nowrap;
+    }
+
+    .debt-container td {
+        padding: 9px 8px;
+        font-size: 0.78rem;
+        white-space: nowrap;
+    }
+
+    /* Sticky bank-name column so it stays visible while scrolling */
+    .debt-container th:first-child,
+    .debt-container td:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background: #f0f6ff;
+        font-weight: 700;
+        box-shadow: 2px 0 4px rgba(0, 0, 0, .06);
+    }
+
+    .debt-container tbody tr.today-emi td:first-child {
+        background: #dbeafe;
+    }
+
+    .debt-container tbody tr.future-emi td:first-child {
+        background: #fee2e2;
+    }
+
+    .debt-container tbody tr.past-emi td:first-child {
+        background: #dcfce7;
+    }
+
+    .debt-container tbody tr:hover td:first-child {
+        background: #e0eeff;
+    }
+
+    /* Scroll hint label below the table */
+    .debt-container::after {
+        content: '← Scroll to see more →';
+        display: block;
+        text-align: center;
+        font-size: 0.68rem;
+        color: var(--bank-muted);
+        padding: 5px 0 6px;
+        background: var(--bank-bg);
+        border-top: 1px solid var(--bank-border);
+        letter-spacing: 0.04em;
+    }
+}
+
+@media (max-width: 480px) {
+    .debt-container table {
+        min-width: 460px;
+        font-size: 11px;
+    }
+
+    .debt-container th {
+        font-size: 0.62rem;
+        padding: 8px 6px;
+    }
+
+    .debt-container td {
+        font-size: 0.72rem;
+        padding: 7px 6px;
+    }
+}
+
+
+/* ================================================================
+   DESCRIPTION SUMMARY LIST — match "Total Pending" row styling
+   The h3[data-description-summary] elements are JS-injected inside
+   #description-summary-list which sits inside .top-loans-section.
+   They inherit text-transform:uppercase + 0.78rem from that rule,
+   making labels SCREAM. Override to match .summary-row instead.
+================================================================ */
+
+#description-summary-list {
+    padding: 0;
+    background: var(--bank-card);
+    border: 1px solid var(--bank-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 2px;
+}
+
+/* Each loan description row */
+#description-summary-list h3[data-description-summary] {
+    /* Reset the .top-loans-section h3 overrides */
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    font-size: 0.95rem !important;
+    /* same visual weight as "Total Pending" span */
+    font-weight: 500 !important;
+    color: var(--bank-text) !important;
+    border-bottom: 1px solid var(--bank-border) !important;
+    margin: 0 !important;
+    padding: 10px 14px !important;
+
+    /* Side-by-side label : value layout, matching .summary-row */
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 8px;
+
+    transition: background 0.15s ease;
+}
+
+#description-summary-list h3[data-description-summary]:last-child {
+    border-bottom: none !important;
+}
+
+#description-summary-list h3[data-description-summary]:hover {
+    background: #f0f6ff;
+}
+
+/* The ₹ amount span inside each row — bold & primary colour like "Total Pending" strong */
+#description-summary-list h3[data-description-summary] .remaining-by-desc {
+    font-weight: 700 !important;
+    color: var(--bank-primary) !important;
+    font-size: 1rem !important;
+    white-space: nowrap;
+}
+
+/* Dark mode */
+[data-theme="dark"] #description-summary-list h3[data-description-summary]:hover {
+    background: #162033;
+}
+
+
+/* ================================================================
+   LOAN DETAILS CARD — align heading & spacing to match Sidebar/Summary
+   Desktop: sidebar padding=20px, h2 padding-bottom=10px, 1px border.
+   Loan card was 16px top padding + no h2 border → headings misalign.
+================================================================ */
+
+/* Make card top padding match sidebar exactly */
+.loan-details-card {
+    padding-top: 20px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    padding-bottom: 20px !important;
+}
+
+/* Match sidebar h2: same font-size, same bottom border, same spacing */
+.loan-details-card h2 {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: var(--bank-primary) !important;
+    margin: 0 0 12px !important;
+    padding: 0 0 10px 0 !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+}
+
+[data-theme="dark"] .loan-details-card h2 {
+    border-bottom-color: var(--bank-border) !important;
+}
+
+
+/* ================================================================
+   UNIFIED SECTION HEADINGS — all match .summary-card h4 (STATUS style)
+   Targets: Top 3 Loans, Credit Card Billing Cycle, Debt by Bank,
+   Interest Rate Comparison (h3 inside .top-loans-section),
+   Loan Breakdown (h4 inside .summary-card — already correct),
+   Cards tab overview items (h3 inside .overview-item).
+   Reference: font-size:0.78rem, weight:700, uppercase, muted colour,
+   letter-spacing:0.08em, border-bottom:1px, padding-bottom:8px.
+================================================================ */
+
+/* ── Top-loans-section h3: already close, lock every property ── */
+.top-loans-section h3 {
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    color: var(--bank-muted) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    margin: 0 0 12px !important;
+    padding-bottom: 8px !important;
+    border-bottom: 1px solid var(--bank-border) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    line-height: 1.4 !important;
+}
+
+/* Override inline style="color:..." on icons inside these h3s */
+.top-loans-section h3>i {
+    color: var(--bank-muted) !important;
+    font-size: 0.9em !important;
+    margin-right: 6px !important;
+}
+
+/* ── Cards tab overview h3 ── */
+.overview-item h3 {
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    color: var(--bank-muted) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    margin-bottom: 6px !important;
+    padding-bottom: 0 !important;
+    border-bottom: none !important;
+    /* overview items have no divider — value sits below */
+}
+
+/* ── Loan Breakdown h4 (already in .summary-card — confirm lock) ── */
+.summary-card h4 {
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    color: var(--bank-muted) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    margin: 0 0 10px !important;
+    padding-bottom: 8px !important;
+    border-bottom: 1px solid var(--bank-border) !important;
+}
+
+
+/* ================================================================
+   REMOVE ICONS from Top 3 Loans / Debt by Bank / Interest Rate h3
+   Font Awesome <i> tags can't be deleted via CSS, so hide them.
+================================================================ */
+.top-loans-section h3>i {
+    display: none !important;
+}
+
+/* ================================================================
+   YEARLY EMI FORECAST — restyle to match loan-details-card
+   Replace old hardcoded greys (#f9f9f9, #ddd, #333) with CSS vars.
+================================================================ */
+
+/* Outer container — match .loan-details-card */
+.emi-forecast-section {
+    margin-top: 16px !important;
+    padding: 20px !important;
+    background: var(--bank-card) !important;
+    border: 1px solid var(--bank-border) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .06) !important;
+    text-align: left !important;
+}
+
+/* Section heading — match .loan-details-card h2 */
+.emi-forecast-section h2 {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: var(--bank-primary) !important;
+    margin: 0 0 12px !important;
+    padding: 0 0 10px !important;
+    border-bottom: 1px solid var(--bank-border) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+}
+
+/* Each year row — match .summary-row feel */
+.yearly-forecast-item {
+    margin-bottom: 10px !important;
+    padding: 11px 14px !important;
+    border: 1px solid var(--bank-border) !important;
+    border-radius: var(--radius-sm) !important;
+    background: var(--bank-bg) !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    transition: background 0.15s ease, border-color 0.15s ease !important;
+    box-shadow: none !important;
+}
+
+.yearly-forecast-item:last-child {
+    margin-bottom: 0 !important;
+}
+
+.yearly-forecast-item:hover {
+    background: #eef4ff !important;
+    border-color: var(--bank-secondary) !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.yearly-forecast-item h3 {
+    /* Override the unified h3 rule for this specific context */
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    color: var(--bank-text) !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
+}
+
+.yearly-forecast-item p {
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    color: var(--bank-primary) !important;
+    margin: 0 !important;
+}
+
+.yearly-forecast-item .additional-info {
+    font-size: 0.78rem !important;
+    color: var(--bank-muted) !important;
+    font-weight: 500 !important;
+    margin-top: 2px !important;
+}
+
+/* Current year highlight */
+.current-year {
+    background: #eff6ff !important;
+    border-color: var(--bank-secondary) !important;
+}
+
+.current-year h3 {
+    color: var(--bank-secondary) !important;
+}
+
+.current-year p {
+    color: var(--bank-primary) !important;
+}
+
+/* Past years — muted */
+.past-year {
+    background: var(--bank-bg) !important;
+    border-color: var(--bank-border) !important;
+    opacity: 0.7;
+}
+
+.past-year h3 {
+    color: var(--bank-muted) !important;
+}
+
+.past-year p {
+    color: var(--bank-muted) !important;
+}
+
+/* Future years */
+.future-year p {
+    color: var(--bank-primary) !important;
+}
+
+/* Dark mode */
+[data-theme="dark"] .current-year {
+    background: #0f2442 !important;
+}
+
+[data-theme="dark"] .past-year {
+    background: var(--bank-card) !important;
+}
+
+
+/* ================================================================
+   REMOVE ICONS from h2 headings:
+   Monthly Cash Flow Planner, Your Credit Cards, Yearly EMI Forecast
+================================================================ */
+
+/* Monthly Cash Flow Planner — fa-calendar-alt */
+#calendar-section-heading>i,
+
+/* Your Credit Cards — fa-credit-card */
+#credit-cards-heading>i,
+
+/* Yearly EMI Forecast — JS-injects h2 inside .emi-forecast-section */
+.emi-forecast-section h2>i {
+    display: none !important;
+}
+
+
+/* ================================================================
+   YOUR CREDIT CARDS & MONTHLY CASH FLOW — headings match Summary h2
+   Reference (.sidebar h2): 20px, 700, var(--bank-primary),
+   padding-bottom:10px, border-bottom:1px solid #e5e7eb, margin:0 0 12px
+================================================================ */
+
+/* ── Desktop ─────────────────────────────────────────────────── */
+
+/* Credit Cards section-header row: keep flex but add bottom border */
+#credit-cards-section .section-header {
+    border-bottom: 1px solid var(--bank-border);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+/* "Your Credit Cards" h2 */
+#credit-cards-heading {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: var(--bank-primary) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    line-height: 1.3 !important;
+}
+
+/* Calendar section-header row */
+.calendar-outer .section-header {
+    border-bottom: 1px solid var(--bank-border) !important;
+    padding-bottom: 10px !important;
+    margin-bottom: 20px !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+/* "Monthly Cash Flow Planner" h2 */
+#calendar-section-heading {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: var(--bank-primary) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    line-height: 1.3 !important;
+}
+
+/* ── Mobile ──────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+
+    /* Keep section-header stacked on mobile but heading stays prominent */
+    #credit-cards-section .section-header {
+        padding-bottom: 10px;
+        margin-bottom: 14px;
+    }
+
+    #credit-cards-heading {
+        font-size: 1.15rem !important;
+    }
+
+    .calendar-outer .section-header {
+        padding-bottom: 10px !important;
+        margin-bottom: 14px !important;
+    }
+
+    #calendar-section-heading {
+        font-size: 1.15rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+    #credit-cards-heading,
+    #calendar-section-heading {
+        font-size: 1.05rem !important;
+    }
+}
+
+
+/* ================================================================
+   MONTHLY CASH FLOW PLANNER — heading left-aligned
+================================================================ */
+.calendar-outer .section-header {
+    justify-content: flex-start !important;
+}
+
+#calendar-section-heading {
+    text-align: left !important;
+    width: 100% !important;
 }
