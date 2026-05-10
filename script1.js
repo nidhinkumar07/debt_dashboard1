@@ -2198,18 +2198,30 @@ document.addEventListener('DOMContentLoaded', function () {
         const totalMonthEmi = Object.values(emiMap).flat().reduce((s, l) => s + l.emi, 0);
         const emiDaysSorted = Object.keys(emiMap).map(Number).sort((a, b) => a - b);
 
+        // Big stats bar below month nav
+        const statsEl = document.getElementById('cashflow-month-stats');
+        if (statsEl) {
+            statsEl.innerHTML = `
+                <div class="cashflow-stat-item">
+                    <div class="cashflow-stat-label">Total EMI This Month</div>
+                    <div class="cashflow-stat-value">₹${totalMonthEmi.toLocaleString('en-IN')}</div>
+                </div>
+                <div class="cashflow-stat-divider"></div>
+                <div class="cashflow-stat-item">
+                    <div class="cashflow-stat-label">EMI Dates</div>
+                    <div class="cashflow-stat-dates">${emiDaysSorted.join(', ')}</div>
+                </div>`;
+        }
+
+        // Danger days below calendar
         summaryEl.innerHTML = '';
-        const makeRow = (label, value, danger = false) => {
-            const row = document.createElement('div');
-            row.className = `cashflow-summary-row${danger ? ' danger-row' : ''}`;
-            row.innerHTML = `<span>${label}</span><strong>${value}</strong>`;
-            summaryEl.appendChild(row);
-        };
-
-        makeRow('Total EMI this month', `₹${totalMonthEmi.toLocaleString('en-IN')}`);
-        makeRow('EMI dates', emiDaysSorted.join(', '));
-
         if (dangerDays.length) {
+            const makeRow = (label, value, danger = false) => {
+                const row = document.createElement('div');
+                row.className = `cashflow-summary-row${danger ? ' danger-row' : ''}`;
+                row.innerHTML = `<span>${label}</span><strong>${value}</strong>`;
+                summaryEl.appendChild(row);
+            };
             const dangerList = dangerDays.map(([d, loans]) => {
                 const suffix = formatDateSuffix(parseInt(d));
                 return `${d}${suffix} (${loans.length} EMIs, ₹${loans.reduce((s,l) => s + l.emi, 0).toLocaleString('en-IN')})`;
