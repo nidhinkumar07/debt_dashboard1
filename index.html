@@ -24,10 +24,10 @@
         kept as-is but consider subsetting or self-hosting for production.
     -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="style1.css" />
-    <title>Debt Dashboard</title>
+    <title>My Debt Dashboard</title>
     <!-- DEVOPS [PERFORMANCE]: chart.js loaded before defer script but after CSS to unblock paint -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script1.js" defer></script>
@@ -121,7 +121,7 @@
     <div class="admin-btn-desktop" id="adminBtnDesktop">
         <button id="adminToggleBtn" class="admin-toggle-btn" type="button" aria-haspopup="dialog"
             aria-controls="adminModal">
-            <i class="fas fa-cog" aria-hidden="true"></i> Admin Panel
+            <i class="fas fa-cog" aria-hidden="true"></i> Manage Data
         </button>
     </div>
 
@@ -146,7 +146,7 @@
             <button class="desk-tab desk-tab-admin" id="deskTabAdmin" type="button" aria-haspopup="dialog"
                 aria-controls="adminModal">
                 <i class="fas fa-cog" aria-hidden="true"></i>
-                <span>Admin</span>
+                <span>Manage</span>
             </button>
         </div>
     </nav>
@@ -156,10 +156,10 @@
         <div class="modal-content admin-modal-content">
             <!-- SECURITY [XSS]: Using a proper button with event handler instead of onclick -->
             <!-- UI/UX [A11Y]: aria-label on close button -->
-            <button class="close-admin" type="button" aria-label="Close Admin Panel">
+            <button class="close-admin" type="button" aria-label="Close Manage Data Panel">
                 <span aria-hidden="true">&times;</span>
             </button>
-            <h2 id="adminModalTitle"><i class="fas fa-database" aria-hidden="true"></i> Loan Management System</h2>
+            <h2 id="adminModalTitle"><i class="fas fa-database" aria-hidden="true"></i> Manage Data</h2>
             <div class="admin-form-container">
                 <h3><i class="fas fa-plus-circle" aria-hidden="true"></i> Add / Edit Loan</h3>
                 <!-- DEV [STRUCTURE]: novalidate lets JS control validation UX consistently -->
@@ -304,7 +304,7 @@
         <button class="mob-tab mob-tab-admin" id="tabAdmin" type="button" aria-haspopup="dialog"
             aria-controls="adminModal">
             <i class="fas fa-cog" aria-hidden="true"></i>
-            <span>Admin</span>
+            <span>Manage</span>
         </button>
     </nav>
 
@@ -512,7 +512,7 @@
             <div class="section-header">
                 <h2 id="credit-cards-heading">
                     <i class="fas fa-credit-card" aria-hidden="true"></i>
-                    Your Credit Cards
+                    Credit Cards
                     <!-- UI/UX [A11Y]: aria-live so the "as of" date update is announced -->
                     <span id="cards-as-of-date" class="cards-as-of-badge" aria-live="polite"></span>
                 </h2>
@@ -554,27 +554,88 @@
     ================================================================ -->
     <div id="panelCalendar" class="page-container panel-calendar-container desk-hidden">
         <section class="dashboard-section calendar-outer" aria-labelledby="calendar-section-heading">
+
+            <!-- Section heading row -->
             <div class="section-header">
                 <h2 id="calendar-section-heading">
                     <i class="fas fa-calendar-alt" aria-hidden="true"></i>
                     Monthly Cash Flow Planner
                 </h2>
             </div>
-            <div class="top-loans-section" id="cashflow-section">
-                <div class="cashflow-nav" role="navigation" aria-label="Calendar month navigation">
-                    <button id="cashflow-prev" class="cashflow-nav-btn" type="button" aria-label="Previous month">
-                        <i class="fas fa-chevron-left" aria-hidden="true"></i>
-                    </button>
-                    <span id="cashflow-month-label" class="cashflow-month-label" aria-live="polite"></span>
-                    <button id="cashflow-next" class="cashflow-nav-btn" type="button" aria-label="Next month">
-                        <i class="fas fa-chevron-right" aria-hidden="true"></i>
-                    </button>
+
+            <!-- ── Dual-column layout wrapper ── -->
+            <div class="cashflow-dual-col" id="cashflow-section">
+
+                <!-- ════════════════════════════════════════
+                     LEFT COLUMN — Visual Core (65%)
+                ════════════════════════════════════════ -->
+                <div class="cashflow-left-col">
+
+                    <!-- Month navigation -->
+                    <div class="cashflow-nav" role="navigation" aria-label="Calendar month navigation">
+                        <button id="cashflow-prev" class="cashflow-nav-btn" type="button" aria-label="Previous month">
+                            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                        </button>
+                        <span id="cashflow-month-label" class="cashflow-month-label" aria-live="polite"></span>
+                        <button id="cashflow-next" class="cashflow-nav-btn" type="button" aria-label="Next month">
+                            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                        </button>
+                    </div>
+
+                    <!-- Macro stats bar (below nav, above calendar) -->
+                    <div id="cashflow-month-stats" class="cashflow-month-stats" aria-live="polite"></div>
+
+                    <!-- Calendar grid -->
+                    <div id="cashflow-calendar" class="cashflow-calendar" aria-label="EMI payment calendar"></div>
+
                 </div>
-                <!-- Big stats below month label -->
-                <div id="cashflow-month-stats" class="cashflow-month-stats" aria-live="polite"></div>
-                <div id="cashflow-calendar" class="cashflow-calendar" aria-label="EMI payment calendar"></div>
-                <div id="cashflow-summary" class="cashflow-summary" aria-live="polite"></div>
+                <!-- END left col -->
+
+                <!-- ════════════════════════════════════════
+                     RIGHT COLUMN — Action Hub (35%)
+                ════════════════════════════════════════ -->
+                <div class="cashflow-right-col" aria-label="Monthly insights panel">
+
+                    <!-- Component 1: Month Progress  |  mobile order: 0 (topmost) -->
+                    <div class="cf-panel cf-tracker-panel cf-mob-order-0" aria-label="Pending vs cleared EMI tracker">
+                        <div class="cf-panel-title">
+                            <i class="fas fa-tasks" aria-hidden="true"></i>
+                            Month Progress
+                        </div>
+                        <div id="cashflow-tracker" aria-live="polite">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Component 2: MoM Trend  |  mobile order: 1 (above calendar) -->
+                    <div class="cf-panel cf-trend-panel cf-mob-order-1" aria-label="Month-over-month trend">
+                        <div class="cf-panel-title">
+                            <i class="fas fa-chart-line" aria-hidden="true"></i>
+                            Trend
+                        </div>
+                        <div id="cashflow-mom-trend" class="cf-mom-trend" aria-live="polite">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Component 3: Efficiency Gauge  |  mobile order: 3 (below calendar) -->
+                    <div class="cf-panel cf-gauge-panel cf-mob-order-3" aria-live="polite"
+                        aria-label="Payment efficiency — principal vs interest split">
+                        <div class="cf-panel-title cf-gauge-title">
+                            <i class="fas fa-balance-scale" aria-hidden="true"></i>
+                            Efficiency Gauge
+                        </div>
+                        <div id="cashflow-gauge-body" class="cf-gauge-body">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                </div>
+                <!-- END right col -->
+
             </div>
+            <!-- END cashflow-dual-col -->
+
         </section>
     </div>
     <!-- END panelCalendar -->
@@ -664,7 +725,7 @@
         <div class="footer-inner">
             <div class="footer-brand">
                 <span class="footer-logo" aria-hidden="true"><i class="fas fa-wallet"></i></span>
-                <span class="footer-app-name">Debt Dashboard</span>
+                <span class="footer-app-name">My Debt Dashboard</span>
             </div>
 
             <p class="footer-tagline">Track smarter. Pay faster. Stress less.</p>
@@ -691,7 +752,7 @@
             </div>
 
             <p class="footer-copy">
-                &copy; <span id="footer-year"></span> Debt Dashboard. Built with
+                &copy; <span id="footer-year"></span> My Debt Dashboard. Built with
                 <i class="fas fa-heart footer-heart" aria-hidden="true"></i> for financial clarity.
             </p>
         </div>
