@@ -720,61 +720,178 @@ document.addEventListener('DOMContentLoaded', function () {
         if (totalAvailableLimitElement) totalAvailableLimitElement.textContent = `₹ ${totalAvailable.toLocaleString('en-IN')}`;
         if (totalOutstandingElement)    totalOutstandingElement.textContent    = `₹ ${totalOutstanding.toLocaleString('en-IN')}`;
 
+        const fmt = d => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+        // Load paid state from localStorage (keyed by card name + cycle month)
+        const paidState = safeLocalStorageGet('ccPaidState', {});
+
         const processedCards = creditCardData1.map(card => {
-            const available  = card.totalLimit - card.currentOutstanding;
+            const available   = card.totalLimit - card.currentOutstanding;
             const utilization = (card.currentOutstanding / card.totalLimit) * 100;
-            let risk = 'Low';
-            if (utilization > 50) risk = 'High';
-            else if (utilization > 30) risk = 'Medium';
 
-            let dueDate = new Date(today.getFullYear(), today.getMonth(), card.paymentDueDay);
-            if (dueDate < today) dueDate.setMonth(dueDate.getMonth() + 1);
-            const daysToDue = Math.ceil((dueDate - today) / 86400000);
+            // Bill date: this month's billing cycle end day
+            let billDate = new Date(todayMidnight.getFullYear(), todayMidnight.getMonth(), card.billingCycleEndDay);
 
-            return { ...card, available, utilization, risk, daysToDue };
-        }).sort((a, b) => b.utilization - a.utilization);
+            // Due date: paymentDueDay that comes AFTER this bill date
+            let dueDate = new Date(billDate.getFullYear(), billDate.getMonth(), card.paymentDueDay);
+            if (dueDate <= billDate) dueDate.setMonth(dueDate.getMonth() + 1);
 
+            // Advance to next cycle only once the due date itself has passed
+            if (dueDate < todayMidnight) {
+                billDate.setMonth(billDate.getMonth() + 1);
+                dueDate = new Date(billDate.getFullYear(), billDate.getMonth(), card.paymentDueDay);
+                if (dueDate <= billDate) dueDate.setMonth(dueDate.getMonth() + 1);
+            }
+
+            const billDateStr = fmt(billDate);
+            const dueDateStr  = fmt(dueDate);
+            const daysToDue   = Math.ceil((dueDate - todayMidnight) / 86400000);
+
+            // Paid key: cardName + due month — auto-resets each cycle
+            const paidKey     = `${card.name}_${dueDate.getFullYear()}_${dueDate.getMonth()}`;
+            const isPaid      = !!paidState[paidKey];
+            // Enable toggle only after bill date has passed AND outstanding > 0
+            const billDatePassed = todayMidnight >= billDate;
+            const hasOutstanding = card.currentOutstanding > 0;
+            const canMarkPaid    = billDatePassed && hasOutstanding;
+
+            return { ...card, available, utilization, billDateStr, dueDateStr, daysToDue, dueDate, billDate, paidKey, isPaid, canMarkPaid };
+        }).sort((a, b) => {
+            // Zero-balance cards always last
+            const aZero = a.currentOutstanding === 0;
+            const bZero = b.currentOutstanding === 0;
+            if (aZero !== bZero) return aZero ? 1 : -1;
+            if (aZero && bZero) return a.daysToDue - b.daysToDue;
+
+            // Paid cards after unpaid
+            if (a.isPaid !== b.isPaid) return a.isPaid ? 1 : -1;
+
+            // Both same paid state — sort by due date ascending (soonest first)
+            return a.daysToDue - b.daysToDue;
+        });
+
+        // --- Next payment due banner (only unpaid cards with outstanding > 0) ---
+        const unpaidCards = processedCards.filter(c => !c.isPaid && c.currentOutstanding > 0);
+        const nextDueCard = unpaidCards.length ? unpaidCards.reduce((a, b) => a.daysToDue <= b.daysToDue ? a : b) : null;
+        let nextDueBanner = document.getElementById('cc-next-due-banner');
+        if (!nextDueBanner) {
+            nextDueBanner = document.createElement('div');
+            nextDueBanner.id = 'cc-next-due-banner';
+            creditCardsGrid.parentNode.insertBefore(nextDueBanner, creditCardsGrid);
+        }
+        if (nextDueCard) {
+            const urgentBanner = nextDueCard.daysToDue <= 5;
+            nextDueBanner.className = 'cc-next-due-banner' + (urgentBanner ? ' cc-next-due-urgent' : '');
+            nextDueBanner.innerHTML = `
+                <i class="fas fa-${urgentBanner ? 'exclamation-triangle' : 'calendar-alt'}" aria-hidden="true"></i>
+                <span>Next payment due in <strong>${nextDueCard.daysToDue} day${nextDueCard.daysToDue !== 1 ? 's' : ''}</strong> &mdash; <em>${sanitize(nextDueCard.name)}</em> on ${nextDueCard.dueDateStr}</span>
+            `;
+        } else {
+            nextDueBanner.className = 'cc-next-due-banner cc-next-due-allpaid';
+            nextDueBanner.innerHTML = `<i class="fas fa-check-circle" aria-hidden="true"></i><span>All cards paid this cycle</span>`;
+        }
+
+        // --- Render cards ---
         creditCardsGrid.innerHTML = '';
         processedCards.forEach(card => {
             const cardBox = document.createElement('div');
-            cardBox.className = 'credit-card-box';
 
             let barColor = '#16a34a';
-            if (card.utilization > 60) barColor = '#dc2626';
+            if (card.utilization > 60)      barColor = '#dc2626';
             else if (card.utilization > 30) barColor = '#f59e0b';
 
-            // Build DOM instead of innerHTML to avoid XSS from card.name
+            const isUrgent  = !card.isPaid && card.currentOutstanding > 0 && card.daysToDue <= 5;
+            const isSoon    = !card.isPaid && card.currentOutstanding > 0 && card.daysToDue > 5 && card.daysToDue <= 14;
+            const isZero    = card.currentOutstanding === 0;
+            const dueCls    = isUrgent ? ' cc-due-urgent' : '';
+            const paidCls   = card.isPaid ? ' cc-card-paid' : '';
+            const urgentCls = isUrgent ? ' cc-card-urgent' : isSoon ? ' cc-card-soon' : isZero ? ' cc-card-zero' : '';
+            cardBox.className = 'credit-card-box cc-minimal' + paidCls + urgentCls;
+
+            // Button state logic — FIX 2 & 3
+            let btnLabel, btnCls, btnDisabled, btnTitle;
+            if (card.currentOutstanding === 0) {
+                // FIX 3: clear "No Due" static badge
+                btnLabel = '✓ No Due'; btnCls = 'cc-paid-toggle cc-paid-toggle--nodue';
+                btnDisabled = 'disabled'; btnTitle = 'No outstanding balance';
+            } else if (card.isPaid) {
+                // FIX 3: "✓ Paid" — clearly a success badge
+                btnLabel = '✓ Paid'; btnCls = 'cc-paid-toggle cc-paid-toggle--paid';
+                btnDisabled = ''; btnTitle = 'Click to mark as unpaid';
+            } else if (!card.canMarkPaid) {
+                // FIX 3: disabled until bill date — show tooltip explanation
+                btnLabel = 'Mark Paid'; btnCls = 'cc-paid-toggle cc-paid-toggle--disabled';
+                btnDisabled = 'disabled'; btnTitle = `Available after ${card.billDateStr}`;
+            } else {
+                // FIX 2: active CTA — green solid with checkmark icon
+                btnLabel = '✓ Mark Paid'; btnCls = 'cc-paid-toggle';
+                btnDisabled = ''; btnTitle = 'Mark this card as paid';
+            }
+
             cardBox.innerHTML = `
-            <div class="credit-card-header">
-                <h3>${sanitize(card.name)}</h3>
-                <img src="${sanitize(getBankLogoFromCard(card.name))}" class="credit-bank-logo"
-                     alt="${sanitize(card.name)} logo" />
+            <div class="cc-min-header">
+                <div class="cc-min-header-left">
+                    <img src="${sanitize(getBankLogoFromCard(card.name))}" class="cc-min-logo"
+                         alt="${sanitize(card.name)} logo" />
+                    <span class="cc-min-name">${sanitize(card.name)}</span>
+                </div>
+                <button class="${btnCls}" ${btnDisabled}
+                        data-paid-key="${sanitize(card.paidKey)}"
+                        title="${btnTitle}"
+                        aria-label="${btnTitle}"
+                        aria-pressed="${card.isPaid}">
+                    ${btnLabel}
+                </button>
             </div>
-            <div class="credit-row">
-                <span>Total Limit</span>
-                <span>₹ ${card.totalLimit.toLocaleString('en-IN')}</span>
+
+            <div class="cc-min-bar-row">
+                <span class="cc-min-bar-label">${card.utilization.toFixed(1)}% used</span>
+                <span class="cc-min-bar-amt${card.currentOutstanding === 0 ? ' cc-min-amt-zero' : ''}">
+                    ${card.currentOutstanding === 0 ? 'No outstanding' : '₹ ' + card.currentOutstanding.toLocaleString('en-IN')}
+                </span>
             </div>
-            <div class="credit-row">
-                <span>Available</span>
-                <span class="credit-available">₹ ${card.available.toLocaleString('en-IN')}</span>
+            <div class="cc-min-progress">
+                <div class="cc-min-progress-fill" style="width:${card.utilization.toFixed(1)}%;background:${barColor};"
+                     role="progressbar" aria-valuenow="${card.utilization.toFixed(0)}"
+                     aria-valuemin="0" aria-valuemax="100"></div>
             </div>
-            <div class="credit-row">
-                <span>Outstanding</span>
-                <span class="credit-outstanding">₹ ${card.currentOutstanding.toLocaleString('en-IN')}</span>
+
+            <div class="cc-min-stats">
+                <div class="cc-min-stat-inline">
+                    <span class="cc-min-stat-label">Limit</span>
+                    <span class="cc-min-stat-val">₹ ${card.totalLimit.toLocaleString('en-IN')}</span>
+                </div>
+                <div class="cc-min-stat-inline" style="text-align:right;">
+                    <span class="cc-min-stat-label">Available</span>
+                    <span class="cc-min-stat-val cc-min-avail">₹ ${card.available.toLocaleString('en-IN')}</span>
+                </div>
             </div>
-            <div class="credit-progress">
-                <div class="credit-progress-fill"
-                     style="width:${card.utilization.toFixed(1)}%; background:${barColor};"
-                     role="progressbar"
-                     aria-valuenow="${card.utilization.toFixed(0)}"
-                     aria-valuemin="0" aria-valuemax="100"
-                     aria-label="${sanitize(card.name)} credit utilisation"></div>
-            </div>
-            <div class="credit-used">${card.utilization.toFixed(1)}% Used</div>
-            <div class="credit-footer">
-                <span>Due in ${card.daysToDue} days</span>
-                <span class="risk-${card.risk.toLowerCase()}">${card.risk} Risk</span>
+
+            <div class="cc-min-footer">
+                <div class="cc-min-date-block">
+                    <span class="cc-min-date-label">Bill date</span>
+                    <span class="cc-min-date-val">${card.billDateStr}</span>
+                </div>
+                <div class="cc-min-date-sep"></div>
+                <div class="cc-min-date-block" style="text-align:right;align-items:flex-end;">
+                    <span class="cc-min-date-label">Due date</span>
+                    <span class="cc-min-date-val${dueCls}">${card.dueDateStr}${isUrgent ? ` <span class="cc-due-days">${card.daysToDue}d</span>` : ''}</span>
+                </div>
             </div>`;
+
+            // Toggle handler — only for enabled buttons
+            const btn = cardBox.querySelector('.cc-paid-toggle:not([disabled])');
+            if (btn) {
+                btn.addEventListener('click', function () {
+                    const key   = this.dataset.paidKey;
+                    const state = safeLocalStorageGet('ccPaidState', {});
+                    if (state[key]) { delete state[key]; } else { state[key] = true; }
+                    localStorage.setItem('ccPaidState', JSON.stringify(state));
+                    populateCreditCards();
+                });
+            }
+
             creditCardsGrid.appendChild(cardBox);
         });
     }
@@ -1145,8 +1262,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     </div>
                     <p class="remaining-tenure-display">${loan.monthsRemaining > 0 ? `${loan.monthsRemaining} months left (Total: ${loan.tenureMonths})` : 'Completed'}</p>
-                    <p class="next-emi-date">Next EMI: <span>${sanitize(loan.nextEmiDate)}</span></p>
-                    <p class="due-countdown ${loan.dueCountdownClass}">${sanitize(loan.dueCountdown)}</p>`;
+                    <p class="next-emi-date">Next EMI: <span>${sanitize(loan.nextEmiDate)}</span></p>`;
 
                 const forecloseButton = document.createElement('button');
                 forecloseButton.classList.add('foreclose-button');
@@ -1262,22 +1378,38 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!topLoansList) return;
         topLoansList.innerHTML = '';
-        sortedLoans.forEach(loan => {
+        sortedLoans.forEach((loan, idx) => {
             const item = document.createElement('li');
             item.classList.add('top-loan-item');
+            item.style.fontFamily = "'Space Grotesk', system-ui, -apple-system, sans-serif";
+            const remaining = (100 - loan.progressPercentage).toFixed(1);
+            const almostDone = loan.progressPercentage >= 90;
             item.innerHTML = `
-                <div class="top-loan-header">
-                    <span class="top-loan-bank">${sanitize(loan.bankName)}</span>
-                    <span class="top-loan-emi">EMI: ₹<span>${loan.emi.toLocaleString('en-IN')}</span></span>
+                <div class="tl-top">
+                    <span class="tl-rank">${idx + 1}</span>
+                    <span class="tl-bank">${sanitize(loan.bankName)}</span>
+                    <span class="tl-months-badge">${loan.monthsRemaining} ${loan.monthsRemaining === 1 ? 'month' : 'months'} left</span>
                 </div>
-                <div class="top-loan-details">
-                    <span><span>${loan.monthsRemaining} months</span> Remaining /</span>
-                    <span class="top-loan-amount">Outstanding: ₹<span>${loan.currentRemainingAmount.toLocaleString('en-IN')}</span></span>
-                </div>
-                <div class="top-loan-progress-container">
-                    <div class="top-loan-progress-bar" style="width:${loan.progressPercentage}%;">
-                        <span class="top-loan-progress-text">${loan.progressPercentage.toFixed(1)}% Paid</span>
+                <div class="tl-stats">
+                    <div class="tl-stat">
+                        <div class="tl-stat-label">EMI</div>
+                        <div class="tl-stat-val tl-accent">₹${loan.emi.toLocaleString('en-IN')}</div>
                     </div>
+                    <div class="tl-stat">
+                        <div class="tl-stat-label">Outstanding</div>
+                        <div class="tl-stat-val">₹${loan.currentRemainingAmount.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div class="tl-stat">
+                        <div class="tl-stat-label">Paid</div>
+                        <div class="tl-stat-val">${loan.progressPercentage.toFixed(1)}%</div>
+                    </div>
+                </div>
+                <div class="tl-bar-wrap">
+                    <div class="tl-bar-fill${almostDone ? ' tl-bar-done' : ''}" style="width:${loan.progressPercentage}%;"></div>
+                </div>
+                <div class="tl-bar-meta">
+                    <span>${remaining}% remaining</span>
+                    ${almostDone ? '<span class="tl-done-label">Almost done!</span>' : ''}
                 </div>`;
             topLoansList.appendChild(item);
         });
@@ -1781,19 +1913,7 @@ document.addEventListener('DOMContentLoaded', function () {
             container.appendChild(row);
         });
 
-        if (tipEl && loansWithPct.length >= 1) {
-            const { loan: top, interestPct: topPct } = loansWithPct[0];
-            tipEl.hidden = false;
-            // SECURITY FIX: textContent, not innerHTML
-            tipEl.textContent = '';
-            const icon = document.createElement('i');
-            icon.className = 'fas fa-crosshairs';
-            icon.setAttribute('aria-hidden', 'true');
-            tipEl.appendChild(icon);
-            tipEl.appendChild(document.createTextNode(
-                ` Attack first: ${top.bankName} ${top.description} — ${topPct.toFixed(1)}% of total payments is pure interest.`
-            ));
-        }
+        if (tipEl) tipEl.hidden = true;
     }
 
     // ============================================================
@@ -2080,21 +2200,13 @@ document.addEventListener('DOMContentLoaded', function () {
         tipBox.style.top  = `${y}px`;
     }
 
-    function renderCashflowCalendar() {
-        const calEl     = document.getElementById('cashflow-calendar');
-        const labelEl   = document.getElementById('cashflow-month-label');
-        const summaryEl = document.getElementById('cashflow-summary');
-        if (!calEl || !labelEl) return;
-
-        const year  = cashflowDate.getFullYear();
-        const month = cashflowDate.getMonth();
-        labelEl.textContent = cashflowDate.toLocaleString('default', { month: 'long', year: 'numeric' });
-
+    // Build emiMap for any given year/month offset from cashflowDate
+    function buildEmiMapForOffset(offsetMonths) {
+        const d = new Date(cashflowDate.getFullYear(), cashflowDate.getMonth() + offsetMonths, 1);
+        const year  = d.getFullYear();
+        const month = d.getMonth();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const firstDow    = new Date(year, month, 1).getDay();
-
-        // Build EMI map
-        const emiMap = {};
+        const map = {};
         currentLoanData.forEach(loan => {
             if (loan.monthsRemaining <= 0) return;
             const loanStart = new Date(
@@ -2111,10 +2223,259 @@ document.addEventListener('DOMContentLoaded', function () {
             if (emiDay < 1 || emiDay > daysInMonth) return;
             const emiDate = new Date(year, month, emiDay);
             if (emiDate >= loanStart && emiDate <= loanEnd) {
-                if (!emiMap[emiDay]) emiMap[emiDay] = [];
-                emiMap[emiDay].push(loan);
+                if (!map[emiDay]) map[emiDay] = [];
+                map[emiDay].push(loan);
             }
         });
+        return { map, year, month, daysInMonth };
+    }
+
+    function emiMapTotal(map) {
+        return Object.values(map).flat().reduce((s, l) => s + l.emi, 0);
+    }
+
+    function renderMomTrend(currentTotal) {
+        const trendEl = document.getElementById('cashflow-mom-trend');
+        if (!trendEl) return;
+
+        const prevData = buildEmiMapForOffset(-1);
+        const nextData = buildEmiMapForOffset(+1);
+        const prevTotal = emiMapTotal(prevData.map);
+        const nextTotal = emiMapTotal(nextData.map);
+
+        const maxVal = Math.max(prevTotal, currentTotal, nextTotal, 1);
+
+        const fmtMonth = (year, month) => new Date(year, month, 1).toLocaleString('default', { month: 'short', year: '2-digit' });
+        const fmtAmt   = v => v > 0 ? `₹${(v/1000).toFixed(1)}k` : '—';
+
+        const delta = (curr, prev) => {
+            if (!prev || !curr) return '';
+            const pct = Math.round(((curr - prev) / prev) * 100);
+            if (Math.abs(pct) < 1) return `<span class="cf-mom-delta flat">= same</span>`;
+            return pct > 0
+                ? `<span class="cf-mom-delta up">▲ ${pct}%</span>`
+                : `<span class="cf-mom-delta down">▼ ${Math.abs(pct)}%</span>`;
+        };
+
+        const makeRow = (label, val, max, extraClass, badgeHtml) => {
+            const pct = max > 0 ? Math.round((val / max) * 100) : 0;
+            return `<div class="cf-mom-row ${extraClass}">
+                <span class="cf-mom-month">${label}</span>
+                <div class="cf-mom-bar-wrap"><div class="cf-mom-bar" style="width:${pct}%"></div></div>
+                <span class="cf-mom-amount">${fmtAmt(val)}</span>
+                <span class="cf-mom-badge-wrap">${badgeHtml}</span>
+            </div>`;
+        };
+
+        const prevBadge = prevTotal > 0
+            ? `<span class="cf-mom-delta paid"><i class="fas fa-check-circle"></i> Paid</span>`
+            : `<span class="cf-mom-delta flat">—</span>`;
+
+        trendEl.innerHTML =
+            makeRow(fmtMonth(prevData.year, prevData.month), prevTotal, maxVal, 'cf-mom-prev', prevBadge) +
+            makeRow(fmtMonth(cashflowDate.getFullYear(), cashflowDate.getMonth()), currentTotal, maxVal, 'cf-mom-current', delta(currentTotal, prevTotal) || '<span class="cf-mom-delta flat">—</span>') +
+            makeRow(fmtMonth(nextData.year, nextData.month), nextTotal, maxVal, 'cf-mom-next', delta(nextTotal, currentTotal) || '<span class="cf-mom-delta flat">—</span>');
+    }
+
+    function renderTracker(emiMap) {
+        const el = document.getElementById('cashflow-tracker');
+        if (!el) return;
+
+        const today     = new Date();
+        const todayYear  = today.getFullYear();
+        const todayMonth = today.getMonth();
+        const todayDay   = today.getDate();
+
+        const viewYear   = cashflowDate.getFullYear();
+        const viewMonth  = cashflowDate.getMonth();
+
+        const isThisMonth = (viewYear === todayYear && viewMonth === todayMonth);
+        const isFuture    = (viewYear > todayYear) || (viewYear === todayYear && viewMonth > todayMonth);
+
+        const allLoans  = Object.entries(emiMap); // [[day, loans[]], ...]
+        const grandTotal = allLoans.flatMap(([,l]) => l).reduce((s,l) => s + l.emi, 0);
+
+        if (!grandTotal) {
+            el.innerHTML = '<div style="text-align:center;color:var(--bank-muted);font-size:0.82rem;padding:16px 0"><i class="fas fa-check-circle"></i> No EMIs this month</div>';
+            return;
+        }
+
+        if (isFuture) {
+            // Future month — just show total, no split
+            el.innerHTML = `
+                <div class="cf-tracker-split">
+                    <div class="cf-tracker-box full">
+                        <span class="cf-tracker-box-label"><i class="fas fa-calendar-alt"></i> Total Due</span>
+                        <span class="cf-tracker-box-amount">₹${grandTotal.toLocaleString('en-IN')}</span>
+                        <span class="cf-tracker-box-sub">${allLoans.length} EMI date${allLoans.length !== 1 ? 's' : ''}</span>
+                    </div>
+                </div>
+                <div class="cf-tracker-caption">Viewing a future month</div>`;
+            return;
+        }
+
+        if (!isThisMonth) {
+            // Past month — everything cleared
+            const totalCount = allLoans.flatMap(([,l]) => l).length;
+            el.innerHTML = `
+                <div class="cf-tracker-split">
+                    <div class="cf-tracker-box cleared" style="grid-column:1/-1">
+                        <span class="cf-tracker-box-label"><i class="fas fa-check-double"></i> All Cleared</span>
+                        <span class="cf-tracker-box-amount">₹${grandTotal.toLocaleString('en-IN')}</span>
+                        <span class="cf-tracker-box-sub">${totalCount} EMI${totalCount !== 1 ? 's' : ''} · past month</span>
+                    </div>
+                </div>
+                <div class="cf-tracker-bar-wrap"><div class="cf-tracker-bar-fill" style="width:100%"></div></div>
+                <div class="cf-tracker-caption"><strong>100%</strong> cleared</div>`;
+            return;
+        }
+
+        // Current month — split by today's date
+        let cleared = 0, clearedCount = 0;
+        let pending = 0, pendingCount = 0;
+
+        allLoans.forEach(([dayStr, loans]) => {
+            const day = parseInt(dayStr);
+            const amt = loans.reduce((s,l) => s + l.emi, 0);
+            if (day < todayDay) {
+                cleared     += amt;
+                clearedCount += loans.length;
+            } else {
+                pending     += amt;
+                pendingCount += loans.length;
+            }
+        });
+
+        const clearedPct = grandTotal > 0 ? Math.round((cleared / grandTotal) * 100) : 0;
+        const daysLeft   = new Date(cashflowDate.getFullYear(), cashflowDate.getMonth() + 1, 0).getDate() - todayDay;
+
+        el.innerHTML = `
+            <div class="cf-tracker-split">
+                <div class="cf-tracker-box cleared">
+                    <span class="cf-tracker-box-label"><i class="fas fa-check"></i> Cleared</span>
+                    <span class="cf-tracker-box-amount">₹${cleared.toLocaleString('en-IN')}</span>
+                    <span class="cf-tracker-box-sub">${clearedCount} EMI${clearedCount !== 1 ? 's' : ''} past</span>
+                </div>
+                <div class="cf-tracker-box pending">
+                    <span class="cf-tracker-box-label"><i class="fas fa-clock"></i> Remaining</span>
+                    <span class="cf-tracker-box-amount">₹${pending.toLocaleString('en-IN')}</span>
+                    <span class="cf-tracker-box-sub">${pendingCount} EMI${pendingCount !== 1 ? 's' : ''} ahead</span>
+                </div>
+            </div>
+            <div class="cf-tracker-bar-wrap">
+                <div class="cf-tracker-bar-fill" style="width:${clearedPct}%"></div>
+            </div>
+            <div class="cf-tracker-caption">
+                <strong>${clearedPct}%</strong> Cleared
+                ${daysLeft > 0 ? ` · <strong>${daysLeft}</strong> days left in ${cashflowDate.toLocaleString('default', { month: 'long' })}` : ' · Last day of month'}
+            </div>`;
+    }
+
+    function renderEfficiencyGauge(emiMap) {
+        var bodyEl = document.getElementById('cashflow-gauge-body');
+        if (!bodyEl) return;
+
+        var viewYear  = cashflowDate.getFullYear();
+        var viewMonth = cashflowDate.getMonth();
+        var activeLoanSet = new Set(Object.values(emiMap).flat());
+
+        var totalEmi = 0, totalInterest = 0, totalPrincipal = 0;
+
+        activeLoanSet.forEach(function(loan) {
+            var loanStart = new Date(
+                parseInt(loan.rowElement.dataset.startYear),
+                parseInt(loan.rowElement.dataset.startMonth) - 1,
+                parseInt(loan.rowElement.dataset.startDay) || 1
+            );
+            var monthsElapsed = (viewYear - loanStart.getFullYear()) * 12
+                + (viewMonth - loanStart.getMonth());
+            var mPaid = Math.max(0, Math.min(monthsElapsed, loan.tenureMonths));
+            var monthlyRate = loan.annualInterestRate / 1200;
+            var remainingP;
+            if (monthlyRate === 0) {
+                remainingP = Math.max(0, loan.principalAmount - (loan.principalAmount / loan.tenureMonths) * mPaid);
+            } else {
+                var factor = Math.pow(1 + monthlyRate, mPaid);
+                remainingP = Math.max(0, loan.principalAmount * factor - (loan.emi / monthlyRate) * (factor - 1));
+            }
+            var interestThisMonth  = Math.round(remainingP * monthlyRate);
+            var principalThisMonth = Math.max(0, loan.emi - interestThisMonth);
+            totalEmi       += loan.emi;
+            totalInterest  += interestThisMonth;
+            totalPrincipal += principalThisMonth;
+        });
+
+        if (!totalEmi) {
+            bodyEl.innerHTML = '<div class="cf-gauge-empty"><i class="fas fa-check-circle"></i> No active EMIs this month</div>';
+            return;
+        }
+
+        totalInterest  = Math.min(totalInterest,  totalEmi);
+        totalPrincipal = Math.min(totalPrincipal, totalEmi);
+
+        var principalPct = Math.round((totalPrincipal / totalEmi) * 100);
+        var interestPct  = 100 - principalPct;
+        var fmt2 = function(v) { return '\u20B9' + v.toLocaleString('en-IN'); };
+
+        var qualityLabel, qualityClass;
+        if (principalPct >= 70) {
+            qualityLabel = 'Excellent \u2014 most payment builds equity';
+            qualityClass = 'cf-gauge-quality excellent';
+        } else if (principalPct >= 50) {
+            qualityLabel = 'Good \u2014 over half is reducing your debt';
+            qualityClass = 'cf-gauge-quality good';
+        } else if (principalPct >= 30) {
+            qualityLabel = 'Fair \u2014 interest is still the bigger share';
+            qualityClass = 'cf-gauge-quality fair';
+        } else {
+            qualityLabel = 'Early stage \u2014 most payment is interest for now';
+            qualityClass = 'cf-gauge-quality early';
+        }
+
+        bodyEl.innerHTML =
+            '<div class="cf-gauge-total">' +
+                '<span class="cf-gauge-total-label">This Month\'s Total</span>' +
+                '<span class="cf-gauge-total-amount">' + fmt2(totalEmi) + '</span>' +
+            '</div>' +
+            '<div class="cf-gauge-bar-wrap" role="img" aria-label="Principal ' + principalPct + '%, Interest ' + interestPct + '%">' +
+                '<div class="cf-gauge-bar-principal" style="width:' + principalPct + '%"></div>' +
+                '<div class="cf-gauge-bar-interest" style="width:' + interestPct + '%"></div>' +
+            '</div>' +
+            '<div class="cf-gauge-legend">' +
+                '<div class="cf-gauge-legend-item">' +
+                    '<span class="cf-gauge-legend-dot principal-dot"></span>' +
+                    '<div class="cf-gauge-legend-text">' +
+                        '<span class="cf-gauge-legend-label">Principal</span>' +
+                        '<span class="cf-gauge-legend-amount principal-amount">' + fmt2(totalPrincipal) + '</span>' +
+                        '<span class="cf-gauge-legend-pct">' + principalPct + '%</span>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="cf-gauge-divider"></div>' +
+                '<div class="cf-gauge-legend-item">' +
+                    '<span class="cf-gauge-legend-dot interest-dot"></span>' +
+                    '<div class="cf-gauge-legend-text">' +
+                        '<span class="cf-gauge-legend-label">Interest</span>' +
+                        '<span class="cf-gauge-legend-amount interest-amount">' + fmt2(totalInterest) + '</span>' +
+                        '<span class="cf-gauge-legend-pct">' + interestPct + '%</span>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="' + qualityClass + '">' +
+                '<i class="fas fa-info-circle" aria-hidden="true"></i> ' + qualityLabel +
+            '</div>';
+    }
+
+    function renderCashflowCalendar() {
+        const calEl     = document.getElementById('cashflow-calendar');
+        const labelEl   = document.getElementById('cashflow-month-label');
+        if (!calEl || !labelEl) return;
+
+        const year  = cashflowDate.getFullYear();
+        const month = cashflowDate.getMonth();
+        labelEl.textContent = cashflowDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+        const { map: emiMap, daysInMonth } = buildEmiMapForOffset(0);
+        const firstDow = new Date(year, month, 1).getDay();
 
         const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
         let html = '<div class="cal-grid">';
@@ -2143,11 +2504,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>`
             ).join('');
             const tooltipTotal = emis.length > 1
-                ? `<div class="cal-tip-total">Total: ₹${totalEmi.toLocaleString('en-IN')}</div>`
+                ? `<div class="cal-tip-total"><span>Total</span><span>₹${totalEmi.toLocaleString('en-IN')}</span></div>`
                 : '';
             const monthShort = cashflowDate.toLocaleString('default', { month: 'short' });
             const tooltipHtml = hasEmi
-                ? `<div class="cal-tip-header">${day} ${monthShort} — ${emis.length} EMI${emis.length > 1 ? 's' : ''}</div>${tooltipLines}${tooltipTotal}`
+                ? `<div class="cal-tip-header"><span>${day} ${monthShort}</span><span>${emis.length} EMI${emis.length > 1 ? 's' : ''}</span></div>${tooltipLines}${tooltipTotal}`
                 : '';
 
             html += `<div class="${cellClass}" data-cal-tip="${hasEmi ? encodeURIComponent(tooltipHtml) : ''}">
@@ -2192,14 +2553,10 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
-        // Summary
-        if (!summaryEl) return;
-        const dangerDays = Object.entries(emiMap).filter(([, l]) => l.length >= 2);
-        const totalMonthEmi = Object.values(emiMap).flat().reduce((s, l) => s + l.emi, 0);
-        const emiDaysSorted = Object.keys(emiMap).map(Number).sort((a, b) => a - b);
-
-        // Big stats bar below month nav
+        // ── Stats bar ──────────────────────────────────────────────
         const statsEl = document.getElementById('cashflow-month-stats');
+        const totalMonthEmi  = emiMapTotal(emiMap);
+        const emiDaysSorted  = Object.keys(emiMap).map(Number).sort((a, b) => a - b);
         if (statsEl) {
             statsEl.innerHTML = `
                 <div class="cashflow-stat-item">
@@ -2213,21 +2570,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>`;
         }
 
-        // Danger days below calendar
-        summaryEl.innerHTML = '';
-        if (dangerDays.length) {
-            const makeRow = (label, value, danger = false) => {
-                const row = document.createElement('div');
-                row.className = `cashflow-summary-row${danger ? ' danger-row' : ''}`;
-                row.innerHTML = `<span>${label}</span><strong>${value}</strong>`;
-                summaryEl.appendChild(row);
-            };
-            const dangerList = dangerDays.map(([d, loans]) => {
-                const suffix = formatDateSuffix(parseInt(d));
-                return `${d}${suffix} (${loans.length} EMIs, ₹${loans.reduce((s,l) => s + l.emi, 0).toLocaleString('en-IN')})`;
-            }).join('; ');
-            makeRow('⚠️ Danger days', dangerList, true);
-        }
+        // ── Right-column panels ────────────────────────────────────
+        renderMomTrend(totalMonthEmi);
+        renderTracker(emiMap);
+        renderEfficiencyGauge(emiMap);
     }
 
     document.getElementById('cashflow-prev')?.addEventListener('click', () => {
